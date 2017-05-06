@@ -1,0 +1,60 @@
+exportClasses(
+    TReNA,
+    NullFilter,
+    VarianceFilter,
+    FootprintFilter)
+
+export(
+    TReNA,
+    Solver,
+    BayesSpikeSolver,
+    EnsembleSolver,
+    LassoPVSolver,
+    LassoSolver,
+    PearsonSolver,
+    RandomForestSolver,
+    RidgeSolver,
+    SpearmanSolver,
+    SqrtLassoSolver,
+    CandidateFilter,
+    FootprintFilter,
+    NullFilter,
+    VarianceFilter,
+    FootprintFinder
+)
+
+exportMethods(
+    closeDatabaseConnections,
+    getCandidates,
+    getAssayData,
+    getFilterAssayData,
+    getChromLoc,
+    getFootprintsForGene,
+    getFootprintsInRegion,
+    getGenePromoterRegion,
+    getGtfGeneBioTypes,
+    getGtfMoleculeTypes,
+    getPromoterRegionsAllGenes,
+    getSolverName,
+    getSolverObject,
+    mapMotifsToTFsMergeIntoTable,
+    rescalePredictorWeights,
+    solve
+)
+
+import(
+    DBI,
+    doParallel,
+    flare,
+    foreach,
+    glmnet,
+    lassopv,
+    methods,
+    randomForest,
+    vbsr
+)
+
+importFrom(RSQLite, SQLite)
+importFrom(RPostgreSQL, PostgreSQL)
+importFrom(GenomicRanges, makeGRangesFromDataFrame)
+importFrom(utils, head)
