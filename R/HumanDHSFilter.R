@@ -1,3 +1,5 @@
+#' @include CandidateFilter.R
+
 #----------------------------------------------------------------------------------------------------
 .HumanDHSFilter <- setClass("HumanDHSFilter",
                             contains="CandidateFilter",

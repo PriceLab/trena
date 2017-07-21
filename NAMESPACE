@@ -3,11 +3,9 @@ exportClasses(
     VarianceFilter,
     MotifMatcher,
     FootprintFilter,
-    NullFilter,
     HumanDHSFilter,
     GeneOntologyFilter,
     RandomForestSolver)
-
 
 export(
     TReNA,
@@ -26,16 +24,9 @@ export(
     MotifMatcher,
     FootprintFilter,
     HumanDHSFilter,
-    NullFilter,
     VarianceFilter,
     GeneOntologyFilter,
     FootprintFinder,
-    getTargetGene,
-    getCandidateFilterSpec,
-    getSolverSpec,
-    getVariants,
-    getGenome,
-    getMinid,
     run,
     show
 )
