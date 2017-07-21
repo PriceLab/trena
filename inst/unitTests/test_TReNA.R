@@ -1,4 +1,4 @@
-library(TReNA)
+library(trena)
 library(RUnit)
 #----------------------------------------------------------------------------------------------------
 printf <- function(...) print(noquote(sprintf(...)))

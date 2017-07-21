@@ -1,2 +1,2 @@
-require(TReNA) || stop("unable to load TReNA Package")
-BiocGenerics:::testPackage('TReNA')
+require(trena) || stop("unable to load trena Package")
+BiocGenerics:::testPackage('trena')

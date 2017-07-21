@@ -1,4 +1,4 @@
-library(TReNA)
+library(trena)
 library(RUnit)
 library(RPostgreSQL)
 #----------------------------------------------------------------------------------------------------
@@ -22,16 +22,16 @@ runTests <- function()
 test_.parseDatabaseUri <- function()
 {
    printf("--- test_.parseDatabaseUri")
-   db.address <- system.file(package="TReNA", "extdata")
+   db.address <- system.file(package="trena", "extdata")
    genome.db.uri <- paste("sqlite:/",db.address,"genome.sub.db", sep = "/")
    project.db.uri <- paste("sqlite:/",db.address,"project.sub.db", sep = "/")
 
-   x <- TReNA:::.parseDatabaseUri(genome.db.uri)
+   x <- trena:::.parseDatabaseUri(genome.db.uri)
    checkEquals(x$brand, "sqlite")
    checkEquals(x$host,  db.address)
    checkEquals(x$name,  "genome.sub.db")
 
-   x <- TReNA:::.parseDatabaseUri(project.db.uri)
+   x <- trena:::.parseDatabaseUri(project.db.uri)
    checkEquals(x$brand, "sqlite")
    checkEquals(x$host,  db.address)
    checkEquals(x$name,  "project.sub.db")
@@ -42,7 +42,7 @@ test_constructor <- function()
 {
    printf("--- test_constructor")
 
-   db.address <- system.file(package="TReNA", "extdata")
+   db.address <- system.file(package="trena", "extdata")
    genome.db.uri <- paste("sqlite:/",db.address,"genome.sub.db", sep = "/")
    project.db.uri <- paste("sqlite:/",db.address,"project.sub.db", sep = "/")
 
@@ -55,7 +55,7 @@ test_getGtfGeneBioTypes <- function()
 {
    printf("--- test_getGtfGeneBioTypes")
 
-   db.address <- system.file(package="TReNA", "extdata")
+   db.address <- system.file(package="trena", "extdata")
    genome.db.uri <- paste("sqlite:/",db.address,"genome.sub.db", sep = "/")
    project.db.uri <- paste("sqlite:/",db.address,"project.sub.db", sep = "/")
 
@@ -73,7 +73,7 @@ test_getGtfMoleculeTypes <- function()
 {
    printf("--- test_getGtfMoleculeTypes")
 
-   db.address <- system.file(package="TReNA", "extdata")
+   db.address <- system.file(package="trena", "extdata")
    genome.db.uri <- paste("sqlite:/",db.address,"genome.sub.db", sep = "/")
    project.db.uri <- paste("sqlite:/",db.address,"project.sub.db", sep = "/")
 
@@ -93,7 +93,7 @@ test_getChromLoc <- function()
 {
    printf("--- test_getChromLoc")
 
-   db.address <- system.file(package="TReNA", "extdata")
+   db.address <- system.file(package="trena", "extdata")
    genome.db.uri <- paste("sqlite:/",db.address,"genome.sub.db", sep = "/")
    project.db.uri <- paste("sqlite:/",db.address,"project.sub.db", sep = "/")
 
@@ -124,7 +124,7 @@ test_getGenePromoterRegion <- function()
 {
    printf("--- test_getGenePromoterRegion")
 
-   db.address <- system.file(package="TReNA", "extdata")
+   db.address <- system.file(package="trena", "extdata")
    genome.db.uri <- paste("sqlite:/",db.address,"genome.sub.db", sep = "/")
    project.db.uri <- paste("sqlite:/",db.address,"project.sub.db", sep = "/")
 
@@ -184,7 +184,7 @@ test_getFootprintsForGene <- function()
 {
    printf("--- test_getFootprintsForGene")
 
-   db.address <- system.file(package="TReNA", "extdata")
+   db.address <- system.file(package="trena", "extdata")
    genome.db.uri <- paste("sqlite:/",db.address,"genome.sub.db", sep = "/")
    project.db.uri <- paste("sqlite:/",db.address,"project.sub.db", sep = "/")
 
@@ -219,7 +219,7 @@ test_getFootprintsInRegion <- function()
 {
    printf("--- test_getFootprintsInRegion")
 
-   db.address <- system.file(package="TReNA", "extdata")
+   db.address <- system.file(package="trena", "extdata")
    genome.db.uri <- paste("sqlite:/",db.address,"genome.sub.db", sep = "/")
    project.db.uri <- paste("sqlite:/",db.address,"project.sub.db", sep = "/")
 
@@ -244,7 +244,7 @@ test_getFootprintsInRegionWithVariants <- function()
 {
    printf("--- test_getFootprintsInRegionWithVariants")
 
-   db.address <- system.file(package="TReNA", "extdata")
+   db.address <- system.file(package="trena", "extdata")
    genome.db.uri <- paste("sqlite:/",db.address,"genome.sub.db", sep = "/")
    project.db.uri <- paste("sqlite:/",db.address,"project.sub.db", sep = "/")
 
@@ -290,7 +290,7 @@ test_mapMotifsToTFsMergeIntoTable <- function()
 {
     printf("--- test_mapMotifsToTFsMergeIntoTable")
 
-   db.address <- system.file(package="TReNA", "extdata")
+   db.address <- system.file(package="trena", "extdata")
    genome.db.uri <- paste("sqlite:/",db.address,"genome.sub.db", sep = "/")
    project.db.uri <- paste("sqlite:/",db.address,"project.sub.db", sep = "/")
 

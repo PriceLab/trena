@@ -1,4 +1,4 @@
-library(TReNA)
+library(trena)
 library(RUnit)
 #----------------------------------------------------------------------------------------------------
 printf <- function(...) print(noquote(sprintf(...)))
@@ -29,7 +29,7 @@ test_ampAD.mef2c.154tfs.278samples.spearman <- function()
    printf("--- test_ampAD.mef2c.154tfs.278samples.spearman")
 
    # Load matrix and transform via arcsinh
-   load(system.file(package="TReNA", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+   load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
    
    mtx.asinh <- asinh(mtx.sub)
    target.gene <- "MEF2C"

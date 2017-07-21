@@ -1,4 +1,4 @@
-library(TReNA)
+library(trena)
 library(RUnit)
 #----------------------------------------------------------------------------------------------------
 printf <- function(...) print(noquote(sprintf(...)))
@@ -32,7 +32,7 @@ test_ampAD.mef2c.154tfs.278samples.sqrtlasso <- function()
    printf("--- test_ampAD.mef2c.154tfs.278samples.sqrtlasso")
 
    # Load matrix and transform via arcsinh
-   load(system.file(package="TReNA", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))   
+   load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))   
    mtx.asinh <- asinh(mtx.sub)
    target.gene <- "MEF2C"
    # Use only 30 genes
@@ -58,7 +58,7 @@ test_lambda.sqrtlasso <- function()
    printf("--- test_lambda.sqrtlasso")
 
    # Load matrix and transform via arcsinh
-   load(system.file(package="TReNA", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))   
+   load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))   
    mtx.asinh <- asinh(mtx.sub)
    target.gene <- "MEF2C"
    tfs <- setdiff(rownames(mtx.asinh), "MEF2C")
@@ -82,7 +82,7 @@ test_nCores.sqrtlasso <- function()
    printf("--- test_nCores.sqrtlasso")
 
    # Load matrix and transform via arcsinh
-   load(system.file(package="TReNA", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))   
+   load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))   
    mtx.asinh <- asinh(mtx.sub)
    target.gene <- "MEF2C"
    # Use only 30 genes

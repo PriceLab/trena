@@ -1,4 +1,4 @@
-library(TReNA)
+library(trena)
 library(RUnit)
 #----------------------------------------------------------------------------------------------------
 printf <- function(...) print(noquote(sprintf(...)))
@@ -30,7 +30,7 @@ test_ampAD.mef2c.154tfs.278samples.bayesSpike <- function()
    printf("--- test_ampAD.mef2c.154tfs.278samples.bayesSpike")
 
    set.seed(12415)
-   load(system.file(package="TReNA", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+   load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
    
    mtx.asinh <- asinh(mtx.sub)
    target.gene <- "MEF2C"
@@ -56,7 +56,7 @@ test_nOrderings <- function()
    printf("--- test_nOrderings")
 
    set.seed(12415)
-   load(system.file(package="TReNA", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+   load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
    
    mtx.asinh <- asinh(mtx.sub)
    target.gene <- "MEF2C"

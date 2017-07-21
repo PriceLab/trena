@@ -1,4 +1,4 @@
-library(TReNA)
+library(trena)
 library(RUnit)
 #----------------------------------------------------------------------------------------------------
 printf <- function(...) print(noquote(sprintf(...)))
@@ -34,7 +34,7 @@ test_ampAD.mef2c.154tfs.278samples.ensemble <- function()
 
    set.seed(122113)
    # Load matrix and transform via arcsinh
-   load(system.file(package="TReNA", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+   load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
     mtx.asinh <- asinh(mtx.sub)
    #print(fivenum(mtx.asinh)  # [1] 0.000000 1.327453 3.208193 4.460219 7.628290)
 
@@ -58,7 +58,7 @@ test_selectedSolversOnly <- function()
 
    set.seed(122113)
    # Load matrix and transform via arcsinh
-   load(system.file(package="TReNA", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))   
+   load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))   
    mtx.asinh <- asinh(mtx.sub)
    #print(fivenum(mtx.asinh)  # [1] 0.000000 1.327453 3.208193 4.460219 7.628290)
 

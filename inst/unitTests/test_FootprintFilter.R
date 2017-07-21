@@ -1,4 +1,4 @@
-library(TReNA)
+library(trena)
 library(RUnit)
 #----------------------------------------------------------------------------------------------------
 printf <- function(...) print(noquote(sprintf(...)))
@@ -16,7 +16,7 @@ test_FootprintFilter.geneCentered <- function()
 {
    printf("--- test_FootprintFilter.geneCentered")
 
-   db.address <- system.file(package="TReNA", "extdata")
+   db.address <- system.file(package="trena", "extdata")
    genome.db.uri    <- paste("sqlite:/", db.address, "genome.sub.db",  sep = "/")
    footprint.db.uri <- paste("sqlite:/", db.address, "project.sub.db", sep = "/")
    target.gene <- "MEF2C"
@@ -53,7 +53,7 @@ test_FootprintFilter.byRegion <- function()
 {
    printf("--- test_FootprintFilter.byRegion")
 
-   db.address <- system.file(package="TReNA", "extdata")
+   db.address <- system.file(package="trena", "extdata")
    genome.db.uri    <- paste("sqlite:/", db.address, "genome.sub.db",  sep = "/")
    footprint.db.uri <- paste("sqlite:/", db.address, "project.sub.db", sep = "/")
    #target.gene <- "MEF2C"
@@ -93,7 +93,7 @@ test_FootprintFilter.byTwoRegions <- function()
 {
    printf("--- test_FootprintFilter.byTwoRegions")
 
-   db.address <- system.file(package="TReNA", "extdata")
+   db.address <- system.file(package="trena", "extdata")
    genome.db.uri    <- paste("sqlite:/", db.address, "genome.sub.db",  sep = "/")
    footprint.db.uri <- paste("sqlite:/", db.address, "project.sub.db", sep = "/")
 
@@ -137,7 +137,7 @@ test_FootprintFilter.geneCenteredPlusRegion <- function()
 {
    printf("--- test_FootprintFilter.geneCenteredPlusRegion")
 
-   db.address <- system.file(package="TReNA", "extdata")
+   db.address <- system.file(package="trena", "extdata")
    genome.db.uri    <- paste("sqlite:/", db.address, "genome.sub.db",  sep = "/")
    footprint.db.uri <- paste("sqlite:/", db.address, "project.sub.db", sep = "/")
    target.gene <- "MEF2C"

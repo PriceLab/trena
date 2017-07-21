@@ -1,4 +1,4 @@
-library(TReNA)
+library(trena)
 library(MotifDb)
 library(RUnit)
 #----------------------------------------------------------------------------------------------------
@@ -41,11 +41,11 @@ test_.matchPwmForwardAndReverse <- function()
 
    sequence <- "TTGTCTAATTTGCATGCTGGT"
 
-   tbl.1 <- TReNA:::.matchPwmForwardAndReverse(sequence, mtx.1, motifName.1, min.match.percentage=90, quiet=TRUE)
+   tbl.1 <- trena:::.matchPwmForwardAndReverse(sequence, mtx.1, motifName.1, min.match.percentage=90, quiet=TRUE)
    checkEquals(nrow(tbl.1), 1)
    checkEquals(colnames(tbl.1),
                c("start","end","width","score","maxScore","relativeScore","motif","match","strand"))
-   tbl.2 <- TReNA:::.matchPwmForwardAndReverse(sequence, mtx.2, motifName.2, min.match.percentage=60, quiet=TRUE)
+   tbl.2 <- trena:::.matchPwmForwardAndReverse(sequence, mtx.2, motifName.2, min.match.percentage=60, quiet=TRUE)
    checkEquals(nrow(tbl.2), 4)
    checkEquals(colnames(tbl.2),
                c("start","end","width","score","maxScore","relativeScore","motif","match","strand"))
@@ -57,14 +57,14 @@ test_.getScoredMotifs <- function()
    printf("--- test_.getScoredMotifs")
    seqs <- test_getSequence(indirect=TRUE)
 
-   motifs <- TReNA:::.getScoredMotifs(seqs, min.match.percentage=80)  # relatexed threshold
+   motifs <- trena:::.getScoredMotifs(seqs, min.match.percentage=80)  # relatexed threshold
    checkEquals(unlist(lapply(motifs, nrow)), c(2, 0, 20))
    checkEquals(colnames(motifs[[1]]),
                         c("start", "end", "width", "score", "maxScore", "relativeScore", "motif", "match", "strand"))
    checkEquals(colnames(motifs[[3]]),
                         c("start", "end", "width", "score", "maxScore", "relativeScore", "motif", "match", "strand"))
 
-   motifs <- TReNA:::.getScoredMotifs(seqs, min.match.percentage=100)  # nigh impossible threshold
+   motifs <- trena:::.getScoredMotifs(seqs, min.match.percentage=100)  # nigh impossible threshold
    checkEquals(unlist(lapply(motifs, nrow)), c(0, 0, 0))
 
 } # test_.getScoredMotifs
@@ -101,7 +101,7 @@ test_.parseVariantString <- function()
 {
    mm <- MotifMatcher(name="rs13384219.neighborhood", genomeName="hg38")
 
-   tbl.variant <- TReNA:::.parseVariantString(mm, "rs13384219")
+   tbl.variant <- trena:::.parseVariantString(mm, "rs13384219")
    checkEquals(dim(tbl.variant), c(1, 4))
    checkEquals(tbl.variant$chrom, "chr2")
    checkEquals(tbl.variant$loc, 57907323)
@@ -109,28 +109,28 @@ test_.parseVariantString <- function()
    checkEquals(tbl.variant$mut, "G")
 
        # the same snp, but here expressed as a string (not an rsid)
-   tbl.v2 <- TReNA:::.parseVariantString(mm, "chr2:57907323:A:G")
+   tbl.v2 <- trena:::.parseVariantString(mm, "chr2:57907323:A:G")
    checkEquals(dim(tbl.v2), c(1, 4))
    checkEquals(tbl.v2$chrom, "chr2")
    checkEquals(tbl.v2$loc, 57907323)
    checkEquals(tbl.v2$wt, "A")
    checkEquals(tbl.v2$mut, "G")
 
-   tbl.2vars <- TReNA:::.parseVariantString(mm, "rs3763040:A")  # snp with two variant alleles; one must be specified
+   tbl.2vars <- trena:::.parseVariantString(mm, "rs3763040:A")  # snp with two variant alleles; one must be specified
    checkEquals(dim(tbl.2vars), c(1,4))
    checkEquals(tbl.2vars$chrom, "chr18")
    checkEquals(tbl.2vars$loc, 26864410)
    checkEquals(tbl.2vars$wt, "G")
    checkEquals(tbl.2vars$mut, "A")
 
-   tbl.2vars <- TReNA:::.parseVariantString(mm, "rs3763040:T")  # snp with two variant alleles; one must be specified
+   tbl.2vars <- trena:::.parseVariantString(mm, "rs3763040:T")  # snp with two variant alleles; one must be specified
    checkEquals(dim(tbl.2vars), c(1,4))
    checkEquals(tbl.2vars$chrom, "chr18")
    checkEquals(tbl.2vars$loc, 26864410)
    checkEquals(tbl.2vars$wt, "G")
    checkEquals(tbl.2vars$mut, "T")
 
-   tbl.2vars <- TReNA:::.parseVariantString(mm, "rs3763040")  # snp with two variant alleles; first is chosen by default
+   tbl.2vars <- trena:::.parseVariantString(mm, "rs3763040")  # snp with two variant alleles; first is chosen by default
    checkEquals(dim(tbl.2vars), c(1,4))
    checkEquals(tbl.2vars$chrom, "chr18")
    checkEquals(tbl.2vars$loc, 26864410)
@@ -139,7 +139,7 @@ test_.parseVariantString <- function()
 
       # now fail on purpose, explictly specifying an alt allele not include in the snp
    checkException(
-      tbl.2vars <- TReNA:::.parseVariantString(mm, "rs3763040:C"),
+      tbl.2vars <- trena:::.parseVariantString(mm, "rs3763040:C"),
       "caught!", silent=TRUE)
 
 } # test_.parseVariantString
@@ -154,7 +154,7 @@ test_.injectSnp <- function()
    checkEquals(tbl.regions$seq, "CATGCAAATTA")
 
    tbl.variants <- data.frame(chrom="chr2", loc=57907323, wt="A", mut="G", stringsAsFactors=FALSE)
-   tbl.regions.new <- TReNA:::.injectSnp(tbl.regions, tbl.variants)
+   tbl.regions.new <- trena:::.injectSnp(tbl.regions, tbl.variants)
    checkEquals(dim(tbl.regions.new), c(1, 5))
    checkEquals(tbl.regions.new$seq, "CATGCGAATTA")
    checkEquals(tbl.regions.new$status, "mut")
@@ -169,7 +169,7 @@ test_.injectSnp <- function()
    #   checkEquals(tbl.regions$status, "wt")
    #
    #   tbl.variants <- data.frame(chrom=rep("chr18",2), loc=rep(26864410,2), wt=rep("G",2) , mut=c("A", "T"),stringsAsFactors=FALSE)
-   #   tbl.regions.new <- TReNA:::.injectSnp(tbl.regions, tbl.variants)
+   #   tbl.regions.new <- trena:::.injectSnp(tbl.regions, tbl.variants)
    #   checkEquals(dim(tbl.regions.new), c(2, 5))
    #     #                                      |
    #   checkEquals(tbl.regions.new$seq, c("ACAGGAGGGTG",
@@ -180,7 +180,7 @@ test_.injectSnp <- function()
    #      # that same snp but with a region that does not containt it
    #   tbl.regions <- data.frame(chrom="chr2", start=26864405, end=26864415, seq="ACAGGGGGGTG",stringsAsFactors=FALSE)
    #   tbl.variants <- data.frame(chrom=rep("chr18",2), loc=rep(26864410,2), wt=rep("G",2) , mut=c("A", "T"),stringsAsFactors=FALSE)
-   #   tbl.regions.new <- TReNA:::.injectSnp(tbl.regions, tbl.variants)
+   #   tbl.regions.new <- trena:::.injectSnp(tbl.regions, tbl.variants)
    #   checkEquals(tbl.regions, tbl.regions.new)
    #
    #      # now with one overlapping region, two non-overlapping
@@ -190,7 +190,7 @@ test_.injectSnp <- function()
    #                             seq=c("CTAGCCCTTAG", "ACAGGGGGGTG","CTCTAGAGGAA"),
    #                             stringsAsFactors=FALSE)
    #   tbl.variants <- data.frame(chrom=rep("chr18",2), loc=rep(26864410,2), wt=rep("G",2) , mut=c("A", "T"),stringsAsFactors=FALSE)
-   #   tbl.regions.new <- TReNA:::.injectSnp(tbl.regions, tbl.variants)
+   #   tbl.regions.new <- trena:::.injectSnp(tbl.regions, tbl.variants)
    #   checkEquals(dim(tbl.regions.new), c(4, 5))
    #   checkEquals(tbl.regions.new$chrom, rep("chr18", 4))
    #   checkEquals(tbl.regions.new$start, c(26864305, 26864405, 26864405, 26864505))
@@ -209,7 +209,7 @@ test_.injectSnp <- function()
    tbl.regions.noSeq <- data.frame(chrom="chr18", start=26865463, end=26865472, stringsAsFactors=FALSE)
    tbl.regions <- getSequence(mm, tbl.regions.noSeq)
 
-   tbl.regions.new <- TReNA:::.injectSnp(tbl.regions, tbl.variants)
+   tbl.regions.new <- trena:::.injectSnp(tbl.regions, tbl.variants)
       #                                 |  |
    checkEquals(tbl.regions$seq,     "AAAGCATCCC")
    checkEquals(tbl.regions.new$seq, "AAACCACCCC")

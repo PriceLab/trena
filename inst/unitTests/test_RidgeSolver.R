@@ -1,4 +1,4 @@
-library(TReNA)
+library(trena)
 library(RUnit)
 #----------------------------------------------------------------------------------------------------
 printf <- function(...) print(noquote(sprintf(...)))
@@ -33,7 +33,7 @@ test_ampAD.mef2c.154tfs.278samples.ridge <- function()
    printf("--- test_ampAD.mef2c.154tfs.278samples.ridge")
 
    # Load matrix and transform via arcsinh
-   load(system.file(package="TReNA", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+   load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
    mtx.asinh <- asinh(mtx.sub)
    target.gene <- "MEF2C"
    tfs <- setdiff(rownames(mtx.asinh), "MEF2C")
@@ -55,7 +55,7 @@ test_alpha.ridge <- function()
    printf("--- test_alpha.ridge")
 
    # Load matrix and transform via arcsinh
-   load(system.file(package="TReNA", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+   load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
    mtx.asinh <- asinh(mtx.sub)
    target.gene <- "MEF2C"
    tfs <- setdiff(rownames(mtx.asinh), "MEF2C")
@@ -83,7 +83,7 @@ test_lambda.ridge <- function()
    printf("--- test_lambda.ridge")
 
    # Load matrix and transform via arcsinh
-   load(system.file(package="TReNA", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+   load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
    mtx.asinh <- asinh(mtx.sub)
    target.gene <- "MEF2C"
    tfs <- setdiff(rownames(mtx.asinh), "MEF2C")
@@ -109,7 +109,7 @@ test_keep.metrics.ridge <- function()
    printf("--- test_keep.metrics.ridge")
 
    # Load matrix and transform via arcsinh
-   load(system.file(package="TReNA", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+   load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
    mtx.asinh <- asinh(mtx.sub)
    target.gene <- "MEF2C"
    tfs <- setdiff(rownames(mtx.asinh), "MEF2C")

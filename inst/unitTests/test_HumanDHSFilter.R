@@ -1,4 +1,4 @@
-library(TReNA)
+library(trena)
 library(MotifDb)
 library(RUnit)
 #----------------------------------------------------------------------------------------------------
@@ -306,7 +306,7 @@ test_getRegulatoryRegions <- function()
    tableNames <- getEncodeRegulatoryTableNames(hdf)
    table <- "wgEncodeRegDnaseClustered"
    checkTrue(table %in% tableNames)
-   x <- TReNA:::.parseChromLocString(candidateFilterSpec$regionsSpec)
+   x <- trena:::.parseChromLocString(candidateFilterSpec$regionsSpec)
 
    tbl.regions <-getRegulatoryRegions(hdf, table, x$chrom, x$start, x$end)
 
@@ -466,7 +466,7 @@ test_.matchForwardAndReverse <- function()
    tbl.regions <- data.frame(chrom=chrom, chromStart=start, chromEnd=end, stringsAsFactors=FALSE)
    sequence <- getSequence(hdf, tbl.regions)
 
-   tbl <- TReNA:::.matchForwardAndReverse(sequence, mtx, motifName, min.match.percentage=90, quiet=TRUE)
+   tbl <- trena:::.matchForwardAndReverse(sequence, mtx, motifName, min.match.percentage=90, quiet=TRUE)
 
    checkEquals(nrow(tbl), 1)
    checkEquals(tbl$start, 57)
@@ -480,7 +480,7 @@ test_.matchForwardAndReverse <- function()
    motifName <- "MA0478.1"
    mtx <- query(MotifDb, motifName)[[1]];
 
-   tbl <- TReNA:::.matchForwardAndReverse(sequence, mtx, motifName, min.match.percentage=90, quiet=TRUE)
+   tbl <- trena:::.matchForwardAndReverse(sequence, mtx, motifName, min.match.percentage=90, quiet=TRUE)
       # fimo finds:
       #  X.pattern.name sequence.name start stop strand   score  p.value q.value matched.sequence
       #        MA0478.1        ma0478    58   68      - 14.5455 1.21e-05   0.006      GCATGACTCAG
@@ -504,7 +504,7 @@ test_.matchForwardAndReverse <- function()
                                   strand="-"))
 
         # now relax the score threshold
-   tbl <- TReNA:::.matchForwardAndReverse(sequence, mtx, motifName, min.match.percentage=80, quiet=TRUE)
+   tbl <- trena:::.matchForwardAndReverse(sequence, mtx, motifName, min.match.percentage=80, quiet=TRUE)
    tbl$score         <- round(tbl$score, 2)
    tbl$maxScore      <- round(tbl$maxScore, 2)
    tbl$relativeScore <- round(tbl$relativeScore, 2)
@@ -525,7 +525,7 @@ test_.findMofits <- function()
    printf("--- test_.findMotifs")
    x <- .findMotifs("ACTATTCCCCT", pfms, 90)
    seqs <- test_getSequence()
-   motifs <- TReNA:::.getScoredMotifs(seqs, min.match.percentage=95)
+   motifs <- trena:::.getScoredMotifs(seqs, min.match.percentage=95)
    checkEquals(unlist(lapply(motifs, nrow)), c(2, 4, 3))
 
 } # test_.findMotifs
@@ -534,7 +534,7 @@ test_.getScoredMotifs <- function()
 {
    printf("--- test_.getScoredMotifs")
    seqs <- test_getSequence()
-   motifs <- TReNA:::.getScoredMotifs(seqs, min.match.percentage=95)
+   motifs <- trena:::.getScoredMotifs(seqs, min.match.percentage=95)
    checkEquals(unlist(lapply(motifs, nrow)), c(2, 4, 3))
 
 } # test_.getScoredMotifs
@@ -562,7 +562,7 @@ test_vrk2Promoter.incrementally <- function()
    seqs <-getSequence(df, tbl.regions)
    checkEquals(with(tbl.regions, 1 + chromEnd - chromStart), nchar(seqs))  #  231 391
 
-   motifs <- TReNA:::.getScoredMotifs(seqs, min.match.percentage=95)
+   motifs <- trena:::.getScoredMotifs(seqs, min.match.percentage=95)
    checkEquals(unlist(lapply(motifs, dim)), c(8,9,8,9))   # both
 
 } # test_vrk2Promoter.incrementally
@@ -836,7 +836,7 @@ test_rs34423320 <- function()
    printf("--- test_rs34423320")
      # chr1 167830170 167830170  rs34423320-C-T
 
-   load(system.file(package="TReNA", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+   load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
    checkTrue(exists("mtx.sub"))
    hdcf <- HumanDHSFilter("hg38", mtx.sub)
 
@@ -864,12 +864,12 @@ test_rs34423320 <- function()
    seq.wt <-  as.character(getSeq(reference.genome, "chr1", 167830170-10, 167830170+10))
    seq.mut <- sprintf("%s%s%s", substr(seq.wt, 1, 10), "T", substr(seq.wt, 12, 21))
 
-   TReNA:::.findMotifs(seq.wt, hdcf@pfms["MA0081.1"], 90)
-   TReNA:::.findMotifs(seq.wt, hdcf@pfms["MA0056.1"], 90)
-   TReNA:::.findMotifs(seq.mut, hdcf@pfms["MA0081.1"], 90)
-   TReNA:::.findMotifs(seq.mut, hdcf@pfms["MA0056.1"], 90)
+   trena:::.findMotifs(seq.wt, hdcf@pfms["MA0081.1"], 90)
+   trena:::.findMotifs(seq.wt, hdcf@pfms["MA0056.1"], 90)
+   trena:::.findMotifs(seq.mut, hdcf@pfms["MA0081.1"], 90)
+   trena:::.findMotifs(seq.mut, hdcf@pfms["MA0056.1"], 90)
 
-   TReNA:::.getScoredMotifs(list(seq.wt, seq.mut), min.match.percentage=90, quiet=TRUE)
+   trena:::.getScoredMotifs(list(seq.wt, seq.mut), min.match.percentage=90, quiet=TRUE)
 
 } # test_rs34423320
 #----------------------------------------------------------------------------------------------------
