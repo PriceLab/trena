@@ -28,7 +28,7 @@ Using the gtf table in the genome database contained in a FootprintFinder object
 of chromasomes with the specified gene name, biological unit type, and molecule type
 }
 \examples{
-db.address <- system.file(package="TReNA", "extdata")
+db.address <- system.file(package="trena", "extdata")
 genome.db.uri <- paste("sqlite:/",db.address,"genome.sub.db", sep = "/")
 project.db.uri <- paste("sqlite:/",db.address,"project.sub.db", sep = "/")
 fp <- FootprintFinder(genome.db.uri, project.db.uri)

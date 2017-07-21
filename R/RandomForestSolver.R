@@ -97,7 +97,7 @@ setMethod('show', 'RandomForestSolver',
 #'
 #' @examples
 #' # Load included Alzheimer's data, create a TReNA object with Random Forest as solver, and solve
-#' load(system.file(package="TReNA", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+#' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
 #' trena <- TReNA(mtx.assay = mtx.sub, solver = "randomForest")
 #' targetGene <- "MEF2C"
 #' candidateRegulators <- setdiff(rownames(mtx.sub), targetGene)

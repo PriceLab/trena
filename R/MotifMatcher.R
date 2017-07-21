@@ -87,7 +87,7 @@ setMethod("findMatchesByChromosomalRegion", "MotifMatcher",
        tbl.out <- tbl.out[, desired.column.order]
        tbl.out <- tbl.out[order(tbl.out$motifScore, decreasing=TRUE),]
            # tbl.mg will soon come from MotifDb
-       tbl.mg <- read.table(system.file(package="TReNA", "extdata", "motifGenes.tsv"), sep="\t", as.is=TRUE, header=TRUE)
+       tbl.mg <- read.table(system.file(package="trena", "extdata", "motifGenes.tsv"), sep="\t", as.is=TRUE, header=TRUE)
        tfs.by.motif <- lapply(tbl.out$motifName, function(m) subset(tbl.mg, motif==m)$tf.gene)
        all.tfs <- sort(unique(unlist(tfs.by.motif)))
        tfs.by.motif.joined <- unlist(lapply(tfs.by.motif, function(m) paste(m, collapse=";")))

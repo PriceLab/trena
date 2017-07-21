@@ -33,7 +33,7 @@ printf <- function(...) print(noquote(sprintf(...)))
 #' @family Filtering Objects
 #'
 #' @examples
-#' load(system.file(package="TReNA", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+#' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
 #' null.filter <- NullFilter(mtx.assay = mtx.sub)
 
 NullFilter <- function(mtx.assay=matrix(), quiet = TRUE)
@@ -58,7 +58,7 @@ NullFilter <- function(mtx.assay=matrix(), quiet = TRUE)
 #' @examples
 #'
 #' # Using the included Alzheimer's data, return all transcription factors as candidates
-#' load(system.file(package="TReNA", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+#' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
 #' null.filter <- NullFilter(mtx.assay=mtx.sub)
 #' tfs <- getCandidates(null.filter)
 

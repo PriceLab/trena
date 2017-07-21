@@ -31,7 +31,7 @@ This method should be called using the \code{\link{solve}} method on an appropri
 }
 \examples{
 # Load included Alzheimer's data, create an Ensemble object with default solvers, and solve
-load(system.file(package="TReNA", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
 target.gene <- "MEF2C"
 tfs <- setdiff(rownames(mtx.sub), target.gene)
 ensemble.solver <- EnsembleSolver(mtx.sub, target.gene, tfs)

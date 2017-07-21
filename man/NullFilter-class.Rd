@@ -25,7 +25,7 @@ A NullFilter object allows for "filtering" of the genes in an assay matrix. Its 
 \code{getCandidates} method returns the list of transcription factors included in the assay matrix.
 }
 \examples{
-load(system.file(package="TReNA", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
 null.filter <- NullFilter(mtx.assay = mtx.sub)
 }
 \seealso{

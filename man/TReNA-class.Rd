@@ -55,12 +55,12 @@ samples for a group of genes, and a string representing the name of a chosen sol
 \examples{
 
 # Create a LassoSolver object using the included Alzheimer's data and retrieve the solver name
-load(system.file(package="TReNA", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
 solver <- TReNA(mtx.sub, solver = "lasso")
 mtx <- getSolverName(solver)
 
 # Create a LassoSolver object using the included Alzheimer's data and retrieve the solver object
-load(system.file(package="TReNA", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
 solver <- TReNA(mtx.sub, solver = "lasso")
 mtx <- getSolverObject(solver)
 }

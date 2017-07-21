@@ -228,7 +228,7 @@ setMethod("closeDatabaseConnections", "FootprintFinder",
 #' database.
 #'
 #' @examples
-#' db.address <- system.file(package="TReNA", "extdata")
+#' db.address <- system.file(package="trena", "extdata")
 #' genome.db.uri <- paste("sqlite:/",db.address,"genome.sub.db", sep = "/")
 #' project.db.uri <- paste("sqlite:/",db.address,"project.sub.db", sep = "/")
 #' fp <- FootprintFinder(genome.db.uri, project.db.uri)
@@ -260,7 +260,7 @@ setMethod("getGtfGeneBioTypes", "FootprintFinder",
 #' database.
 #'
 #' @examples
-#' db.address <- system.file(package="TReNA", "extdata")
+#' db.address <- system.file(package="trena", "extdata")
 #' genome.db.uri <- paste("sqlite:/",db.address,"genome.sub.db", sep = "/")
 #' project.db.uri <- paste("sqlite:/",db.address,"project.sub.db", sep = "/")
 #' fp <- FootprintFinder(genome.db.uri, project.db.uri)
@@ -296,7 +296,7 @@ setMethod("getGtfMoleculeTypes", "FootprintFinder",
 #' chr, start, endpos, strand
 #'
 #' @examples
-#' db.address <- system.file(package="TReNA", "extdata")
+#' db.address <- system.file(package="trena", "extdata")
 #' genome.db.uri <- paste("sqlite:/",db.address,"genome.sub.db", sep = "/")
 #' project.db.uri <- paste("sqlite:/",db.address,"project.sub.db", sep = "/")
 #' fp <- FootprintFinder(genome.db.uri, project.db.uri)
@@ -342,7 +342,7 @@ setMethod("getChromLoc", "FootprintFinder",
 #' 3) end : The ending location of the promoter region for the specified gene
 #'
 #' @examples
-#' db.address <- system.file(package="TReNA", "extdata")
+#' db.address <- system.file(package="trena", "extdata")
 #' genome.db.uri <- paste("sqlite:/",db.address,"genome.sub.db", sep = "/")
 #' project.db.uri <- paste("sqlite:/",db.address,"project.sub.db", sep = "/")
 #' fp <- FootprintFinder(genome.db.uri, project.db.uri)
@@ -401,7 +401,7 @@ setMethod("getGenePromoterRegion", "FootprintFinder",
 #' @family FootprintFinder methods
 #'
 #' @examples
-#' db.address <- system.file(package="TReNA", "extdata")
+#' db.address <- system.file(package="trena", "extdata")
 #' genome.db.uri <- paste("sqlite:/",db.address,"genome.sub.db", sep = "/")
 #' project.db.uri <- paste("sqlite:/",db.address,"project.sub.db", sep = "/")
 #' fp <- FootprintFinder(genome.db.uri, project.db.uri)
@@ -440,7 +440,7 @@ setMethod("getFootprintsForGene", "FootprintFinder",
 #' @return A dataframe containing all footprints for the specified region
 #'
 #' @examples
-#' db.address <- system.file(package="TReNA", "extdata")
+#' db.address <- system.file(package="trena", "extdata")
 #' genome.db.uri <- paste("sqlite:/",db.address,"genome.sub.db", sep = "/")
 #' project.db.uri <- paste("sqlite:/",db.address,"project.sub.db", sep = "/")
 #' fp <- FootprintFinder(genome.db.uri, project.db.uri)
@@ -497,7 +497,7 @@ setMethod("getFootprintsInRegion", "FootprintFinder",
 #' @family FootprintFinder methods
 #'
 #' @examples
-#' db.address <- system.file(package="TReNA", "extdata")
+#' db.address <- system.file(package="trena", "extdata")
 #' genome.db.uri <- paste("sqlite:/",db.address,"genome.sub.db", sep = "/")
 #' project.db.uri <- paste("sqlite:/",db.address,"project.sub.db", sep = "/")
 #' fp <- FootprintFinder(genome.db.uri, project.db.uri)
@@ -567,7 +567,7 @@ setMethod("getPromoterRegionsAllGenes","FootprintFinder",
 #' @family FootprintFinder methods
 #'
 #' @examples
-#' db.address <- system.file(package="TReNA", "extdata")
+#' db.address <- system.file(package="trena", "extdata")
 #' genome.db.uri <- paste("sqlite:/",db.address,"genome.sub.db", sep = "/")
 #' project.db.uri <- paste("sqlite:/",db.address,"project.sub.db", sep = "/")
 #' fp <- FootprintFinder(genome.db.uri, project.db.uri)

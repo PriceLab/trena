@@ -36,7 +36,8 @@ export(
     getVariants,
     getGenome,
     getMinid,
-    run
+    run,
+    show
 )
 
 exportMethods(

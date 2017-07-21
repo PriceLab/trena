@@ -28,7 +28,7 @@ theoretical minimum and maximum value.
 }
 \examples{
 # Create a LassoSolver object using the included Alzheimer's data and rescale the predictors
-load(system.file(package="TReNA", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
 ls <- LassoSolver(mtx.sub)
 raw.values <- c(241, 4739, 9854, 22215, 658334)
 cooked.values <- rescalePredictorWeights(ls, rawValue.min = 1, rawValue.max = 1000000, raw.values)

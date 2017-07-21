@@ -15,7 +15,7 @@ printf <- function(...) print(noquote(sprintf(...)))
 #----------------------------------------------------------------------------------------------------
 GeneOntologyFilter <- function(organismDatabase=org.Hs.eg.db, GOTerm="GO:0006351", quiet=TRUE)
 {
-    data.file <- system.file(package="TReNA", "extdata", "human.regulatory.genes.RData")
+    data.file <- system.file(package="trena", "extdata", "human.regulatory.genes.RData")
     load(data.file)
     .GeneOntologyFilter(organismDatabase=organismDatabase, GOTerm=GOTerm, quiet=quiet)
 

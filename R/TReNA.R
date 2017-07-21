@@ -28,7 +28,7 @@ setGeneric("solve",                    signature="obj", function(obj, target.gen
 #'
 #' @examples
 #' # Create a LassoSolver object using the included Alzheimer's data and retrieve the solver name
-#' load(system.file(package="TReNA", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+#' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
 #' solver <- TReNA(mtx.sub, solver = "lasso")
 #' mtx <- getSolverName(solver)
 #' 
@@ -49,7 +49,7 @@ setGeneric("getSolverName",   signature="obj", function(obj) standardGeneric ("g
 #' @examples
 #'
 #' # Create a LassoSolver object using the included Alzheimer's data and retrieve the solver object
-#' load(system.file(package="TReNA", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+#' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
 #' solver <- TReNA(mtx.sub, solver = "lasso")
 #' mtx <- getSolverObject(solver)
 #' 
@@ -144,7 +144,7 @@ TReNA <- function(mtx.assay=matrix(), solverName="lasso", quiet=TRUE)
 #'
 #' @examples
 #' # Load included Alzheimer's data, create a TReNA object with LASSO as the solver, and solve
-#' load(system.file(package="TReNA", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+#' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
 #' trena <- TReNA(mtx.assay = mtx.sub, solver = "lasso")
 #' target.gene <- "MEF2C"
 #' tfs <- setdiff(rownames(mtx.sub), target.gene)
@@ -164,7 +164,7 @@ setMethod("solve", "TReNA",
 #' @examples
 #'
 #' # Create a LassoSolver object using the included Alzheimer's data and retrieve the solver name
-#' load(system.file(package="TReNA", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+#' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
 #' solver <- TReNA(mtx.sub, solver = "lasso")
 #' mtx <- getSolverName(solver)
 
@@ -181,7 +181,7 @@ setMethod("getSolverName", "TReNA",
 #' @examples
 #'
 #' # Create a LassoSolver object using the included Alzheimer's data and retrieve the solver object
-#' load(system.file(package="TReNA", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+#' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
 #' solver <- TReNA(mtx.sub, solver = "lasso")
 #' mtx <- getSolverObject(solver)
 

@@ -27,11 +27,11 @@ Retrieve the target gene from a Solver object
 }
 \examples{
 # Create a Solver object using the included Alzheimer's data and retrieve the target gene
-load(system.file(package="TReNA", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
 solver <- Solver(mtx.sub)
 mtx <- getTarget(solver) 
 # Create a Solver object using the included Alzheimer's data and retrieve the regulators
-load(system.file(package="TReNA", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
 solver <- Solver(mtx.sub)
 mtx <- getRegulators(solver) 
 }

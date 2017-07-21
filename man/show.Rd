@@ -17,7 +17,7 @@ target gene, and the total number of candidate regulators
 Show a Solver object
 }
 \examples{
-load(system.file(package="TReNA", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
 tfs <- setdiff(rownames(mtx.sub),"MEF2C")
 pearson.solver <- PearsonSolver(mtx.sub, "MEF2C", tfs)
 show(pearson.solver)

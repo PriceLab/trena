@@ -26,7 +26,7 @@ object, return the location, chromasome, starting position, and ending positions
 for the specified region.
 }
 \examples{
-db.address <- system.file(package="TReNA", "extdata")
+db.address <- system.file(package="trena", "extdata")
 genome.db.uri <- paste("sqlite:/",db.address,"genome.sub.db", sep = "/")
 project.db.uri <- paste("sqlite:/",db.address,"project.sub.db", sep = "/")
 fp <- FootprintFinder(genome.db.uri, project.db.uri)

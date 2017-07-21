@@ -27,7 +27,7 @@ Get candidate genes using the variance filter
 
 # Using the included Alzheimer's dataset, filter out only those transcription factors with variance
 # within 50\% of the variance of MEF2C
-load(system.file(package="TReNA", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
 variance.filter <- VarianceFilter(mtx.assay = mtx.sub)
 
 target.gene <- "MEF2C"
