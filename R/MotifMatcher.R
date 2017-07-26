@@ -56,7 +56,7 @@ setMethod("findMatchesByChromosomalRegion", "MotifMatcher",
     function(obj, tbl.regions, pwmMatchMinimumAsPercentage, variants=NA_character_){
        x <- lapply(1:nrow(tbl.regions), function(r) getSequence(obj, tbl.regions[r,], variants))
        tbl.regions <- do.call(rbind, x)
-       tbl.motifs.list <- .getScoredMotifs(tbl.regions$seq, pwmMatchMinimumAsPercentage, obj@quiet)
+       tbl.motifs.list <- .getScoredMotifs(tbl.regions$seq, obj@pfms, pwmMatchMinimumAsPercentage, obj@quiet)
 
        region.count <- nrow(tbl.regions)
        tbl.out <- data.frame()
@@ -191,7 +191,7 @@ setMethod("getPfms", "MotifMatcher",
 
 }  # .findMotifs
 #------------------------------------------------------------------------------------------------------------------------
-.getScoredMotifs <- function(seqs, min.match.percentage=95, quiet=TRUE)
+.getScoredMotifs <- function(seqs, pfms, min.match.percentage=95, quiet=TRUE)
 {
    parseLine <- function(textOfLine) {
       # first delete the leading A, C, G or T.  then the square brackets.  then convert
@@ -238,13 +238,13 @@ setMethod("getPfms", "MotifMatcher",
       invisible (pwms)
    } # readRawJasparMatrices
 
-   if(!exists("pfms")){
-      uri <- "http://jaspar.genereg.net/html/DOWNLOAD/JASPAR_CORE/pfm/nonredundant/pfm_vertebrates.txt"
-      x <- readRawJasparMatrices(uri)
-      # normalize, so that a frequency sum of 1.0 is true across the 4 possible bases at each position
-      pfms <<- lapply(x, function(e) apply(e$matrix, 2, function(col) col/sum(col)))
-      names(pfms) <<- as.character(lapply(x, function(e) e$title))
-      }
+   #if(!exists("pfms")){
+   #   uri <- "http://jaspar.genereg.net/html/DOWNLOAD/JASPAR_CORE/pfm/nonredundant/pfm_vertebrates.txt"
+   #   x <- readRawJasparMatrices(uri)
+   #   # normalize, so that a frequency sum of 1.0 is true across the 4 possible bases at each position
+   #   pfms <<- lapply(x, function(e) apply(e$matrix, 2, function(col) col/sum(col)))
+   #   names(pfms) <<- as.character(lapply(x, function(e) e$title))
+   #   }
 
    result <- lapply(seqs, function(seq) .findMotifs(seq, pfms, min.match.percentage, quiet))
    if(is.null(result))
