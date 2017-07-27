@@ -63,10 +63,8 @@ exportMethods(
 import(
     DBI,
     doParallel,
-    flare,
     foreach,
     glmnet,
-    lassopv,
     methods,
     randomForest,
     vbsr,

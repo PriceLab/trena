@@ -1,15 +1,13 @@
 Package: trena
 Type: Package
 Title: Fit transcriptional regulatory networks using gene expression, priors, machine learning
-Version: 0.99.134
-Date: 2017-07-21
+Version: 0.99.135
+Date: 2017-07-25
 Author: Seth Ament <seth.ament@systemsbiology.org>, Paul Shannon <pshannon@systemsbioloyg.org>, Matthew Richards <mrichard@systemsbiology.org>
 Maintainer: Matthew Richards <mrichard@systemsbiology.org>
 Imports:
     RSQLite,
-    lassopv,
     randomForest,
-    flare,
     vbsr,
     foreach,
     doParallel,
@@ -18,7 +16,7 @@ Imports:
     RMySQL,
     DBI
 Depends:
-    R (>= 3.4.0),
+    R (>= 3.3.2),
     utils,
     glmnet (>= 2.0.3),
     GenomicRanges
