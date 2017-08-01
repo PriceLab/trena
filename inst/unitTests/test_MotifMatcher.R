@@ -3,6 +3,7 @@ library(MotifDb)
 library(RUnit)
 
 #----------------------------------------------------------------------------------------------------
+printf <- function(...) print(noquote(sprintf(...)))
 # the vrk2 promoter snp
 # chr2:57907313-57907333
 sequence <- "ACCAGCATGCAAATTAGACAA"
@@ -518,7 +519,7 @@ test_findMatchesByChromosomalRegion.twoAlternateAlleles <- function()
 test_useMotifDbMatrices <- function()
 {
    printf("--- test_useMotifDbMatrices")
-   mm <- MotifMatcher(name="motifDB.test", genomeName="hg38", pfms=as.list(query(mdb, "sapiens")))
+   mm <- MotifMatcher(name="motifDB.test", genomeName="hg38", pfms=as.list(query(MotifDb, "sapiens")))
    mm <- MotifMatcher(name="motifDB.test", genomeName="hg38", pfms=as.list(query(MotifDb, "MESP1")))
 
      # an alzheimer's-related snp
@@ -530,6 +531,7 @@ test_useMotifDbMatrices <- function()
    tbl <- rbind(x.wt$tbl[, c(1,12, 2,3,4,5,7,8,13)], x.mut$tbl[, c(1,12, 2,3,4,5,7,8,13)])
    tbl <- tbl[order(tbl$motifName, tbl$motifStart, tbl$motifRelativeScore, decreasing=TRUE),]
 
+   ### Is this incomplete??? ###
 
 } # test_useMotifDbMatrices
 #----------------------------------------------------------------------------------------------------

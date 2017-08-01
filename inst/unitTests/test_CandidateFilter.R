@@ -13,8 +13,8 @@ test_CandidateFilter <- function()
 {
     printf("--- test_CandidateFilter")
 
-    # Create a filter with an empty matrix
-    candidate.filter <- CandidateFilter(matrix())
+    # Create an empty filter
+    candidate.filter <- CandidateFilter(quiet = TRUE)
     checkEquals(is(candidate.filter), "CandidateFilter")
 
 } #test_CandidateFilter

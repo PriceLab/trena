@@ -94,7 +94,7 @@ setMethod("getEncodeRegulatoryTableNames", "HumanDHSFilter",
 #----------------------------------------------------------------------------------------------------
 setMethod("show", "HumanDHSFilter",
 
-     function(object){
+     function(obj){
         s <- sprintf("HumanDHSFilter...")
         cat(s, sep="\n")
         })

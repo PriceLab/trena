@@ -14,7 +14,12 @@
 #' @aliases VarianceFilter
 
 #----------------------------------------------------------------------------------------------------
-.VarianceFilter <- setClass("VarianceFilter", contains = "CandidateFilter")
+.VarianceFilter <- setClass("VarianceFilter",
+                            contains = "CandidateFilter",
+                            slots = c(mtx.assay = "matrix",
+                                      targetGene = "character",
+                                      varSize = "numeric")
+                            )
 
 #----------------------------------------------------------------------------------------------------
 printf <- function(...) print(noquote(sprintf(...)))
@@ -22,6 +27,8 @@ printf <- function(...) print(noquote(sprintf(...)))
 #' @rdname VarianceFilter-class
 #'
 #' @param mtx.assay An assay matrix of gene expression data
+#' @param varSize A user-specified fraction (0-1) of the target gene variance to use as a filter
+#' @param targetGene A designated target gene that must be part of the mtx.assay data
 #' @param quiet A logical denoting whether or not the solver should print output
 #'
 #' @return A CandidateFilter class object with variance as the filtering method
@@ -38,9 +45,12 @@ printf <- function(...) print(noquote(sprintf(...)))
 #' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
 #' variance.filter <- VarianceFilter(mtx.assay = mtx.sub)
 
-VarianceFilter <- function(mtx.assay=matrix(), quiet=TRUE)
+VarianceFilter <- function(mtx.assay=matrix(), targetGene, varSize = 0.5, quiet=TRUE)
 {
-    .VarianceFilter(CandidateFilter(mtx.assay = mtx.assay, quiet = quiet))
+    .VarianceFilter(mtx.assay = mtx.assay,
+                    targetGene = targetGene,
+                    varSize = varSize,
+                    quiet = quiet)
 
 } # VarianceFilter, the constructor
 #----------------------------------------------------------------------------------------------------
@@ -49,11 +59,7 @@ VarianceFilter <- function(mtx.assay=matrix(), quiet=TRUE)
 #' @aliases getCandidates-VarianceFilter
 #'
 #' @param obj An object of class VarianceFilter
-#' @param argsList A named list containing two fields:
-#' \itemize{
-#' \item{"target.gene" A designated target gene that should be part of the mtx.assay data}
-#' \item{"var.size" A user-specified percentage (0-1) of the target gene variance to use as a filter}
-#' }
+#' 
 #' @seealso \code{\link{VarianceFilter}}
 #'
 #' @family getCandidate Methods
@@ -65,23 +71,22 @@ VarianceFilter <- function(mtx.assay=matrix(), quiet=TRUE)
 #' # Using the included Alzheimer's dataset, filter out only those transcription factors with variance
 #' # within 50% of the variance of MEF2C
 #' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
-#' variance.filter <- VarianceFilter(mtx.assay = mtx.sub)
-#'
-#' target.gene <- "MEF2C"
-#' tfs <- getCandidates(variance.filter, argsList = list("target.gene" = target.gene, "var.size" = 0.5))
+#' variance.filter <- VarianceFilter(mtx.assay = mtx.sub, targetGene = "MEF2C")
+#' tfs <- getCandidates(variance.filter)
 
 setMethod("getCandidates", "VarianceFilter",
 
-          function(obj,argsList){
+          function(obj){
 
               # Retrive the extra arguments
-              target.gene <- argsList[["target.gene"]]
-              var.size <- argsList[["var.size"]]
+              mtx <- obj@mtx.assay
+              target.gene <- obj@targetGene
+              var.size <- obj@varSize
 
               # Designate the target genes and tfs              
-              tfs <- setdiff(rownames(getFilterAssayData(obj)), target.gene)              
-              tf.mtx <- getFilterAssayData(obj)[-c(which(rownames(getFilterAssayData(obj)) == target.gene)),]              
-              target.mtx <- getFilterAssayData(obj)[which(rownames(getFilterAssayData(obj)) == target.gene),]
+              tfs <- setdiff(rownames(mtx), target.gene)              
+              tf.mtx <- mtx[-c(which(rownames(mtx) == target.gene)),]              
+              target.mtx <- mtx[which(rownames(mtx) == target.gene),]
               
               # Find the variances              
               tf.var <- apply(tf.mtx,1,stats::var)              

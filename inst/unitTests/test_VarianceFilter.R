@@ -15,9 +15,10 @@ test_VarianceFilter <- function()
 
     # Create dummy data and filter it based on variance
     load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
-    var.filter <- VarianceFilter(mtx.assay = mtx.sub)
-    tf.list <- getCandidates(var.filter, extraArgs = list("target.gene" = "MEF2C",
-                                                          "var.size" = 0.5))
+    var.filter <- VarianceFilter(mtx.assay = mtx.sub,
+                                 targetGene ="MEF2C",
+                                 varSize = 0.5)
+    tf.list <- getCandidates(var.filter)
     
     checkTrue(length(tf.list$tfs) == 1)
 

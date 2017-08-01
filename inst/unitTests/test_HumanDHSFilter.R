@@ -2,6 +2,7 @@ library(trena)
 library(MotifDb)
 library(RUnit)
 #----------------------------------------------------------------------------------------------------
+printf <- function(...) print(noquote(sprintf(...)))
 mef2c.tss <- 88904257
 mef2c.promoter.region <- list(chrom="chr5", start=mef2c.tss-100, end=mef2c.tss+100)
 mef2c.promoter.string <- with(mef2c.promoter.region, sprintf("%s:%d-%d", chrom, start, end))

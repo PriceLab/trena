@@ -123,7 +123,7 @@ setMethod("run", "LassoPVSolver",
               target <- as.numeric(mtx[target.gene,])
 
               # Run LASSO P-Value and return the P-values, ordered by increasing value
-              fit <- lassopv(features, target)
+              fit <- lassopv::lassopv(features, target)
               fit <- fit[order(fit, decreasing=FALSE)]
 
               # Add pearson correlations and make a data frame              

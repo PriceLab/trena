@@ -180,7 +180,7 @@ setMethod("run", "SqrtLassoSolver",
                       step.size <- lambda/2 # Start at 0.5
                       while(step.size > lambda.change){
                           # Get the fit
-                          fit <- slim(features, target.mixed, method = "lq", verbose = FALSE, lambda = lambda)
+                          fit <- flare::slim(features, target.mixed, method = "lq", verbose = FALSE, lambda = lambda)
                           # Case 1: nonsense, need to lower lambda
                           if(max(fit$beta) < threshold){
                               lambda <- lambda - step.size
@@ -202,7 +202,7 @@ setMethod("run", "SqrtLassoSolver",
               }              
 
               # Run square root lasso and return an object of class "slim"              
-              fit <- slim(features, target, method = "lq", lambda = lambda, verbose=FALSE)
+              fit <- flare::slim(features, target, method = "lq", lambda = lambda, verbose=FALSE)
               
               # Pull out the coefficients        
               mtx.beta <- as.matrix(fit$beta)

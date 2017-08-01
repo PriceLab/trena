@@ -3,6 +3,8 @@
 library(trena)
 library(RUnit)
 #----------------------------------------------------------------------------------------------------
+printf <- function(...) print(noquote(sprintf(...)))
+#----------------------------------------------------------------------------------------------------
 # Run All Tests
 runTests <- function() {
   test_NaiveSolverConstructor()
@@ -21,7 +23,7 @@ test_NaiveSolverConstructor <- function() {
   
   checkEquals(class(solver)[1], "NaiveSolver")    
   checkTrue(all(c("NaiveSolver", "Solver") %in% is(solver)))
-}
+} # test_NaiveSolverConstructor
 #----------------------------------------------------------------------------------------------------
 # MEF2C Data Test
 test_ampAD.mef2c.154tfs.278samples.naive <- function() {
@@ -41,4 +43,6 @@ test_ampAD.mef2c.154tfs.278samples.naive <- function() {
   checkTrue(max(tbl$beta) < 0.3)
   checkTrue(min(tbl$p.value) > 1e-14)
   checkTrue(max(tbl$p.value) < 1e-01)
-}
+} # test_ampAD.mef2c.154tfs.278samples.naive
+#----------------------------------------------------------------------------------------------------
+if(!interactive()) runTests()
