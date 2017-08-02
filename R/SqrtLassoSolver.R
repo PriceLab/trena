@@ -2,7 +2,7 @@
 #' An S4 class to represent a Square Root LASSO solver
 #'
 #' @import flare
-#' @import doParallel
+#' @import BiocParallel
 #' @import foreach
 #' @import methods
 #' 
@@ -170,11 +170,20 @@ setMethod("run", "SqrtLassoSolver",
                   threshold <- 1E-15
                   lambda.change <- 10^(-4)
                   lambda <- 1
+
+                  # Register a BiocParallel instance based on platform
+                  if(Sys.info()['sysname'] == "Windows"){
+                      BiocParallel::register(BiocParallel::SnowParam(workers = nCores,
+                                                                     stop.on.error = FALSE,
+                                                                     log = FALSE),
+                                             default = TRUE)                      
+                  } else{                  
+                      BiocParallel::register(BiocParallel::MulticoreParam(workers = nCores,
+                                                                          stop.on.error = FALSE,
+                                                                          log = FALSE),                                             
+                                             default = TRUE)}                  
                   
-                  cl <- parallel::makeCluster(nCores)
-                  doParallel::registerDoParallel(cl)
-                  
-                  lambda.list <- foreach::foreach(i = 1:30) %dopar% {
+                  lambda.list <- BiocParallel::bplapply(rep(lambda,30), function(lambda){
 
                       # Do a binary search
                       step.size <- lambda/2 # Start at 0.5
@@ -194,10 +203,12 @@ setMethod("run", "SqrtLassoSolver",
                           target.mixed <- sample(target)
                       }
                       lambda
-                  }
+                  })
+
+                  # Could potentially stop the cluster here
+                  
                   # Grab the lambdas and average them
-                  lambda.list <- unlist(lambda.list)                  
-                  parallel::stopCluster(cl)                  
+                  lambda.list <- unlist(lambda.list)                                                   
                   lambda <- mean(lambda.list) + (stats::sd(lambda.list)/sqrt(length(lambda.list)))                                 
               }              
 

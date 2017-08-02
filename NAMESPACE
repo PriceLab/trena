@@ -57,8 +57,7 @@ exportMethods(
 
 import(
     DBI,
-    doParallel,
-    foreach,
+    BiocParallel,
     glmnet,
     methods,
     randomForest,
