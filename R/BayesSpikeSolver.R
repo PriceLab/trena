@@ -117,7 +117,6 @@ setMethod("run", "BayesSpikeSolver",
       if(rowMeans(mtx)[target.gene] < stats::quantile(rowMeans(mtx), probs = 0.1)){                   
           warning("Target gene mean expression is in the bottom 10% of all genes in the assay matrix")         
       }           
-      
       # we don't try to handle tf self-regulation      
       deleters <- grep(target.gene, tfs)      
       if(length(deleters) > 0){          

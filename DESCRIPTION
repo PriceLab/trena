@@ -15,7 +15,7 @@ Imports:
     RMySQL,
     DBI
 Depends:
-    R (>= 3.3.2),
+    R (>= 3.4.0),
     utils,
     glmnet (>= 2.0.3),
     GenomicRanges

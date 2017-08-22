@@ -64,6 +64,8 @@ import(
     vbsr,
     GenomicRanges,
     BSgenome
+    flare,
+    lassopv
 )
 
 importFrom(RSQLite, SQLite)
