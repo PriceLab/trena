@@ -63,7 +63,7 @@ import(
     randomForest,
     vbsr,
     GenomicRanges,
-    BSgenome
+    BSgenome,
     flare,
     lassopv
 )

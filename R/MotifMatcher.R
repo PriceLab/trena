@@ -45,7 +45,7 @@ MotifMatcher <- function(name=NA_character_,
 #------------------------------------------------------------------------------------------------------------------------
 setMethod("show", "MotifMatcher",
 
-     function(object){
+     function(obj){
         s <- sprintf("MotifMatcher...")
         cat(s, sep="\n")
      })

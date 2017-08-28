@@ -8,10 +8,15 @@
 \alias{VarianceFilter}
 \title{Create a VarianceFilter object}
 \usage{
-VarianceFilter(mtx.assay = matrix(), quiet = TRUE)
+VarianceFilter(mtx.assay = matrix(), targetGene, varSize = 0.5,
+  quiet = TRUE)
 }
 \arguments{
 \item{mtx.assay}{An assay matrix of gene expression data}
+
+\item{targetGene}{A designated target gene that must be part of the mtx.assay data}
+
+\item{varSize}{A user-specified fraction (0-1) of the target gene variance to use as a filter}
 
 \item{quiet}{A logical denoting whether or not the solver should print output}
 }

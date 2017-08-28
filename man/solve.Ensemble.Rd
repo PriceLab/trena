@@ -57,6 +57,5 @@ Other solver methods: \code{\link{run,BayesSpikeSolver-method}},
   \code{\link{run,RandomForestSolver-method}},
   \code{\link{run,RidgeSolver-method}},
   \code{\link{run,SpearmanSolver-method}},
-  \code{\link{run,SqrtLassoSolver-method}},
-  \code{\link{solve,TReNA-method}}
+  \code{\link{run,SqrtLassoSolver-method}}
 }
