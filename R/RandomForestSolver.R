@@ -15,7 +15,7 @@
 #' Create a Solver class object using the Random Forest solver
 #'
 #' @param mtx.assay An assay matrix of gene expression data
-#' @param target.gene A designated target gene that should be part of the mtx.assay data
+#' @param targetGene A designated target gene that should be part of the mtx.assay data
 #' @param candidateRegulators The designated set of transcription factors that could be associated
 #' with the target gene
 #' @param regulatorWeights A set of weights on the transcription factors
@@ -31,7 +31,10 @@
 #' @export
 #'
 #' @examples
-#' solver <- RandomForestSolver()
+#' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+#' targetGene <- "MEF2C"
+#' candidateRegulators <- setdiff(rownames(mtx.sub), targetGene)
+#' rf.solver <- RandomForestSolver(mtx.sub, targetGene, candidateRegulators)
 
 RandomForestSolver <- function(mtx.assay=matrix(), targetGene, candidateRegulators,
                                regulatorWeights=rep(1, length(candidateRegulators)),
@@ -82,12 +85,8 @@ setMethod('show', 'RandomForestSolver',
 #' Given a TReNA object with RandomForest as the solver, use the \code{\link{randomForest}} function
 #' to estimate coefficients for each transcription factor as a predictor of the target gene's
 #' expression level.
-#' This method should be called using the \code{\link{solve}} method on an appropriate TReNA object.
+#' 
 #' @param obj An object of class TReNA with "randomForest" as the solver string
-#' @param targetGene A designated target gene that should be part of the mtx.assay data
-#' @param candidateRegulators The designated set of transcription factors that could be associated with the target gene.
-#' @param tf.weights A set of weights on the transcription factors (default = rep(1, length(candidateRegulators)))
-#' @param extraArgs Modifiers to the Random Forest solver
 #'
 #' @return A list containing various parameters of the Random Forest fit.
 #'
@@ -98,10 +97,10 @@ setMethod('show', 'RandomForestSolver',
 #' @examples
 #' # Load included Alzheimer's data, create a TReNA object with Random Forest as solver, and solve
 #' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
-#' trena <- TReNA(mtx.assay = mtx.sub, solver = "randomForest")
 #' targetGene <- "MEF2C"
 #' candidateRegulators <- setdiff(rownames(mtx.sub), targetGene)
-#' tbl <- solve(trena, targetGene, candidateRegulators)
+#' rf.solver <- RandomForestSolver(mtx.sub, targetGene, candidateRegulators)
+#' tbl <- solve(rf.solver)
 
 
 setMethod("run", "RandomForestSolver",

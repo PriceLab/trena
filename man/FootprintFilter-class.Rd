@@ -5,10 +5,42 @@
 \alias{FootprintFilter-class}
 \alias{.FootprintFilter}
 \alias{FootprintFilter}
+\alias{FootprintFilter}
 \title{Create a FootprintFilter object}
+\usage{
+FootprintFilter(genomeDB, footprintDB, geneCenteredSpec = list(),
+  regionsSpec = list(), quiet = TRUE)
+}
+\arguments{
+\item{genomeDB}{A connection to a database that contains genome information}
+
+\item{footprintDB}{A connection to a database that contains footprint information}
+
+\item{geneCenteredSpec}{\itemize{
+\item{"target.gene" A designated target gene that should be part of the mtx.assay data}
+\item{"size.upstream" An integer denoting the distance upstream of the target gene to look for footprints}
+\item{"size.downstream" An integer denoting the distance downstream of the target gene to look for footprints}
+}}
+
+\item{regionsSpec}{}
+
+\item{quiet}{A logical denoting whether or not the filter should print output}
+}
+\value{
+An object of the FootprintFilter class
+}
 \description{
 A FootprintFilter object allows for filtering based on gene footprinting databases. Using its
 associated \code{getCandidates} method and URIs for both a genome database and project database,
 a FootprintFilter object can be used to filter a list of possible transcription factors to those
 that match footprint motifs for a supplied target gene.
+}
+\examples{
+load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+footprint.filter <- FootprintFilter()
+}
+\seealso{
+\code{\link{getCandidates-FootprintFilter}}, \code{\link{getFilterAssayData}}
+
+Other Filtering Objects: \code{\link{VarianceFilter-class}}
 }

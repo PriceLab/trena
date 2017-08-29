@@ -2,27 +2,17 @@
 % Please edit documentation in R/Solver.R
 \name{getTarget}
 \alias{getTarget}
-\alias{getRegulators}
-\alias{getTarget}
 \title{Retrieve the target gene from a Solver object}
 \usage{
 getTarget(obj)
-
-getRegulators(obj)
 }
 \arguments{
-\item{obj}{An object of class Solver}
-
 \item{obj}{An object of class Solver}
 }
 \value{
 The target gene associated with a Solver object
-
-The target gene associated with a Solver object
 }
 \description{
-Retrieve the target gene from a Solver object
-
 Retrieve the target gene from a Solver object
 }
 \examples{
@@ -30,8 +20,4 @@ Retrieve the target gene from a Solver object
 load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
 solver <- Solver(mtx.sub)
 mtx <- getTarget(solver) 
-# Create a Solver object using the included Alzheimer's data and retrieve the regulators
-load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
-solver <- Solver(mtx.sub)
-mtx <- getRegulators(solver) 
 }

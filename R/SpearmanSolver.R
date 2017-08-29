@@ -12,7 +12,7 @@
 #' Create a Solver class object using Spearman correlation coefficients as the solver
 #'
 #' @param mtx.assay An assay matrix of gene expression data
-#' @param target.gene A designated target gene that should be part of the mtx.assay data
+#' @param targetGene A designated target gene that should be part of the mtx.assay data
 #' @param candidateRegulators The designated set of transcription factors that could be associated
 #' with the target gene
 #' @param quiet A logical denoting whether or not the solver should print output
@@ -26,7 +26,10 @@
 #' @export
 #' 
 #' @examples
-#' solver <- SpearmanSolver()
+#' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+#' target.gene <- "MEF2C"
+#' tfs <- setdiff(rownames(mtx.sub), target.gene)
+#' spearman.solver <- SpearmanSolver(mtx.sub, target.gene, tfs)
 
 SpearmanSolver <- function(mtx.assay = matrix(), targetGene, candidateRegulators, quiet=TRUE)
 {
@@ -97,7 +100,7 @@ setMethod('show', 'SpearmanSolver',
 
 setMethod("run", "SpearmanSolver",
 
-          function (obj, target.gene, tfs, tf.weights=rep(1,length(tfs)), extraArgs=list()){
+          function (obj){
 
               mtx <- getAssayData(obj)
               target.gene <- getTarget(obj)

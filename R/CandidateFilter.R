@@ -4,7 +4,6 @@
 #' @rdname CandidateFilter-class
 #' @aliases CandidateFilter
 #'
-#' @slot mtx.assay An assay matrix of gene expression data
 #' @slot quiet A logical denoting whether or not the CandidateFilter object should print output
 #'
 #' @family Filtering objects
@@ -40,10 +39,8 @@ setGeneric("getCandidates", signature="obj", function(obj, ...) standardGeneric(
 #'
 #' @examples
 #'
-#' # Create a CandidateFilter object using the included Alzheimer's data and retrieve the matrix
-#' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
-#' my.filter <- CandidateFilter(mtx.sub)
-#' mtx <- getFilterAssayData(my.filter)
+#' # Create an empty CandidateFilter object
+#' my.filter <- CandidateFilter()
 
 #' @export
 #' 
@@ -57,7 +54,6 @@ setGeneric("getFilterAssayData",    signature="obj", function(obj) standardGener
 #' @rdname CandidateFilter-class
 #' @aliases CandidateFilter
 #'
-#' @param mtx.assay An assay matrix of gene expression data
 #' @param quiet A logical denoting whether or not the CandidateFilter object should print output
 #'
 #' @return An object of the Candidate filter class
@@ -68,28 +64,11 @@ setGeneric("getFilterAssayData",    signature="obj", function(obj) standardGener
 #'
 #' @examples
 #' # Create an empty candidate filter
-#' candidate.filter <- CandidateFilter(mtx.assay = matrix(), quiet=TRUE)
+#' candidate.filter <- CandidateFilter(quiet=TRUE)
 
 CandidateFilter <- function(quiet = TRUE)
 {
     .CandidateFilter(quiet = quiet)
 
 } # CandidateFilter, the constructor
-#----------------------------------------------------------------------------------------------------
-#' @describeIn CandidateFilter Retrieve the assay matrix of gene expression data
-#'
-#' @param obj An object of a CandidateFilter class
-#'
-#' @examples
-#'
-#' # Create a CandidateFilter object using the included Alzheimer's data and retrieve the matrix
-#' load(system.file(package="TReNA", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
-#' my.filter <- CandidateFilter(mtx.sub)
-#' mtx <- getFilterAssayData(my.filter)
-
-setMethod("getFilterAssayData", "CandidateFilter",
-
-   function (obj){
-      obj@mtx.assay
-      })
 #----------------------------------------------------------------------------------------------------

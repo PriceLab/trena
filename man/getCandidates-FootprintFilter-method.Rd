@@ -10,15 +10,6 @@
 }
 \arguments{
 \item{obj}{An object of class FootprintFilter}
-
-\item{extraArgs}{A named list containing 5 fields:
-\itemize{
-\item{"target.gene" A designated target gene that should be part of the mtx.assay data}
-\item{"genome.db.uri" A connection to a genome database containing footprint information}
-\item{"project.db.uri" A connection to a project database containing footprint information}
-\item{"size.upstream" An integer denoting the distance upstream of the target gene to look for footprints}
-\item{"size.downstream" An integer denoting the distance downstream of the target gene to look for footprints}
-}}
 }
 \value{
 A vector containing all genes with variances less than the target gene
@@ -30,17 +21,17 @@ Get candidate genes using the variance filter
 
 # Use footprint filter with the included SQLite database for MEF2C to filter candidates
 # in the included Alzheimer's dataset
-load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
-footprint.filter <- FootprintFilter(mtx.assay = mtx.sub)
-
 target.gene <- "MEF2C"
 db.address <- system.file(package="trena", "extdata")
 genome.db.uri <- paste("sqlite:/",db.address,"genome.sub.db", sep = "/")
 project.db.uri <- paste("sqlite:/",db.address,"project.sub.db", sep = "/")
+size.upstream <- 1000
+size.downstream <- 1000
+geneCenteredSpec <- list(targetGene = target.gene, tssUpstream = size.upstream, tssDownstream = size.downstream)
+footprint.filter <- FootprintFilter(genomeDB = genome.db.uri, footprintDB = project.db.uri,
+geneCenteredSpec = geneCenteredSpec)
 
-tfs <- getCandidates(footprint.filter, extraArgs = list("target.gene" = target.gene,
-"genome.db.uri" = genome.db.uri, "project.db.uri" = project.db.uri,
-"size.upstream" = 1000, "size.downstream" = 1000))
+tfs <- getCandidates(footprint.filter)
 }
 \seealso{
 \code{\link{FootprintFilter}}

@@ -7,8 +7,7 @@
 \alias{solve.Spearman}
 \title{Run the Spearman Solver}
 \usage{
-\S4method{run}{SpearmanSolver}(obj, target.gene, tfs, tf.weights = rep(1,
-  length(tfs)), extraArgs = list())
+\S4method{run}{SpearmanSolver}(obj)
 }
 \arguments{
 \item{obj}{An object of class SpearmanSolver}

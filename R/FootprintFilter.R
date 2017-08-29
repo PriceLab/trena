@@ -7,6 +7,7 @@
 #' that match footprint motifs for a supplied target gene.
 #'
 #' @include CandidateFilter.R
+#' @include FootprintFinder.R
 #' @import methods
 #'
 #' @name FootprintFilter-class
@@ -26,7 +27,16 @@ printf <- function(...) print(noquote(sprintf(...)))
 #----------------------------------------------------------------------------------------------------
 #' @rdname FootprintFilter-class
 #'
-#' #' @param quiet A logical denoting whether or not the filter should print output
+#' @param genomeDB A connection to a database that contains genome information
+#' @param footprintDB A connection to a database that contains footprint information
+#' @param geneCenteredSpec 
+#' \itemize{
+#' \item{"target.gene" A designated target gene that should be part of the mtx.assay data}
+#' \item{"size.upstream" An integer denoting the distance upstream of the target gene to look for footprints}
+#' \item{"size.downstream" An integer denoting the distance downstream of the target gene to look for footprints}
+#' }
+#' @param regionsSpec 
+#' @param quiet A logical denoting whether or not the filter should print output
 #'
 #' @seealso \code{\link{getCandidates-FootprintFilter}}, \code{\link{getFilterAssayData}}
 #'
@@ -70,14 +80,6 @@ FootprintFilter <- function(genomeDB, footprintDB, geneCenteredSpec=list(),
 #' @aliases getCandidates-FootprintFilter
 #'
 #' @param obj An object of class FootprintFilter
-#' @param extraArgs A named list containing 5 fields:
-#' \itemize{
-#' \item{"target.gene" A designated target gene that should be part of the mtx.assay data}
-#' \item{"genome.db.uri" A connection to a genome database containing footprint information}
-#' \item{"project.db.uri" A connection to a project database containing footprint information}
-#' \item{"size.upstream" An integer denoting the distance upstream of the target gene to look for footprints}
-#' \item{"size.downstream" An integer denoting the distance downstream of the target gene to look for footprints}
-#' }
 #'
 #' @seealso \code{\link{FootprintFilter}}
 #'
@@ -89,17 +91,17 @@ FootprintFilter <- function(genomeDB, footprintDB, geneCenteredSpec=list(),
 #'
 #' # Use footprint filter with the included SQLite database for MEF2C to filter candidates
 #' # in the included Alzheimer's dataset
-#' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
-#' footprint.filter <- FootprintFilter(mtx.assay = mtx.sub)
-#'
 #' target.gene <- "MEF2C"
 #' db.address <- system.file(package="trena", "extdata")
 #' genome.db.uri <- paste("sqlite:/",db.address,"genome.sub.db", sep = "/")
 #' project.db.uri <- paste("sqlite:/",db.address,"project.sub.db", sep = "/")
-#'
-#' tfs <- getCandidates(footprint.filter, extraArgs = list("target.gene" = target.gene,
-#' "genome.db.uri" = genome.db.uri, "project.db.uri" = project.db.uri,
-#' "size.upstream" = 1000, "size.downstream" = 1000))
+#' size.upstream <- 1000
+#' size.downstream <- 1000
+#' geneCenteredSpec <- list(targetGene = target.gene, tssUpstream = size.upstream, tssDownstream = size.downstream)
+#' footprint.filter <- FootprintFilter(genomeDB = genome.db.uri, footprintDB = project.db.uri,
+#' geneCenteredSpec = geneCenteredSpec)
+#' 
+#' tfs <- getCandidates(footprint.filter)
 
 
 setMethod("getCandidates", "FootprintFilter",

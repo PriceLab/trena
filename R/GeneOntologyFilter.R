@@ -1,3 +1,16 @@
+#' @title Create a GeneOntologyFilter object
+#'
+#' @description
+#' A GeneOntologyFilter object allows for filtering based on gene ontology (GO) terms. Its
+#' associated \code{getCandidates} method uses an organism database and a GO term (e.g. GO:#######)
+#' to filter a list of possible regulators factors to those that match the GO term.
+#'
+#' @include CandidateFilter.R
+#' @import methods
+#'
+#' @name GeneOntologyFilter-class
+#' @rdname GeneOntologyFilter-class
+#' @aliases GeneOntologyFilter
 #----------------------------------------------------------------------------------------------------
 .GeneOntologyFilter <- setClass("GeneOntologyFilter",
                             contains="CandidateFilter",

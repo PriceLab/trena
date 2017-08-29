@@ -38,5 +38,5 @@ variance.filter <- VarianceFilter(mtx.assay = mtx.sub)
 \seealso{
 \code{\link{getCandidates-VarianceFilter}}, \code{\link{getFilterAssayData}}
 
-Other Filtering Objects: \code{\link{FootprintFilter}}
+Other Filtering Objects: \code{\link{FootprintFilter-class}}
 }

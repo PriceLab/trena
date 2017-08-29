@@ -6,19 +6,12 @@
 \alias{.CandidateFilter}
 \alias{CandidateFilter}
 \alias{CandidateFilter}
-\alias{getFilterAssayData,CandidateFilter-method}
 \title{CandidateFilter}
 \usage{
 CandidateFilter(quiet = TRUE)
-
-\S4method{getFilterAssayData}{CandidateFilter}(obj)
 }
 \arguments{
 \item{quiet}{A logical denoting whether or not the CandidateFilter object should print output}
-
-\item{obj}{An object of a CandidateFilter class}
-
-\item{mtx.assay}{An assay matrix of gene expression data}
 }
 \value{
 An object of the Candidate filter class
@@ -27,27 +20,15 @@ An object of the Candidate filter class
 A CandidateFilter is an S4 class to represent a gene candidate filter. These filters can employ a variety of methods
 to reduce the number of transcription factors used as predictors for solving a TReNA object.
 }
-\section{Methods (by generic)}{
-\itemize{
-\item \code{getFilterAssayData}: Retrieve the assay matrix of gene expression data
-}}
-
 \section{Slots}{
 
 \describe{
-\item{\code{mtx.assay}}{An assay matrix of gene expression data}
-
 \item{\code{quiet}}{A logical denoting whether or not the CandidateFilter object should print output}
 }}
 
 \examples{
 # Create an empty candidate filter
-candidate.filter <- CandidateFilter(mtx.assay = matrix(), quiet=TRUE)
-
-# Create a CandidateFilter object using the included Alzheimer's data and retrieve the matrix
-load(system.file(package="TReNA", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
-my.filter <- CandidateFilter(mtx.sub)
-mtx <- getFilterAssayData(my.filter)
+candidate.filter <- CandidateFilter(quiet=TRUE)
 }
 \seealso{
 \code{\link{getCandidates}}, \code{\link{getFilterAssayData}}

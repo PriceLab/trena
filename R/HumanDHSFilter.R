@@ -1,4 +1,17 @@
+#' @title Create a HumanDHSFilter object
+#'
+#' @description
+#' A HumanDHSFilter object allows for filtering based on DNAse hypersensitivity (DHS) data. Its
+#' associated \code{getCandidates} method uses a genome from a BSgenome database (either hg19 or
+#' hg38), DNA region specifications, and (variants/pfms,encodetablename, match%)
+#' to filter a list of possible regulators factors to those that match the supplied criteria.
+#'
 #' @include CandidateFilter.R
+#' @import methods
+#'
+#' @name HumanDHSFilter-class
+#' @rdname HumanDHSFilter-class
+#' @aliases HumanDHSFilter
 
 #----------------------------------------------------------------------------------------------------
 .HumanDHSFilter <- setClass("HumanDHSFilter",

@@ -22,6 +22,10 @@ Solver(mtx.assay = matrix(), targetGene, candidateRegulators, quiet = TRUE)
 \arguments{
 \item{mtx.assay}{An assay matrix of gene expression data}
 
+\item{targetGene}{A designated target gene that should be part of the mtx.assay data}
+
+\item{candidateRegulators}{The designated set of transcription factors that could be associated}
+
 \item{quiet}{A logical indicating whether or not the Solver object should print output}
 
 \item{obj}{An object of class Solver}
@@ -70,7 +74,7 @@ solver <- Solver(mtx.sub)
 mtx <- getRegulators(solver)
 }
 \seealso{
-\code{\link{getAssayData}}, \code{\link{TReNA}}, \code{\link{solve}}
+\code{\link{getAssayData}}, \code{\link{getTarget}}, \code{\link{getRegulators}}
 
 Other Solver class objects: \code{\link{BayesSpikeSolver}},
   \code{\link{EnsembleSolver}},

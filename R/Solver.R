@@ -30,7 +30,9 @@ printf <- function(...) print(noquote(sprintf(...)))
 #' @examples
 #' # Create a Solver object using the included Alzheimer's data and retrieve the matrix
 #' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
-#' solver <- Solver(mtx.sub)
+#' targetGene <- "MEF2C"
+#' candidateRegulators <- setdiff(rownames(mtx.sub), targetGene)
+#' solver <- Solver(mtx.sub,targetGene,candidateRegulators)
 #' mtx <- getAssayData(solver)
 #' 
 setGeneric("getAssayData",    signature="obj", function(obj) standardGeneric ("getAssayData"))
@@ -38,7 +40,7 @@ setGeneric("getAssayData",    signature="obj", function(obj) standardGeneric ("g
 #' @export
 setGeneric("show", signature = "obj", function(obj) standardGeneric("show"))
 #' @export
-setGeneric("run",             signature="obj", function(obj, target.gene, tfs, tf.weights, extraArgs=list()) standardGeneric ("run"))
+setGeneric("run",             signature="obj", function(obj) standardGeneric ("run"))
 #' @export
 setGeneric("rescalePredictorWeights",
            signature="obj", function(obj, rawValue.min, rawValue.max, rawValues) standardGeneric ("rescalePredictorWeights"))
@@ -61,14 +63,14 @@ setGeneric("rescalePredictorWeights",
 #' @export
 setGeneric("getTarget", signature = "obj", function(obj) standardGeneric("getTarget"))
 
-#' Retrieve the target gene from a Solver object
+#' Retrieve the candiate regulators from a Solver object
 #'
-#' @rdname getTarget
-#' @aliases getTarget
+#' @rdname getRegulators
+#' @aliases getRegulators
 #'
 #' @param obj An object of class Solver
 #'
-#' @return The target gene associated with a Solver object
+#' @return The candidate regulators associated with a Solver object
 #'
 #' @examples
 #' # Create a Solver object using the included Alzheimer's data and retrieve the regulators
@@ -108,6 +110,8 @@ setGeneric("show", signature = "obj", function(obj) standardGeneric("show"))
 #' @rdname Solver-class
 #'
 #' @param mtx.assay An assay matrix of gene expression data
+#' @param targetGene A designated target gene that should be part of the mtx.assay data
+#' @param candidateRegulators The designated set of transcription factors that could be associated
 #' @param quiet A logical indicating whether or not the Solver object should print output
 #'
 #' @export
@@ -119,7 +123,7 @@ setGeneric("show", signature = "obj", function(obj) standardGeneric("show"))
 #' mtx <- matrix(rnorm(10000), nrow = 100)
 #' solver <- Solver(mtx)
 #'
-#' @seealso \code{\link{getAssayData}}, \code{\link{TReNA}}, \code{\link{solve}}
+#' @seealso \code{\link{getAssayData}}, \code{\link{getTarget}}, \code{\link{getRegulators}}
 #'
 #' @family Solver class objects
 
@@ -131,9 +135,7 @@ Solver <- function(mtx.assay=matrix(), targetGene, candidateRegulators, quiet=TR
         if(mtx.ratio > 1000){
             warning("Assay matrix may contain highly skewed data; consider transforming your matrix.")
             }
-    }
-
-    
+    }    
 
     env <- new.env(parent=emptyenv())
     .Solver(mtx.assay=mtx.assay,

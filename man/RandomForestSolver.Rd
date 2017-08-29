@@ -10,6 +10,8 @@ RandomForestSolver(mtx.assay = matrix(), targetGene, candidateRegulators,
 \arguments{
 \item{mtx.assay}{An assay matrix of gene expression data}
 
+\item{targetGene}{A designated target gene that should be part of the mtx.assay data}
+
 \item{candidateRegulators}{The designated set of transcription factors that could be associated
 with the target gene}
 
@@ -17,8 +19,6 @@ with the target gene}
 (default = rep(1, length(candidateRegulators)))}
 
 \item{quiet}{A logical denoting whether or not the solver should print output}
-
-\item{target.gene}{A designated target gene that should be part of the mtx.assay data}
 }
 \value{
 A Solver class object with Random Forest as the solver
@@ -27,7 +27,10 @@ A Solver class object with Random Forest as the solver
 Create a Solver class object using the Random Forest solver
 }
 \examples{
-solver <- RandomForestSolver()
+load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+targetGene <- "MEF2C"
+candidateRegulators <- setdiff(rownames(mtx.sub), targetGene)
+rf.solver <- RandomForestSolver(mtx.sub, targetGene, candidateRegulators)
 }
 \seealso{
 \code{\link{solve.RandomForest}}, \code{\link{getAssayData}}

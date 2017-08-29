@@ -21,6 +21,33 @@ with the target gene}
 
 \item{solverNames}{A character vector of strings denoting}
 
+\item{geneCutoff}{A fraction (0-1) of the supplied candidate regulators to be included in the
+fetaures output by the solver (default = 0.1)}
+
+\item{alpha.lasso}{A fraction (0-1) denoting the LASSO-Ridge balance of the `glmnet` solver used
+by the LASSO method (default = 0.9)}
+
+\item{alpha.ridge}{A fraction (0-1) denoting the LASSO-Ridge balance of the `glmnet` solver used
+by the Ridge method (default = 0)}
+
+\item{lambda.lasso}{The penalty parameter for LASSO, used to determine how strictly to penalize
+the regression coefficients. If none is supplied, this will be determined via permutation
+testing (default = NULL).}
+
+\item{lambda.ridge}{The penalty parameter for Ridge, used to determine how strictly to penalize
+the regression coefficients. If none is supplied, this will be determined via permutation
+testing (default = NULL).}
+
+\item{lambda.sqrt}{The penalty parameter for square root LASSO, used to determine how strictly
+to penalize the regression coefficients. If none is supplied, this will be determined via
+permutation testing (default = NULL).}
+
+\item{nCores.sqrt}{An integer denoting the number of computational cores to devote to the
+square root LASSO solver, which is the slowest of the solvers (default = 4)}
+
+\item{nOrderings.bayes}{An integer denoting the number of random starts to use for the Bayes
+Spike method (default = 10)}
+
 \item{quiet}{A logical denoting whether or not the solver should print output}
 }
 \value{
@@ -30,7 +57,10 @@ A Solver class object with Ensemble as the solver
 Create a Solver class object using an ensemble of solvers
 }
 \examples{
-solver <- EnsembleSolver()
+load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+target.gene <- "MEF2C"
+tfs <- setdiff(rownames(mtx.sub), target.gene)
+ensemble.solver <- EnsembleSolver(mtx.sub, target.gene, tfs)
 }
 \seealso{
 \code{\link{solve.Ensemble}}, \code{\link{getAssayData}}

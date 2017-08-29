@@ -11,6 +11,8 @@ SqrtLassoSolver(mtx.assay = matrix(), targetGene, candidateRegulators,
 \arguments{
 \item{mtx.assay}{An assay matrix of gene expression data}
 
+\item{targetGene}{A designated target gene that should be part of the mtx.assay data}
+
 \item{candidateRegulators}{The designated set of transcription factors that could be associated
 with the target gene}
 
@@ -26,8 +28,6 @@ square root LASSO solver. This solver is generally quite slow and is greatly spe
 multiple cores (default = 4)}
 
 \item{quiet}{A logical denoting whether or not the solver should print output}
-
-\item{target.gene}{A designated target gene that should be part of the mtx.assay data}
 }
 \value{
 A Solver class object with Square Root LASSO as the solver
@@ -36,7 +36,10 @@ A Solver class object with Square Root LASSO as the solver
 Create a Solver class object using the Square Root LASSO solver
 }
 \examples{
-solver <- SqrtLassoSolver()
+load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+target.gene <- "MEF2C"
+tfs <- setdiff(rownames(mtx.sub), target.gene)
+sqrt.solver <- SqrtLassoSolver(mtx.sub, target.gene, tfs)
 }
 \seealso{
 \code{\link{solve.SqrtLasso}}, \code{\link{getAssayData}}

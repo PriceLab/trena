@@ -27,7 +27,26 @@
 #' @param targetGene A designated target gene that should be part of the mtx.assay data
 #' @param candidateRegulators The designated set of transcription factors that could be associated
 #' with the target gene
-#' @param solverNames A character vector of strings denoting 
+#' @param solverNames A character vector of strings denoting
+#' @param geneCutoff A fraction (0-1) of the supplied candidate regulators to be included in the
+#' fetaures output by the solver (default = 0.1)
+#' @param alpha.lasso A fraction (0-1) denoting the LASSO-Ridge balance of the `glmnet` solver used
+#' by the LASSO method (default = 0.9)
+#' @param alpha.ridge A fraction (0-1) denoting the LASSO-Ridge balance of the `glmnet` solver used
+#' by the Ridge method (default = 0)
+#' @param lambda.lasso The penalty parameter for LASSO, used to determine how strictly to penalize
+#' the regression coefficients. If none is supplied, this will be determined via permutation
+#' testing (default = NULL).
+#' @param lambda.ridge The penalty parameter for Ridge, used to determine how strictly to penalize
+#' the regression coefficients. If none is supplied, this will be determined via permutation
+#' testing (default = NULL).
+#' @param lambda.sqrt The penalty parameter for square root LASSO, used to determine how strictly
+#' to penalize the regression coefficients. If none is supplied, this will be determined via
+#' permutation testing (default = NULL).
+#' @param nCores.sqrt An integer denoting the number of computational cores to devote to the
+#' square root LASSO solver, which is the slowest of the solvers (default = 4)
+#' @param nOrderings.bayes An integer denoting the number of random starts to use for the Bayes
+#' Spike method (default = 10)
 #' @param quiet A logical denoting whether or not the solver should print output
 #'
 #' @return A Solver class object with Ensemble as the solver
@@ -39,7 +58,11 @@
 #' @export
 #'
 #' @examples
-#' solver <- EnsembleSolver()
+#' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+#' target.gene <- "MEF2C"
+#' tfs <- setdiff(rownames(mtx.sub), target.gene)
+#' ensemble.solver <- EnsembleSolver(mtx.sub, target.gene, tfs)
+
 
 EnsembleSolver <- function(mtx.assay=matrix(), targetGene, candidateRegulators,
                            solverNames = c("lasso",
@@ -140,7 +163,7 @@ setMethod('show', 'EnsembleSolver',
 #'
 #' # Solve the same problem, but supply extra arguments that change alpha for LASSO to 0.8 and also
 #' # Change the gene cutoff from 10% to 20%
-#' ensemble.solver <- EnsembleSolve(mtx.sub, target.gene, tfs, gene.cutoff = 0.2, alpha.lasso = 0.8)))
+#' ensemble.solver <- EnsembleSolver(mtx.sub, target.gene, tfs, gene.cutoff = 0.2, alpha.lasso = 0.8)
 #' tbl <- run(ensemble.solver)
 #'
 #' # Solve the original problem with default cutoff and solver parameters, but use only 4 solvers

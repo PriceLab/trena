@@ -1,3 +1,16 @@
+#' @title Create a MotifMatcher object
+#'
+#' @description
+#' A MotifMatcher object is used directly by the \code{\link{HumanDHSFilter}} class to match motif
+#' matrices to where they occur in the supplied genome. 
+#'
+#' @include MotifMatcher.R
+#' @import methods
+#'
+#' @name MotifMatcher-class
+#' @rdname MotifMatcher-class
+#' @aliases MotifMatcher
+#----------------------------------------------------------------------------------------------------
 .MotifMatcher <- setClass('MotifMatcher',
                           representation(name="character",
                                          genome="BSgenome",

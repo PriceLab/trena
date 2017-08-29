@@ -11,14 +11,6 @@
 }
 \arguments{
 \item{obj}{An object of class TReNA with "randomForest" as the solver string}
-
-\item{targetGene}{A designated target gene that should be part of the mtx.assay data}
-
-\item{candidateRegulators}{The designated set of transcription factors that could be associated with the target gene.}
-
-\item{tf.weights}{A set of weights on the transcription factors (default = rep(1, length(candidateRegulators)))}
-
-\item{extraArgs}{Modifiers to the Random Forest solver}
 }
 \value{
 A list containing various parameters of the Random Forest fit.
@@ -27,15 +19,14 @@ A list containing various parameters of the Random Forest fit.
 Given a TReNA object with RandomForest as the solver, use the \code{\link{randomForest}} function
 to estimate coefficients for each transcription factor as a predictor of the target gene's
 expression level.
-This method should be called using the \code{\link{solve}} method on an appropriate TReNA object.
 }
 \examples{
 # Load included Alzheimer's data, create a TReNA object with Random Forest as solver, and solve
 load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
-trena <- TReNA(mtx.assay = mtx.sub, solver = "randomForest")
 targetGene <- "MEF2C"
 candidateRegulators <- setdiff(rownames(mtx.sub), targetGene)
-tbl <- solve(trena, targetGene, candidateRegulators)
+rf.solver <- RandomForestSolver(mtx.sub, targetGene, candidateRegulators)
+tbl <- solve(rf.solver)
 }
 \seealso{
 \code{\link{randomForest}}, \code{\link{RandomForestSolver}}

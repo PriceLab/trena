@@ -15,33 +15,35 @@ knitr::opts_chunk$set(echo = TRUE)
 
 TReNA is a package for inferring relationships between target genes and their transcription factors. By using TReNA, we can generate hypotheses aroung regulation of gene expression and enable the construction of gene network models. In the most basic sense, TReNA accepts a matrix of gene expression data (that must include the expression levels of transcription factors) and provides two operations using the data. First, it filters putitive transcriptional regulators based on user-specified criteria, such as presence of motifs or footprints. Second, given a target gene and list of transcription factors as predictors, it uses a user-specified solver to perform feature selection. Thus, the standard TReNA workflow is the following:
 
-1. Create a TReNA object using an expression matrix (RNA-seq or microarray) and a desired solver.
-2. (optional) Select candidate transcription factors from either motifs or footprints. 
-3. Perform feature selection to identify putative transcriptional regulators for the target gene.
+1. Select an expression matrix (RNA-seq or microarray) of interest.
+2. Create a `CandidateFilter` object based on your desired filtering criteria.
+3. Call the `getCandidates` method on your `CandidateFilter` to determine your set of candidate regulators.
+4. Create a `Solver` object based on your desired feature selection method using the expression matrix, a target gene of interest, and your candidate regulators. 
+5. Call the `run` method on your `Solver` to perform feature selection, identifying putative transcriptional regulators for the target gene.
 
-The filtering step, while optional, can constrain the solution space and reduce computational time by reducing the number of predictors supplied to the solver. Rather than supplying hundreds of transcription factors that can obscure meaningful relationships between genes, filters allow the user to screen out less likely candidates, leaving only the most likely affectors. 
+The filtering steps (Step 2-3), while technically optional, can constrain the solution space and reduce computational time by reducing the number of predictors supplied to the solver. Rather than supplying hundreds of transcription factors that can obscure meaningful relationships between genes, filters allow the user to screen out less likely candidates, leaving only the most likely affectors. 
 
 Starting off, we'll load the TReNA library.
 
-```{r message = FALSE}
-library(TReNA)
+```{r message = FALSE, warning = FALSE}
+library(trena)
 ```
 
-## Creating a TReNA Object
+## Selecting an Expression Matrix
 
-Running TReNA requires a matrix of gene expression data; there are several example data sets included with the TReNA package. In this case, we will load data from a study on Alzheimer's disease (Nat Sci Data, doi:10.1038/sdata.2016.89), in which 278 samples were obtained for 154 transcription factors.
+Running the solvers in TReNA requires a matrix of gene expression data; there are several example data sets included with the TReNA package. In this case, we will load data from a study on Alzheimer's disease (Nat Sci Data, doi:10.1038/sdata.2016.89), in which 278 samples were obtained for 154 transcription factors.
 
 ```{r}
-load(system.file(package="TReNA", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
 ```
 
-This gives us a matrix, *mtx.sub*, that contains our gene expression data in units of TMM. Before creating a TReNA object, it is wise to inspect the distribution of the matrix and consider using some sort of data transformation to normalize the mean-variance relationship. We can see, for instance, that our dataset is fairly skewed, with most of the expression values falling close to 0 and only a few values on the higher end of the spectrum.
+This gives us a matrix, `mtx.sub`, that contains our gene expression data in units of TMM. Before proceeding further , it is wise to inspect the distribution of the matrix and consider using some sort of data transformation to normalize the mean-variance relationship. We can see, for instance, that our dataset is fairly skewed, with most of the expression values falling close to 0 and only a few values on the higher end of the spectrum.
 
 ```{r echo=FALSE, fig.width = 6}
 hist(mtx.sub, main = "Expression Matrix Data")
 ```
 
-The skewed nature of the matrix may profoundly affect our results. To overcome this, we will transform our matrix using the *voom* function in the *limma* package.
+The skewed nature of the matrix may profoundly affect our results. To overcome this, we will transform our matrix using the `voom` function in the `limma` package.
 
 ```{r message = FALSE}
 library(limma)
@@ -54,112 +56,203 @@ If we now plot our transformed matrix, we can see that it's been scaled down sub
 hist(mtx.voom, main = "VOOM-Transformed Expression Matrix Data")
 ```
 
-Moving forward, we will use this transformed data set in the rest of our analyses. That gives us one half of our TReNA object; the other half concerns our choice of solver. TReNA currently supports 9 different solvers. Their associated character strings for use in TReNA are (in no particular order):
+In general, we recommend a transformation of this nature to adjust skewed data. The `voom` transformation or something similar (e.g. `asinh()`) adjusts the mean-variance relationship and can greatly change the results we see. Moving forward, we will use this transformed data set in the rest of our analyses. 
 
-1. lasso - an application of *glmnet* using *alpha = 0.9* as the default elastic net parameter; default TReNA solver
-2. ridge - an application of *glmnet* using *alpha = 0* as the default elastic net parameter
-3. randomForest - an application of *randomForest*, the standard Random Forest function
-4. bayesSpike - an application of *vbsr*, the Bayes Spike function
-5. sqrtlasso - an application of the *slim* function from the *flare* package, with *q = 2*
-6. lassopv - an application of *lassopv*, the P-Value LASSO function
-7. pearson - an application of the *cor* function using the default parameters
-8. spearman - an application of the *cor* function using *method = "spearman"*
-9. ensemble - a combination of 2 or more of the other solvers; by default, it uses all but *bayesSpike* and *sqrtlasso*
+## Filtering Candidate Regulators
 
-Although TReNA defaults to using LASSO as the solver, we recommend doing some critical thinking about which solver most suits your purposes before choosing. Once a solver has been chosen, the TReNA object is simply specified (using Random Forest in this case):
+TReNA currently supports 4 different candidate transcription factor inputs, all of which are subclasses of the `CandidateFilter` class:
 
-```{r}
-trena <- TReNA(mtx.assay = mtx.voom, solver = "randomForest")
-```
+1. `VarianceFilter`: returns transcription factors with expression variance within a certain range of the target gene's expression variance
+2. `GeneOntologyFilter`: given an organism database and a Gene Ontology term (GOterm), returns only those genes that match the GOterm
+3. `HumanDHSFilter`: given a genome database, DNAse hypersensitivity (DHS) database, and region specifications, return only those genes that fall within the given region
+4. `FootprintFilter`: using a PostgreSQL or SQLite database of footprint data, returns transcription factors with footprints for a given target gene for a specified genomic range
 
-We have now created an object of the TReNA class, which contains our solver and our assay matrix. 
+In order to get a list of transcription factor candidates, you must construct the appropriate object by supplying the necessary parameters for that `CandidateFilter`, then call the `getCandidates()` method on the candidate inputs. In each case, the call to `getCandidates()` is identical and operates on only the `CandidateFilter` object. 
 
-## Using Filtering to Reduce Predictor Number
+### The `VarianceFilter` Subclass
 
-TReNA currently supports 3 different candidate transcription factor inputs:
-
-1. FootprintFilter: using a PostgreSQL or SQLite database of footprint data, returns transcription factors with footprints for a given target gene for a specified genomic range
-2. VarianceFilter: returns transcription factors with expression variance within a certain range of the target gene's expression variance
-3. NullFilter: returns all transcription factors supplied in the matrix
-
-In order to get a list of transcription factor candidates, you must construct the appropriate object by supplying an assay matrix, then call the *getCandidates* function on the candidate inputs. Depending on the input, this method may require other parameters. The simplest input is the NullFilter, which can return candidates with no additional parameters; however, as the name suggests, this just returns all transcription factors, not including the target gene.
+The `VarianceFilter` requires the specification of the expression matrix and a target gene, plus it allows you to optionally specify a variance size range. It finds the variance of all genes in the assay matrix, then returns all transcription factors with variance within the variance size range of the target gene. For instance, we can create a VarianceFilter and use it to find all transcription factors with variance within 50% of the target gene's variance. This will return a named list with both the names of the transcription factors and their variances.
 
 ```{r}
-
-null.filter <- NullFilter(mtx.assay = mtx.voom)
-tfs <- getCandidates(null.filter)
-str(tfs)
-
-```
-
-The VarianceFilter requires the specification of a target gene and also allows you to specify a variance size range. It finds the variance of all genes in the assay matrix, then returns all transcription factors with variance within the variance size range of the target gene. For instance, we can create a VarianceFilter and use it to find all transcription factors with variance within 50% of the target gene's variance. This will return both the names of the transcription factors and their variances in a named list. 
-
-```{r}
-
-variance.filter <- VarianceFilter(mtx.assay = mtx.voom)
-tf.list <- getCandidates(variance.filter, extraArgs = list("target.gene" = "MEF2C", "var.size" = 0.5))
+variance.filter <- VarianceFilter(mtx.assay = mtx.voom, targetGene = "MEF2C", varSize = 0.5)
+tf.list <- getCandidates(variance.filter)
 str(tf.list)
-
 ```
 
-The most complex filter is the FootprintFilter, which leverages information from footprint databases in either SQLite or PostgreSQL. This input requires connection to 2 databases: 1) A genome database, which contains information on the location and function of genes; 2) A project database, which contains footprint regions from a specific project. As an illustration of the format and utility of these databases, we have included in *extdata* two SQLite databases demonstrating the required tables and information needed to use the FootprintFilter. Our databases are subsets of larger databases, corresponding to the *MEF2C* gene and a footprinting project in the brain using the Wellington method for determining footprints. The FootprintFilter method for getting candidates also allows for specification of the distance upstream and downstream of a transcription start site to look for footprints; in this case, we'll use 1000 bases for each, the default distance. As with the VarianceFilter, we return a named list, with the names of the canidate transcription factors, plus a table of other information about them taken from the project and genome databases. 
+### The `GeneOntologyFilter` Subclass
+
+The 
+
+### The `FootprintFilter` Subclass
+
+The most complex filter is the FootprintFilter, which leverages information from footprint databases in either SQLite or PostgreSQL. This input requires connection to 2 databases: 1) A genome database, which contains information on the location and function of genes; 2) A project database, which contains footprint regions from a specific project. As an illustration of the format and utility of these databases, we have included in `extdata` two SQLite databases demonstrating the required tables and information needed to use the FootprintFilter. Our databases are subsets of larger databases, corresponding to the *MEF2C* gene and a footprinting project in the brain using the Wellington method for determining footprints. 
+
+In addition to the databases, constructing a FootprintFilter object requires at least one of 2 different specs for determining the region to look in:
+
+* `geneCenteredSpec` - a list containing: 
+    1. `targetGene` - the gene of interest
+    2. `tssUpstream` - an integer indicating how many bases upstream of a transcription start site to include in the results
+    3. `tssDownstream` - an integer indicating how many bases downstream of a transcription start site to include in the results 
+* `regionsSpec` - a list of regions in the DNA where each element is formatted as "chromosome:start-end" 
+
+Note that you can specify both input types, though we anticipate that for most cases, you will only want one of these two types. As with the `VarianceFilter`, the `FootprintFilter` return a named list where one element is a vector containing the names of the canidate regulators. The other element is a table of metadata about footprints, including the motifs, their locations, and the transcription factors to which they link.
+
+For our examples, we'll first run using the `geneCenteredSpec` option:
 
 ```{r}
-footprint.filter <- FootprintFilter(mtx.assay = mtx.voom)
-db.address <- system.file(package = "TReNA", "extdata")
+
+# Sp
+db.address <- system.file(package="trena", "extdata")
 genome.db.uri <- paste("sqlite:/",db.address,"genome.sub.db", sep = "/")
 project.db.uri <- paste("sqlite:/",db.address,"project.sub.db", sep = "/")
+
+# Create the specs for the gene region
 target.gene <- "MEF2C"
-tfs <- getCandidates(footprint.filter, extraArgs = list("target.gene" = target.gene,
-                                                        "genome.db.uri"=genome.db.uri, 
-                                                        "project.db.uri" = project.db.uri,
-                                                        "size.upstream" = 1000,
-                                                        "size.downstream" = 1000))
+size.upstream <- 1000
+size.downstream <- 1000
+geneCenteredSpec <- list(targetGene = target.gene, tssUpstream = size.upstream, tssDownstream = size.downstream)
+
+# Create a filter using the geneCenteredSpec option
+footprint.filter <- FootprintFilter(genomeDB = genome.db.uri, footprintDB = project.db.uri,
+geneCenteredSpec = geneCenteredSpec)
+
+# Run the getCandidates method
+tfs <- getCandidates(footprint.filter)
 str(tfs)
 ```
 
-The FootprintFilter makes use of another class in the package, the FootprintFinder. This class provides an interface to PostgreSQL and SQLite databases of a specific 2-table schema and has a family of methods for accessing footprint data. To demonstrate some of this functionality, we will use the FootprintFinder to extract footprints from a particular region. In the previous example, we used an SQLite database included in the package; essentially a small snapshot of a larger dataset. More usefully, there are now publically available databases of footprints for use at [bddsrds.globusgenomics.org](). Currently, the sole project database is of brain tissue using the HINT alignment method; this database will remain in perpetuity and will be joined by other methods, issues, and alignments. We can access this information as follows:
+Then, we'll use the `regionsSpec` option to return the same information by supplying the specific transcription start site for MEF2C:
+
+```{r}
+
+# Create the regionsSpec information
+mef2c.tss <- 88904257   # minus strand
+   chrom <- "chr5"
+   start <- mef2c.tss - 1000
+   end   <- mef2c.tss + 1000
+   chromLoc <- sprintf("%s:%d-%d", chrom, start, end)
+regionsSpec <- c(chromLoc)
+
+# Create the filter
+footprint.filter <- FootprintFilter(genomeDB = genome.db.uri, footprintDB = project.db.uri, regionsSpec = regionsSpec)
+
+# Grab the candidates and return
+tfs <- getCandidates(footprint.filter)
+str(tfs)
+```
+
+The FootprintFilter makes use of another class in the package, the FootprintFinder. This class provides an interface to PostgreSQL and SQLite databases of a specific 2-table schema and has a family of methods for accessing footprint data. To demonstrate some of this functionality, we will use the FootprintFinder to extract footprints from a particular region. In the previous example, we used an SQLite database included in the package; essentially a small snapshot of a larger dataset. More usefully, there are now publically available databases of footprints for use at [bddsrds.globusgenomics.org](). For this exmple, we will access footprints for brain tissue obtained using the HINT method for a seed size of 20 bp; other methods, issues, and alignments are also available. We can access this information as follows (this example will take a bit longer):
 
 ```{r}
 genome.db.uri    <- "postgres://bddsrds.globusgenomics.org/hg38"  # has gtf and motifsgenes tables
-footprint.db.uri <- "postgres://bddsrds.globusgenomics.org/brain_hint"  # has hits and regions tables
+footprint.db.uri <- "postgres://bddsrds.globusgenomics.org/brain_hint_20"  # has hits and regions tables
 fpf <- FootprintFinder(genome.db.uri, footprint.db.uri, quiet=FALSE)
 tbl.fp <- getFootprintsInRegion(fpf, "chr5", 88822685, 89011824)
 str(tbl.fp)
 ```
 
-## Solving a TReNA Object
+In general, you shouldn't have much need to use a `FootprintFinder` object directly for TReNA; rather, the `FootprintFilter` object should suffice. 
 
-Each of solvers has its own strengths and weaknesses that we will not delve into here, but that are generally detailed within their own packages. To begin with, we will look at the LASSO solver, which is the default solver for a TReNA object. 
+## Feature Selection: the `Solver` Object
 
-Once a user reaches the point of actually solving the TReNA object, a solver has already been specified, but the user must still specify the target gene response and transcription factor predictors of interest. For our purposes, we will obtain our list of transcription factors using a filter on variance, with *"MEF2C"* as our target gene. 
+Once you know your candidate regulators and you've got a target gene in mind, you're ready to construct a `Solver` object. A `Solver` object is a construct that contains the expression matrix, candidate regulators, target gene, and a solver method of choice. . TReNA currently supports 9 different solvers. Their associated solvers strings for use in TReNA are (in no particular order):
+
+1. LassoSolver - an application of `glmnet` using `alpha = 0.9` as the default elastic net parameter
+2. RidgeSolver - an application of `glmnet` using `alpha = 0` as the default elastic net parameter
+3. RandomForestSolver - an application of `randomForest*, the standard Random Forest function
+4. BayesSpikeSolver - an application of `vbsr`, the Bayes Spike function from the `vbsr` package
+5. SqrtLassoSolver - an application of the `slim` function from the `flare` package, with `q = 2`
+6. LassoPVSolver - an application of `lassopv`, the P-Value LASSO function
+7. PearsonSolver - an application of the `cor` function using the default parameters
+8. SpearmanSolver - an application of the `cor` function using `method = "spearman"`
+9. EnsembleSolver - a combination of 2 or more of the other solvers; by default, it uses all but `BayesSpikeSolver` and `SqrtLassoSolver`
+
+When it comes to selecting a solver, we recommend doing some critical thinking about which solver most suits your purposes before choosing. Each of solvers has its own strengths and weaknesses that we will not delve into here, but that are generally detailed within their own packages. To begin with, we will use  the LassoSolver, which uses LASSO regularlized regression to select features. Once a solver has been chosen, the particular `Solver` object is simply specified:
 
 ```{r}
-
-trena <- TReNA(mtx.assay = mtx.voom, solver = "lasso")
-target.gene <- "MEF2C"
-gene.filter <- VarianceFilter(mtx.assay = mtx.voom)
-tf.list <- getCandidates(gene.filter, extraArgs = list("target.gene" = target.gene, "var.size" = 0.5))
-
-tbl.out <- solve(trena, target.gene, tf.list$tfs)
-head(tbl.out)
-
+lasso.solver <- LassoSolver(mtx.assay = mtx.voom,
+                            targetGene = "MEF2C",
+                            candidateRegulators = tfs$tfs
+                            )
 ```
 
-Each solver will necessarily give a different result, neccessitating some amount of thoughtfulness on the part of the user. For instance, if the goal is to return a sparse list of only the most influential genes, then LASSO may be the best choice. By contrast, the Random Forest solver will return scores for all genes, and will thus result in inferring more relationships.  
+We have now created an object of the `LassoSolver` class, which in this case uses *"MEF2C"* as the target gene and the candidate regulators we found using the `FootprintFilter` above. Regardless of the specific subclass, any `Solver` object can be executed using the `run` command:
+
+```{r}
+set.seed(10)
+tbl <- run(lasso.solver)
+str(tbl)
+```
+
+The output of each `run` method can vary with solver type, but in general it will return the coefficients for each feature, in this case contained in the `beta` field. Notably, the `LassoSolver`, `SqrtLassoSolver`, and `EnsembleSolver` often return subsets of the supplied candidate regulators, whereas the remaining methods return coefficients for all regulators. This behavior can be tuned as well; for instance, we can alter the `LassoSolver` object by adjusting `lambda`, a tuning parameter that corresponds to the penalty imposed on regression coefficients. 
+
+First, we will alter a different parameter of the `LassoSolver` object, the `keep.metrics` parameter. This optional Boolean argument will return several parameters of the fit if specified as `TRUE` (default = FALSE), including the `lambda` value determined via permutation testing. We can see this behavior by creating and running this new `LassoSolver` object:
+
+```{r}
+set.seed(10)
+lasso.solver.keep <- LassoSolver(mtx.assay = mtx.voom,
+                                 targetGene = "MEF2C",
+                                 candidateRegulators = tfs$tfs,
+                                 keep.metrics = TRUE
+                                 )
+tbl.keep <- run(lasso.solver.keep)
+str(tbl.keep)
+```
+
+As shown, we now get a list where the first element is our data frame from the previous example, the second is the value determined for `lambda`, and the final element is the value determined for $r^{2}$.  Notably, the `keep.metrics` argument is only available for the `LassoSolver` and `RidgeSolver` objects at this time.  
+
+Now we can change the value of `lambda` to change how many features are returned by the solver. In this case, we'll make `lambda` much smaller; this will relax the penalty imposed on regression coefficients, thus we expect to get more features returned to us:
+
+```{r}
+lasso.solver.lenient  <- LassoSolver(mtx.assay = mtx.voom,
+                                     targetGene = "MEF2C",
+                                     candidateRegulators = tfs$tfs,
+                                     lambda = 0.05
+                                     )
+tbl.lenient <- run(lasso.solver.lenient)
+str(tbl.lenient)
+```
+
+As expected, we get nearly twice as many features as in our original example. Different `Solver` subclasses have different optional arguments corresponding to their specific solver methods. For more information on `Solver` object, check the documentation for your object of interest; for more information on a particular solver method, check the original package referenced in the help documentation for that `Solver` object. 
+
+Each solver will necessarily give a different result, neccessitating some amount of thoughtfulness on the part of the user. For instance, if the goal is to return a sparse list of only the most influential genes, then LASSO may be the best choice. By contrast, using the Random Forest method will return scores for all genes, and will thus result in inferring more relationships.  
 
 ## Using an Ensemble Solver Approach
 
-In addition to the individual solvers, TReNA includes an ensemble approach as a solver option. The ensemble solver allows the user to specify a vector of multiple TReNA solvers as part of the *extraArgs* list argument (e.g. *extraArgs = list(solver.list = c("lasso","ridge")))*. Alternatively, the user can specify *solver.list = "default.solvers"* to run all solvers but Bayes Spike and square root LASSO (the most sensitive to outliers and the computationally intensive, respectively). In addition to computing and returning the individual scores of each solver, the ensemble solver generates an "extreme" score (*pcaMax*) based on all solvers and a "concordance" score (*concordance*). These new scores differ in that the pcaMax score tends to give more weight to extreme outlying scores from a particular solver and generally scales from 0 to 15, whereas the concordance score attempts to use more of a "voting" system of which solves consider a feature significant and ranges from 0-1. As an example, we can run the ensemble solver on the same problem we just solved using LASSO. 
+In addition to the individual solvers, TReNA includes an ensemble approach as a solver option. The `EnsembleSolver` class allows the user to specify a vector of multiple TReNA solvers as part of the argument list (e.g. `solverNames = c("lasso","ridge")`). Alternatively, the user can leave this argument unspecified to run all solvers but Bayes Spike and square root LASSO (the most sensitive to outliers and the computationally intensive, respectively). Other solver-specific parameters may also be specified, such as the `lambda` value for LASSO; these additional arguments can be found in the help documentation for the `EnsembleSolver`
+
+The `EnsembleSolver` also has a `geneCutoff` argument, whereby the `run` method cuts off a certain fraction of the total regulators supplied. For example, if 200 candidates are supplied and the `geneCutoff` is left at its default value (default = 0.1), only roughly 20 genes will be returned in the final data frame. The `geneCutoff` argument is designed to help the user hone in on only the most important features in a model, but it can be changed to 100% of the features if so desired. In cases of smaller sets of regulators, the cutoff will cease being imposed once the number of features drops below 10. 
+
+Besides computing and returning the individual scores of each solver, the ensemble solver generates an "extreme" score (`pcaMax`)  and a "concordance" score (`concordance`) based on all solvers. Both of these new scores are computed using a principle component analysis on all individual solver scores and can perhaps best be understood as follows:
+
+* `pcaMax` essentially quantifies the extent to which dissimilar solvers agree on selecting a given feature. For instance, if Random Forest and LASSO both deem a particular feature important, then it is likely to have a high `pcaMax` score. By contrast, if Pearson and Spearman both deem a feature important, it would be less likely to have a high `pcaMax` score because the methods are quite similar to one another. The basic idea here is that if lots of dissimilar methods agree on the importance of a feature, it is more likely to actually be important.
+
+* `concordance` essentially weighs each solver equally and sums up the contributions from each one, regardless of method similarity. Thus, if Random Forst and LASSO both deem a particular feature important, it is equally likely to have a high `concordance` score as if Pearson and Spearman both deem a feature important. This score functions as more of a basic "voting" system of which solves consider a feature significant and ranges from 0-1.
+
+We can see this in action by constructing and running an `EnsembleSolver` object with the default arguments for `solverNames` and `geneCutoff`:
 
 ```{r}
-trena <- TReNA(mtx.assay = mtx.voom, solver = "ensemble")
-target.gene <- "MEF2C"
-gene.filter <- VarianceFilter(mtx.assay = mtx.voom)
-tf.list <- getCandidates(gene.filter, extraArgs = list("target.gene" = target.gene, "var.size" = 0.5))
-tbl.out <- solve(trena, target.gene, tf.list$tfs)
+ensemble.solver <- EnsembleSolver(mtx.assay = mtx.voom, 
+                                  targetGene = "MEF2C",
+                                  candidateRegulators = tfs$tfs)
+tbl.out <- run(ensemble.solver)
 tbl.out
 ```
+
+Note that in the final data frame, regulators are returned in descending order of `pcaMax` score. If we so choose, we can change the `solverNames` and `geneCutoff` as well; for this example, we'll change them to just 4 solver methods and 100% of the genes, respectively:
+
+```{r}
+ensemble.full <- EnsembleSolver(mtx.assay = mtx.voom,
+                                targetGene = "MEF2C",
+                                candidateRegulators = tfs$tfs,
+                                solverNames = c("lasso","pearson","randomforest","ridge"),
+                                geneCutoff = 1
+                                )
+tbl.full <- run(ensemble.full)
+str(tbl.full)
+```
+
+As demonstrated, the full set of regulators here is 64; when using a 10% cutoff, we only get 9 features in the final model as the cutoff is designed to go into effect only for 10 or more features. 
 
 The ensemble approach is an attractive option for a couple of reasons:
 
@@ -169,16 +262,7 @@ The ensemble approach is an attractive option for a couple of reasons:
 
 3. The relationship between transcription factors and target genes is a young area of active investigation. How this relates to the various solvers is an open question. TReNA was born out of a desire to explore these relationships. 
 
-We can optionally pass solver-specific parameters as well using named arguments in the *extraArgs* list argument. For instance, we may want to specify the number of cores to use for the square root LASSO solver and include it in our solver list. The following *solve* command will accomplish that, setting the number of cores to dedicate to square root LASSO as 4:
+Thus, if you are a first-time TReNA user, we recommend that you start with the `EnsembleSolver` as your `Solver` object of choice. 
 
-```{r}
 
-tbl.out.2 <- solve(trena, target.gene, tf.list$tfs, 
-                   extraArgs = list(
-                     "solver.list" = c("lasso", "ridge", "sqrtlasso", "randomForest",
-                                       "lassopv", "spearman", "pearson"),
-                     "sqrtlasso" = list("num.cores" = 4)
-                   ))
-tbl.out.2
-```
 

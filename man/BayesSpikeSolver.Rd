@@ -10,6 +10,8 @@ BayesSpikeSolver(mtx.assay = matrix(), targetGene, candidateRegulators,
 \arguments{
 \item{mtx.assay}{An assay matrix of gene expression data}
 
+\item{targetGene}{A designated target gene that should be part of the mtx.assay data}
+
 \item{candidateRegulators}{The designated set of transcription factors that could be associated
 with the target gene}
 
@@ -17,8 +19,6 @@ with the target gene}
 method (default = 10)}
 
 \item{quiet}{A logical denoting whether or not the solver should print output}
-
-\item{target.gene}{A designated target gene that should be part of the mtx.assay data}
 }
 \value{
 A Solver class object with Bayes Spike as the solver
@@ -27,7 +27,10 @@ A Solver class object with Bayes Spike as the solver
 Create a Solver class object using the Bayes Spike Solver
 }
 \examples{
-solver <- BayesSpikeSolver()
+load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+target.gene <- "MEF2C"
+tfs <- setdiff(rownames(mtx.sub), target.gene)
+bayes.solver <- BayesSpikeSolver(mtx.sub, target.gene, tfs)
 }
 \seealso{
 \code{\link{solve.BayesSpike}}, \code{\link{getAssayData}}
