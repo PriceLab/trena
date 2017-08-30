@@ -16,13 +16,20 @@ FootprintFilter(genomeDB, footprintDB, geneCenteredSpec = list(),
 
 \item{footprintDB}{A connection to a database that contains footprint information}
 
-\item{geneCenteredSpec}{\itemize{
-\item{"target.gene" A designated target gene that should be part of the mtx.assay data}
-\item{"size.upstream" An integer denoting the distance upstream of the target gene to look for footprints}
-\item{"size.downstream" An integer denoting the distance downstream of the target gene to look for footprints}
+\item{geneCenteredSpec}{A named list that specifies the regions of interest using a target gene
+and upstream/downstream sizes. If specified,it t should contain the following fields
+(default = list()):
+\itemize{
+\item{"targetGene" A designated target gene that should be part of the mtx.assay data}
+\item{"tssUpstream" An integer denoting the distance upstream of the target gene
+to look for footprints}
+\item{"tssDownstream" An integer denoting the distance downstream of the target gene
+to look for footprints}
 }}
 
-\item{regionsSpec}{}
+\item{regionsSpec}{A character vector that specifies the regions of interest directly, using a
+string containing chromosome number, starting position, and ending position. The string should
+be formatted as follows: "chr##:start-end" (e.g. "chr1:10000-20000"). (default = list())}
 
 \item{quiet}{A logical denoting whether or not the filter should print output}
 }
@@ -37,7 +44,16 @@ that match footprint motifs for a supplied target gene.
 }
 \examples{
 load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
-footprint.filter <- FootprintFilter()
+db.address <- system.file(package="trena", "extdata")
+genome.db.uri <- paste("sqlite:/",db.address,"genome.sub.db", sep = "/")
+project.db.uri <- paste("sqlite:/",db.address,"project.sub.db", sep = "/")
+target.gene <- "MEF2C"
+size.upstream <- 1000
+size.downstream <- 1000
+geneCenteredSpec <- list(targetGene = target.gene, tssUpstream = size.upstream,
+tssDownstream = size.downstream)
+footprint.filter <- FootprintFilter(genomeDB = genome.db.uri, footprintDB = project.db.uri,
+geneCenteredSpec = geneCenteredSpec)
 }
 \seealso{
 \code{\link{getCandidates-FootprintFilter}}, \code{\link{getFilterAssayData}}

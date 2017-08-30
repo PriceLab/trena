@@ -8,8 +8,6 @@ getCandidates(obj, ...)
 }
 \arguments{
 \item{obj}{An object of a CandidateFilter class}
-
-\item{extraArgs}{A named list of extra arguments corresponding to the chosen filter}
 }
 \value{
 A vector containing genes from the assay matrix that are selected by the filter

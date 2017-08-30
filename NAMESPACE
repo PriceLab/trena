@@ -37,7 +37,6 @@ exportMethods(
     getAssayData,
     getTarget,
     getRegulators,
-    getFilterAssayData,
     getChromLoc,
     getFootprintsForGene,
     getFootprintsInRegion,
@@ -65,7 +64,8 @@ import(
     GenomicRanges,
     BSgenome,
     flare,
-    lassopv
+    lassopv,
+    Biostrings
 )
 
 importFrom(RSQLite, SQLite)
@@ -73,3 +73,7 @@ importFrom(RPostgreSQL, PostgreSQL)
 importFrom(RMySQL, MySQL)
 importFrom(utils, head)
 importFrom(stringr, str_match)
+importFrom(org.Hs.eg.db, org.Hs.eg.db)
+importFrom(BSgenome.Hsapiens.UCSC.hg38,BSgenome.Hsapiens.UCSC.hg38)
+importFrom(BSgenome.Hsapiens.UCSC.hg19,BSgenome.Hsapiens.UCSC.hg19)
+importFrom(SNPlocs.Hsapiens.dbSNP144.GRCh38,SNPlocs.Hsapiens.dbSNP144.GRCh38)

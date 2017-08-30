@@ -29,13 +29,19 @@ printf <- function(...) print(noquote(sprintf(...)))
 #'
 #' @param genomeDB A connection to a database that contains genome information
 #' @param footprintDB A connection to a database that contains footprint information
-#' @param geneCenteredSpec 
+#' @param geneCenteredSpec A named list that specifies the regions of interest using a target gene
+#' and upstream/downstream sizes. If specified,it t should contain the following fields
+#' (default = list()):
 #' \itemize{
-#' \item{"target.gene" A designated target gene that should be part of the mtx.assay data}
-#' \item{"size.upstream" An integer denoting the distance upstream of the target gene to look for footprints}
-#' \item{"size.downstream" An integer denoting the distance downstream of the target gene to look for footprints}
+#' \item{"targetGene" A designated target gene that should be part of the mtx.assay data}
+#' \item{"tssUpstream" An integer denoting the distance upstream of the target gene
+#' to look for footprints}
+#' \item{"tssDownstream" An integer denoting the distance downstream of the target gene
+#' to look for footprints}
 #' }
-#' @param regionsSpec 
+#' @param regionsSpec A character vector that specifies the regions of interest directly, using a
+#' string containing chromosome number, starting position, and ending position. The string should
+#' be formatted as follows: "chr##:start-end" (e.g. "chr1:10000-20000"). (default = list())
 #' @param quiet A logical denoting whether or not the filter should print output
 #'
 #' @seealso \code{\link{getCandidates-FootprintFilter}}, \code{\link{getFilterAssayData}}
@@ -48,7 +54,16 @@ printf <- function(...) print(noquote(sprintf(...)))
 #'
 #' @examples
 #' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
-#' footprint.filter <- FootprintFilter()
+#' db.address <- system.file(package="trena", "extdata")
+#' genome.db.uri <- paste("sqlite:/",db.address,"genome.sub.db", sep = "/")
+#' project.db.uri <- paste("sqlite:/",db.address,"project.sub.db", sep = "/")
+#' target.gene <- "MEF2C"
+#' size.upstream <- 1000
+#' size.downstream <- 1000
+#' geneCenteredSpec <- list(targetGene = target.gene, tssUpstream = size.upstream,
+#' tssDownstream = size.downstream)
+#' footprint.filter <- FootprintFilter(genomeDB = genome.db.uri, footprintDB = project.db.uri,
+#' geneCenteredSpec = geneCenteredSpec)
 
 FootprintFilter <- function(genomeDB, footprintDB, geneCenteredSpec=list(),
                             regionsSpec=list(), quiet=TRUE)
@@ -59,9 +74,13 @@ FootprintFilter <- function(genomeDB, footprintDB, geneCenteredSpec=list(),
    regions <- c();   # one or more chromLoc strings: "chr5:88903257-88905257"
 
    if(length(geneCenteredSpec) == 3){
-      new.region <- with (geneCenteredSpec, getGenePromoterRegion(fpFinder, targetGene, tssUpstream, tssDownstream))
-      new.region.chromLocString <- with(new.region, sprintf("%s:%d-%d", chr, start, end))
-      regions <- c(regions, new.region.chromLocString)
+       new.region <- with (geneCenteredSpec,
+                           getGenePromoterRegion(fpFinder,
+                                                 targetGene,
+                                                 tssUpstream,
+                                                 tssDownstream))
+       new.region.chromLocString <- with(new.region, sprintf("%s:%d-%d", chr, start, end))       
+       regions <- c(regions, new.region.chromLocString)       
       }
 
    if(length(regionsSpec) > 0)
@@ -90,7 +109,7 @@ FootprintFilter <- function(genomeDB, footprintDB, geneCenteredSpec=list(),
 #' @examples
 #'
 #' # Use footprint filter with the included SQLite database for MEF2C to filter candidates
-#' # in the included Alzheimer's dataset
+#' # in the included Alzheimer's dataset with a gene-centered spec
 #' target.gene <- "MEF2C"
 #' db.address <- system.file(package="trena", "extdata")
 #' genome.db.uri <- paste("sqlite:/",db.address,"genome.sub.db", sep = "/")
@@ -100,7 +119,16 @@ FootprintFilter <- function(genomeDB, footprintDB, geneCenteredSpec=list(),
 #' geneCenteredSpec <- list(targetGene = target.gene, tssUpstream = size.upstream, tssDownstream = size.downstream)
 #' footprint.filter <- FootprintFilter(genomeDB = genome.db.uri, footprintDB = project.db.uri,
 #' geneCenteredSpec = geneCenteredSpec)
-#' 
+#' tfs <- getCandidates(footprint.filter)
+#'
+#' # Perform the same operation, but use a region spec
+#' mef2c.tss <- 88904257 # Empirically assign the MEF2C TSS as the location
+#' chrom <- "chr5"
+#' start <- mef2c.tss - 1000
+#' end <- mef2c.tss + 1000
+#' regionsSpec <- sprintf("%s:%d-%d", chrom, start, end)
+#' footprint.filter <- FootprintFilter(genomeDB = genome.db.uri,
+#' footprintDB = project.db.uri, regionsSpec = regionsSpec)
 #' tfs <- getCandidates(footprint.filter)
 
 

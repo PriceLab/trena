@@ -20,7 +20,7 @@ Get candidate genes using the variance filter
 \examples{
 
 # Use footprint filter with the included SQLite database for MEF2C to filter candidates
-# in the included Alzheimer's dataset
+# in the included Alzheimer's dataset with a gene-centered spec
 target.gene <- "MEF2C"
 db.address <- system.file(package="trena", "extdata")
 genome.db.uri <- paste("sqlite:/",db.address,"genome.sub.db", sep = "/")
@@ -30,7 +30,16 @@ size.downstream <- 1000
 geneCenteredSpec <- list(targetGene = target.gene, tssUpstream = size.upstream, tssDownstream = size.downstream)
 footprint.filter <- FootprintFilter(genomeDB = genome.db.uri, footprintDB = project.db.uri,
 geneCenteredSpec = geneCenteredSpec)
+tfs <- getCandidates(footprint.filter)
 
+# Perform the same operation, but use a region spec
+mef2c.tss <- 88904257 # Empirically assign the MEF2C TSS as the location
+chrom <- "chr5"
+start <- mef2c.tss - 1000
+end <- mef2c.tss + 1000
+regionsSpec <- sprintf("\%s:\%d-\%d", chrom, start, end)
+footprint.filter <- FootprintFilter(genomeDB = genome.db.uri,
+footprintDB = project.db.uri, regionsSpec = regionsSpec)
 tfs <- getCandidates(footprint.filter)
 }
 \seealso{

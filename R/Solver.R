@@ -38,9 +38,8 @@ printf <- function(...) print(noquote(sprintf(...)))
 setGeneric("getAssayData",    signature="obj", function(obj) standardGeneric ("getAssayData"))
 
 #' @export
-setGeneric("show", signature = "obj", function(obj) standardGeneric("show"))
-#' @export
 setGeneric("run",             signature="obj", function(obj) standardGeneric ("run"))
+
 #' @export
 setGeneric("rescalePredictorWeights",
            signature="obj", function(obj, rawValue.min, rawValue.max, rawValues) standardGeneric ("rescalePredictorWeights"))
@@ -146,51 +145,18 @@ Solver <- function(mtx.assay=matrix(), targetGene, candidateRegulators, quiet=TR
 
 } # Solver, the constructor
 #----------------------------------------------------------------------------------------------------
-#' @describeIn Solver Retrieve the assay matrix of gene expression data
-#'
-#' @param obj An object of class Solver
-#' 
-#' @examples
-#'
-#' # Create a Solver object using the included Alzheimer's data and retrieve the matrix
-#' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
-#' solver <- Solver(mtx.sub)
-#' mtx <- getAssayData(solver)
-
 setMethod("getAssayData", "Solver",
 
    function (obj){
       obj@mtx.assay
       })
 #----------------------------------------------------------------------------------------------------
-#' @describeIn Solver Retrieve the target gene for a Solver
-#'
-#' @param obj An object of class Solver
-#' 
-#' @examples
-#'
-#' # Create a Solver object using the included Alzheimer's data and retrieve the matrix
-#' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
-#' solver <- Solver(mtx.sub)
-#' mtx <- getTarget(solver)
-
 setMethod("getTarget", "Solver",
 
    function (obj){
       obj@targetGene
       })
 #----------------------------------------------------------------------------------------------------
-#' @describeIn Solver Retrieve the candidate regulators for a Solver
-#'
-#' @param obj An object of class Solver
-#' 
-#' @examples
-#'
-#' # Create a Solver object using the included Alzheimer's data and retrieve the matrix
-#' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
-#' solver <- Solver(mtx.sub)
-#' mtx <- getRegulators(solver)
-
 setMethod("getRegulators", "Solver",
 
    function (obj){

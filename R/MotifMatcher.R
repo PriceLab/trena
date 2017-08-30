@@ -4,127 +4,216 @@
 #' A MotifMatcher object is used directly by the \code{\link{HumanDHSFilter}} class to match motif
 #' matrices to where they occur in the supplied genome. 
 #'
-#' @include MotifMatcher.R
 #' @import methods
 #'
 #' @name MotifMatcher-class
 #' @rdname MotifMatcher-class
 #' @aliases MotifMatcher
 #----------------------------------------------------------------------------------------------------
-.MotifMatcher <- setClass('MotifMatcher',
-                          representation(name="character",
+.MotifMatcher <- setClass('MotifMatcher',                          
+                          representation(name="character",                                         
                                          genome="BSgenome",
                                          pfms="list",
                                          quiet="logical")
-                        )
-#------------------------------------------------------------------------------------------------------------------------
-setGeneric("getPfms",            signature="obj", function(obj) standardGeneric ("getPfms"))
-setGeneric("getSequence",        signature="obj", function(obj, tbl.regions, variants=NA_character_) standardGeneric ("getSequence"))
-setGeneric(".parseVariantString", signature="obj", function(obj, variantString) standardGeneric (".parseVariantString"))
+                          )
+#----------------------------------------------------------------------------------------------------
+setGeneric("getPfms",            signature="obj",
+           function(obj) standardGeneric ("getPfms"))
+setGeneric("getSequence",        signature="obj",
+           function(obj,tbl.regions,variants=NA_character_)
+               standardGeneric ("getSequence"))
+setGeneric(".parseVariantString", signature="obj",
+           function(obj, variantString)
+               standardGeneric (".parseVariantString"))
 setGeneric("findMatchesByChromosomalRegion", signature="obj",
            function(obj, tbl.regions, pwmMatchMinimumAsPercentage, variants=NA_character_)
               standardGeneric ("findMatchesByChromosomalRegion"))
-#------------------------------------------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------------
+#' @title Class MotifMatcher
+#' @name MotifMatcher-class
+#' @rdname MotifMatcher-class
+#'
+#' @description
+#' The MotifMatcher class is used to match motif position weight matrices to places where they occur
+#' in a given genome. It requries specification of a genome to search in and a list of motifs to
+#' search for. Ordinarily this class is primarily used by the HumanDHSFilter, but can alternatively
+#' be used to search for motifs in a given genome without any filtering functionality. 
+#'
+#' @param name A character string used to name a given MotifMatcher object (default = NA_character_)
+#' @param genomeName A character string identifying an object of type BSgenome. The genome object
+#' contains the information for a specific human genome and should be either "hg38" or "hg19". The
+#' supplied genome serves as the search space for matching motifs (default = "hg38").
+#' @param pfms A list of motif matrices to serve as queries for the target genome. If supplied,
+#' these should be created using a MotifList object from the \code{\link{MotifDb}} package (see
+#' example below). If unspecified, the motifs will default to all vertebrates in the JASPAR
+#' database (default = list())
+#' @param quiet A logical denoting whether or not the MotifMatcher object should print output
+#'
+#' @return An object of the MotifMatcher class
+#'
+#' @export
+#'
+#' @seealso \code{\link{HumanDHSFilter}}
+#'
+#' @examples
+#' # Create an unamed MotifMatcher object using the default parameters
+#' mm <- MotifMatcher()
+#'
+#' # Specify the name, genome, and motif list to create a MotifMatcher for only human motifs
+#' mm <- MotifMatcher(name="motifDB.test", genomeName="hg38",
+#' pfms=as.list(query(MotifDb, "sapiens")))
+
 MotifMatcher <- function(name=NA_character_,
                          genomeName="hg38",
                          pfms=list(),
                          quiet=TRUE)
 {
-   if(length(pfms) == 0){
-      uri <- "http://jaspar.genereg.net/html/DOWNLOAD/JASPAR_CORE/pfm/nonredundant/pfm_vertebrates.txt"
-      x <- .readRawJasparMatrices(uri)
-         # normalize, so that a frequency sum of 1.0 is true across the 4 possible bases at each position
-      pfms <- lapply(x, function(e) apply(e$matrix, 2, function(col) col/sum(col)))
-      names(pfms) <- as.character(lapply(x, function(e) e$title))
-      }
-
-    if(genomeName == "hg38"){
-       library(BSgenome.Hsapiens.UCSC.hg38)
-       reference.genome <- BSgenome.Hsapiens.UCSC.hg38
-       }
-    else if(genomeName == "hg19"){
-       library(BSgenome.Hsapiens.UCSC.hg19)
-       reference.genome <- BSgenome.Hsapiens.UCSC.hg19
-       }
-    else {
-      stop(sprintf("MotifMatch, genomeName not in hg19, hg38: '%s'", genomeName))
-       }
-
-
-   .MotifMatcher(name=name, genome=reference.genome,
-                 pfms=pfms, quiet=quiet)
+    if(length(pfms) == 0){        
+        uri <- "http://jaspar.genereg.net/html/DOWNLOAD/JASPAR_CORE/pfm/nonredundant/pfm_vertebrates.txt"        
+        x <- .readRawJasparMatrices(uri)        
+        # normalize, so that a frequency sum of 1.0 is true across the 4 possible bases at each position        
+        pfms <- lapply(x, function(e) apply(e$matrix, 2, function(col) col/sum(col)))              
+        names(pfms) <- as.character(lapply(x, function(e) e$title))              
+   }
+   
+   if(genomeName == "hg38"){       
+       # library(BSgenome.Hsapiens.UCSC.hg38) ## Remove the library reference       
+       reference.genome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38       
+   }
+   
+   else if(genomeName == "hg19"){       
+        # library(BSgenome.Hsapiens.UCSC.hg19) ## Remove the library reference        
+        reference.genome <- BSgenome.Hsapiens.UCSC.hg19::BSgenome.Hsapiens.UCSC.hg19        
+    }
+   
+   else {       
+       stop(sprintf("MotifMatch, genomeName not in hg19, hg38: '%s'", genomeName))       
+   }
+    
+    .MotifMatcher(name=name, genome=reference.genome,                  
+                  pfms=pfms, quiet=quiet)    
 
 } # MotifMatcher constructor
-#------------------------------------------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------------
 setMethod("show", "MotifMatcher",
 
-     function(obj){
-        s <- sprintf("MotifMatcher...")
-        cat(s, sep="\n")
-     })
-
+          function(obj){              
+              s <- sprintf("MotifMatcher...")              
+              cat(s, sep="\n")              
+          })
 #----------------------------------------------------------------------------------------------------
+#' Find Motif Matches by Chromosomal Region
+#'
+#' Given a MotifMatcher object, a table of chromosomal regions, and a minimum match percentage,
+#' pull out a list containing a data frame of the motifs in those regions and a character vector
+#' of their associated transcription factors.
+#'
+#' @param obj An object of class MotifMatcher
+#' @param tbl.regions A data frame where each row contains a chromosomal region with the fields
+#' "chrom", "start", and "end".
+#' @param pwmMatchMinimumAsPercentage A percentage (0-100) used as a cutoff for what constitutes
+#' a motif match
+#' @param variants A character containing variants to use for the matching (default = NA_character_).
+#' The variants should either have the same number of entries as rows in the \code{tbl.regions},
+#' or they should not be supplied. 
+#'
+#' @return A list containing a data frame of the motifs in the given regions and a character
+#' vector of their associated transcription factors
+#'
+#' @examples
+#' # Perform a simple match in the rs13384219 neighborhood 
+#' motifMatcher <- MotifMatcher(name="rs13384219.neighborhood", genomeName="hg38", quiet=FALSE)
+#' tbl.regions <- data.frame(chrom="chr2", start=57907313, end=57907333, stringsAsFactors=FALSE)
+#' x <- findMatchesByChromosomalRegion(motifMatcher, tbl.regions, pwmMatchMinimumAsPercentage=92)
+#'
+#' # Perform the same match, but now include a variant
+#' x.mut <- findMatchesByChromosomalRegion(motifMatcher, tbl.regions,
+#' pwmMatchMinimumAsPercentage=92, "rs13384219")
+
 setMethod("findMatchesByChromosomalRegion", "MotifMatcher",
 
-    function(obj, tbl.regions, pwmMatchMinimumAsPercentage, variants=NA_character_){
-       x <- lapply(1:nrow(tbl.regions), function(r) getSequence(obj, tbl.regions[r,], variants))
-       tbl.regions <- do.call(rbind, x)
-       tbl.motifs.list <- .getScoredMotifs(tbl.regions$seq, obj@pfms, pwmMatchMinimumAsPercentage, obj@quiet)
-
-       region.count <- nrow(tbl.regions)
-       tbl.out <- data.frame()
-       all.tfs <- c()
-       for(i in seq_len(region.count)){
-         tbl.motifs <- tbl.motifs.list[[i]]
-         if(nrow(tbl.motifs) > 0){
-            colnames(tbl.motifs) <- c("motifStart", "motifEnd", "width", "motifScore", "maxScore", "motifRelativeScore",
-                                      "motifName", "match", "strand")
-            tbl.region <- tbl.regions[i,]
-            colnames(tbl.region) <- c("chrom", "chromStart", "chromEnd", "seq", "status")
-            tbl.out <- rbind(tbl.out, cbind(tbl.motifs, tbl.region))
-            }
-         } # for i
-       if(nrow(tbl.out) == 0)
-          return(list(tbl=data.frame(), tfs=c()))
-
-       tbl.out$motifStart <- tbl.out$motifStart + tbl.out$chromStart - 1;
-       tbl.out$motifEnd <- tbl.out$motifEnd  + tbl.out$chromStart - 1;
-             # change some column names
-       #colnames(tbl.out)[4] <- "motifscore"
-       #colnames(tbl.out)[2] <- "endpos"
-       #colnames(tbl.out)[7] <- "motifname"
-       tbl.out <- tbl.out[, -c(3,5)] # get rid of width and maxScore columns
-       desired.column.order <- c("motifName", "chrom", "motifStart", "motifEnd", "strand", "motifScore",
-                                 "motifRelativeScore", "match",
-                                 "chromStart", "chromEnd", "seq", "status") #, "count", "score")
-       tbl.out <- tbl.out[, desired.column.order]
-       tbl.out <- tbl.out[order(tbl.out$motifScore, decreasing=TRUE),]
-           # tbl.mg will soon come from MotifDb
-       tbl.mg <- read.table(system.file(package="trena", "extdata", "motifGenes.tsv"), sep="\t", as.is=TRUE, header=TRUE)
-       tfs.by.motif <- lapply(tbl.out$motifName, function(m) subset(tbl.mg, motif==m)$tf.gene)
-       all.tfs <- sort(unique(unlist(tfs.by.motif)))
-       tfs.by.motif.joined <- unlist(lapply(tfs.by.motif, function(m) paste(m, collapse=";")))
-       tbl.out$tf <- tfs.by.motif.joined
-       if(nchar(tbl.out$seq[1]) > 40)
-          tbl.out$seq <- paste(substring(tbl.out$seq, 1, 37), "...", sep="")
-       list(tbl=tbl.out, tfs=all.tfs)
-       })
-
+          function(obj, tbl.regions, pwmMatchMinimumAsPercentage, variants=NA_character_){
+              
+              x <- lapply(1:nrow(tbl.regions),
+                          function(r) getSequence(obj, tbl.regions[r,], variants))              
+              tbl.regions <- do.call(rbind, x)              
+              tbl.motifs.list <- .getScoredMotifs(tbl.regions$seq, obj@pfms,
+                                                  pwmMatchMinimumAsPercentage, obj@quiet)
+              
+              region.count <- nrow(tbl.regions)              
+              tbl.out <- data.frame()              
+              all.tfs <- c()              
+              for(i in seq_len(region.count)){                  
+                  tbl.motifs <- tbl.motifs.list[[i]]                  
+                  if(nrow(tbl.motifs) > 0){                      
+                      colnames(tbl.motifs) <- c("motifStart", "motifEnd", "width",
+                                                "motifScore", "maxScore",
+                                                "motifRelativeScore", "motifName",
+                                                "match", "strand")                      
+                      tbl.region <- tbl.regions[i,]                      
+                      colnames(tbl.region) <- c("chrom", "chromStart", "chromEnd", "seq", "status")                      
+                      tbl.out <- rbind(tbl.out, cbind(tbl.motifs, tbl.region))                      
+                  }                  
+              } # for i
+              
+              if(nrow(tbl.out) == 0)                  
+                  return(list(tbl=data.frame(), tfs=c()))
+              
+              tbl.out$motifStart <- tbl.out$motifStart + tbl.out$chromStart - 1;              
+              tbl.out$motifEnd <- tbl.out$motifEnd  + tbl.out$chromStart - 1;              
+              # change some column names              
+              #colnames(tbl.out)[4] <- "motifscore"             
+              #colnames(tbl.out)[2] <- "endpos"              
+              #colnames(tbl.out)[7] <- "motifname"              
+              tbl.out <- tbl.out[, -c(3,5)] # get rid of width and maxScore columns
+              
+              desired.column.order <- c("motifName", "chrom", "motifStart", "motifEnd", "strand",
+                                        "motifScore", "motifRelativeScore", "match",
+                                        "chromStart", "chromEnd", "seq", "status") #, "count", "score")              
+              tbl.out <- tbl.out[, desired.column.order]              
+              tbl.out <- tbl.out[order(tbl.out$motifScore, decreasing=TRUE),]
+              
+              # tbl.mg will soon come from MotifDb              
+              tbl.mg <- utils::read.table(system.file(package="trena", "extdata", "motifGenes.tsv"),
+                                          sep="\t", as.is=TRUE, header=TRUE)              
+              tfs.by.motif <- lapply(tbl.out$motifName, function(m) subset(tbl.mg, motif==m)$tf.gene)              
+              all.tfs <- sort(unique(unlist(tfs.by.motif)))              
+              tfs.by.motif.joined <- unlist(lapply(tfs.by.motif, function(m) paste(m, collapse=";")))              
+              tbl.out$tf <- tfs.by.motif.joined              
+              if(nchar(tbl.out$seq[1]) > 40)                  
+                  tbl.out$seq <- paste(substring(tbl.out$seq, 1, 37), "...", sep="")              
+              list(tbl=tbl.out, tfs=all.tfs)              
+          })
 #----------------------------------------------------------------------------------------------------
+#' Retrieve the motifs from the pfms slot
+#'
+#' Given a MotifMatcher object, return the motifs, which are stored in the pfms slot.
+#'
+#' @param obj An object of class MotifMatcher
+#'
+#' @return The list of motif matrices stored in the pfms slot. 
+#'
+#' @examples
+#' 
+#' # Return the default matrix of JASPAR motifs
+#' motifMatcher <- MotifMatcher()
+#' motifs <- getPfms(motifMatcher)
+
 setMethod("getPfms", "MotifMatcher",
 
-          function(obj){
-             return(obj@pfms)
+          function(obj){              
+              return(obj@pfms)              
           })
-#------------------------------------------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------------
 .matchPwmForwardAndReverse <- function(sequence, pfm, motifName, min.match.percentage=95, quiet=TRUE)
 {
    min.match.as.string <- sprintf("%02d%%", min.match.percentage)
 
-   hits.fwd <- matchPWM(pfm, sequence, with.score=TRUE, min.score=min.match.as.string)
-   hits.rev <- matchPWM(reverseComplement(pfm), sequence, with.score=TRUE, min.score=min.match.as.string)
+   hits.fwd <- Biostrings::matchPWM(pfm, sequence, with.score=TRUE, min.score=min.match.as.string)
+   hits.rev <- Biostrings::matchPWM(Biostrings::reverseComplement(pfm),
+                        sequence, with.score=TRUE, min.score=min.match.as.string)
 
-   max.score <-  maxScore(pfm)
+   max.score <-  Biostrings::maxScore(pfm)
    tbl <- data.frame()
    if(length(hits.fwd) > 0){
       if(!quiet) printf("%d +", length(hits.fwd))
@@ -320,7 +409,32 @@ setMethod("getPfms", "MotifMatcher",
   invisible (pwms)
 
 } # .readRawJasparMatrices
-#------------------------------------------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------------
+#' Retrieve the Sequence for a Set of Regions
+#'
+#' Given a MotifMatcher object, a table of chromosomal regions, and an optional set of variants,
+#' return the sequences as a new column of the table. 
+#'
+#' @param obj An object of class MotifMatcher
+#' @param tbl.regions A data frame where each row contains a chromosomal region with the fields
+#' "chrom", "start", and "end".
+#' @param variants A character containing variants to use for the matching (default = NA_character_)
+#' The variants should either have the same number of entries as rows in the \code{tbl.regions},
+#' or they should not be supplied.
+#' 
+#' @return The \code{tbl.regions} data frame with an added column containing the sequence for each
+#' entry
+#'
+#' @examples
+#' # Retrieve the sequences for the rs13384219 neighborhood
+#' motifMatcher <- MotifMatcher(name="rs13384219.neighborhood", genomeName="hg38", quiet=FALSE)
+#' tbl.regions <- data.frame(chrom="chr2", start=57907313, end=57907333, stringsAsFactors=FALSE)
+#' x <- findMatchesByChromosomalRegion(motifMatcher, tbl.regions, pwmMatchMinimumAsPercentage=92)
+#'
+#' # Retrieve the sequences, but now include a variant
+#' x.mut <- findMatchesByChromosomalRegion(motifMatcher, tbl.regions,
+#' pwmMatchMinimumAsPercentage=92, "rs13384219")
+
 setMethod("getSequence", "MotifMatcher",
 
    function(obj, tbl.regions, variants=NA_character_){
@@ -403,8 +517,9 @@ setMethod(".parseVariantString", "MotifMatcher",
             variantString <- tokens[1]
             explicitly.specified.alternate.allele <- tokens[2]
             }
-          require(SNPlocs.Hsapiens.dbSNP144.GRCh38)
-          snp.info <- as.data.frame(snpsById(SNPlocs.Hsapiens.dbSNP144.GRCh38, variantString))[1,]
+          #require(SNPlocs.Hsapiens.dbSNP144.GRCh38)
+          snp.info <- as.data.frame(BSgenome::snpsById(
+              SNPlocs.Hsapiens.dbSNP144.GRCh38::SNPlocs.Hsapiens.dbSNP144.GRCh38, variantString))[1,]
           chrom <- as.character(snp.info$seqnames)
           if(!grepl("ch", chrom))
              chrom <- sprintf("chr%s", chrom)
@@ -412,7 +527,7 @@ setMethod(".parseVariantString", "MotifMatcher",
              chrom <- sub("ch", "chr", chrom)
           start <- as.numeric(snp.info$pos)
           ambiguity.code <- snp.info$alleles_as_ambig
-          elements.string <- IUPAC_CODE_MAP[[ambiguity.code]]
+          elements.string <- Biostrings::IUPAC_CODE_MAP[[ambiguity.code]]
           elements <- strsplit(elements.string,'')[[1]]
           wt <- as.character(getSeq(obj@genome, chrom, start, start))
           mut <- setdiff(elements, wt)
@@ -453,14 +568,15 @@ setMethod(".parseVariantString", "MotifMatcher",
 {
    if(grepl("^rs", variantString)){
       stopifnot(genomeName == "hg38")  # support for other coming
-      require(SNPlocs.Hsapiens.dbSNP144.GRCh38)
-      snp.info <- as.data.frame(snpsById(SNPlocs.Hsapiens.dbSNP144.GRCh38, variantString))[1,]
+      #require(SNPlocs.Hsapiens.dbSNP144.GRCh38)
+      snp.info <- as.data.frame(snpsById(
+          SNPlocs.Hsapiens.dbSNP144.GRCh38::SNPlocs.Hsapiens.dbSNP144.GRCh38, variantString))[1,]
       chrom <- as.character(snp.info$seqnames)
       if(!grepl("chr", chrom))
          chrom <- sub("ch", "chr", chrom)
       start <- as.numeric(snp.info$pos)
       ambiguity.code <- snp.info$alleles_as_ambig
-      elements.string <- IUPAC_CODE_MAP[[ambiguity.code]]
+      elements.string <- Biostrings::IUPAC_CODE_MAP[[ambiguity.code]]
       elements <- strsplit(elements.string,'')[[1]]
       wt <- as.character(getSeq(genomeName, chrom, start, start))
       mut <- setdiff(elements, wt)

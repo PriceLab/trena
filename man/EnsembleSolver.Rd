@@ -66,6 +66,7 @@ ensemble.solver <- EnsembleSolver(mtx.sub, target.gene, tfs)
 \code{\link{solve.Ensemble}}, \code{\link{getAssayData}}
 
 Other Solver class objects: \code{\link{BayesSpikeSolver}},
+  \code{\link{GeneOntologyFilter}},
   \code{\link{LassoPVSolver}}, \code{\link{LassoSolver}},
   \code{\link{PearsonSolver}},
   \code{\link{RandomForestSolver}},

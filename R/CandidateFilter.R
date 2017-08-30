@@ -21,7 +21,6 @@ printf <- function(...) print(noquote(sprintf(...)))
 #' @aliases getCandidates
 #'
 #' @param obj An object of a CandidateFilter class
-#' @param extraArgs A named list of extra arguments corresponding to the chosen filter
 #'
 #' @return A vector containing genes from the assay matrix that are selected by the filter
 #'
@@ -29,22 +28,6 @@ printf <- function(...) print(noquote(sprintf(...)))
 #' @export
 setGeneric("getCandidates", signature="obj", function(obj, ...) standardGeneric("getCandidates"))
 
-#' Retrieve the assay matrix of gene expression data
-#'
-#' @aliases getFilterAssayData
-#'
-#' @param obj An object of a CandidateFilter class
-#'
-#' @return The assay matrix of gene expression data associated with a CandidateFilter object
-#'
-#' @examples
-#'
-#' # Create an empty CandidateFilter object
-#' my.filter <- CandidateFilter()
-
-#' @export
-#' 
-setGeneric("getFilterAssayData",    signature="obj", function(obj) standardGeneric ("getFilterAssayData"))
 #----------------------------------------------------------------------------------------------------
 #' CandidateFilter
 #'

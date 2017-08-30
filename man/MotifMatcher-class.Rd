@@ -5,8 +5,47 @@
 \alias{MotifMatcher-class}
 \alias{.MotifMatcher}
 \alias{MotifMatcher}
+\alias{MotifMatcher-class}
+\alias{MotifMatcher}
 \title{Create a MotifMatcher object}
+\usage{
+MotifMatcher(name = NA_character_, genomeName = "hg38", pfms = list(),
+  quiet = TRUE)
+}
+\arguments{
+\item{name}{A character string used to name a given MotifMatcher object (default = NA_character_)}
+
+\item{genomeName}{A character string identifying an object of type BSgenome. The genome object
+contains the information for a specific human genome and should be either "hg38" or "hg19". The
+supplied genome serves as the search space for matching motifs (default = "hg38").}
+
+\item{pfms}{A list of motif matrices to serve as queries for the target genome. If supplied,
+these should be created using a MotifList object from the \code{\link{MotifDb}} package (see
+example below). If unspecified, the motifs will default to all vertebrates in the JASPAR
+database (default = list())}
+
+\item{quiet}{A logical denoting whether or not the MotifMatcher object should print output}
+}
+\value{
+An object of the MotifMatcher class
+}
 \description{
 A MotifMatcher object is used directly by the \code{\link{HumanDHSFilter}} class to match motif
 matrices to where they occur in the supplied genome.
+
+The MotifMatcher class is used to match motif position weight matrices to places where they occur
+in a given genome. It requries specification of a genome to search in and a list of motifs to
+search for. Ordinarily this class is primarily used by the HumanDHSFilter, but can alternatively
+be used to search for motifs in a given genome without any filtering functionality.
+}
+\examples{
+# Create an unamed MotifMatcher object using the default parameters
+mm <- MotifMatcher()
+
+# Specify the name, genome, and motif list to create a MotifMatcher for only human motifs
+mm <- MotifMatcher(name="motifDB.test", genomeName="hg38",
+pfms=as.list(query(MotifDb, "sapiens")))
+}
+\seealso{
+\code{\link{HumanDHSFilter}}
 }

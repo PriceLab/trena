@@ -56,12 +56,12 @@ HumanDHSFilter <- function(genomeName,
     names(pfms) <- as.character(lapply(x, function(e) e$title))
 
     if(genomeName == "hg38"){
-       library(BSgenome.Hsapiens.UCSC.hg38)
-       reference.genome <- BSgenome.Hsapiens.UCSC.hg38
+       # library(BSgenome.Hsapiens.UCSC.hg38) ## Remove the library reference
+       reference.genome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
        }
     else if(genomeName == "hg19"){
-       library(BSgenome.Hsapiens.UCSC.hg19)
-       reference.genome <- BSgenome.Hsapiens.UCSC.hg19
+       # library(BSgenome.Hsapiens.UCSC.hg19) ## Remove the library reference
+       reference.genome <- BSgenome.Hsapiens.UCSC.hg19::BSgenome.Hsapiens.UCSC.hg19
        }
     else {
       stop(sprintf("HumanDHSFilter genome.name not in hg19, hg38: '%s'", genomeName))
@@ -248,8 +248,10 @@ setMethod("getRegulatoryRegions", "HumanDHSFilter",
          if(nrow(tbl.regionsExtended) > 0) { # now find just the intersection of DHS and requested region
             if(!obj@quiet)
                printf("tbl.regionsExtended: %d rows, now have intersection", nrow(tbl.regionsExtended));
-            gr.regions <- with(tbl.regionsExtended, GRanges(seqnames=chromosome, IRanges(chromStart, chromEnd)))
-            gr.target <- GRanges(seqnames=chromosome, IRanges(start, end))
+            gr.regions <- with(tbl.regionsExtended,
+                               GRanges(seqnames=chromosome,
+                                       IRanges::IRanges(chromStart, chromEnd)))
+            gr.target <- GRanges(seqnames=chromosome, IRanges::IRanges(start, end))
               # use range to collapse any multiple intersections down to that of the original target
             gr.intersect <- GenomicRanges::intersect(gr.target, gr.regions, ignore.strand=TRUE)
             if(!obj@quiet) printf("GenomicRanges intersections of extended region with original target: %d", length(gr.intersect))

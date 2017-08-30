@@ -127,11 +127,11 @@ setMethod("run", "NaiveSolver",
             }
             
             else if(is.numeric(lambda)){
-              fit = glmnet(features, target, penalty.factor=tf.weights, alpha=alpha, lambda=lambda)
+              fit <- glmnet(features, target, penalty.factor=tf.weights, alpha=alpha, lambda=lambda)
             }
             
             # Pull out the non-zero coefficients and those matching variables
-            fit.coefs <- as.matrix(coef(fit))
+            fit.coefs <- as.matrix(stats::coef(fit))
             nz.indices <- which(!(fit.coefs == 0))
             non.zeroes <- rownames(as.matrix(fit.coefs[nz.indices,,drop=FALSE]))[-1]
             non.zeroes <- append(non.zeroes, target.gene)
@@ -139,7 +139,7 @@ setMethod("run", "NaiveSolver",
             
             # lm the new matrix
             selected.matrix <- as.data.frame(t(selected.matrix))
-            lin.mod <- lm(paste0(target.gene,"~."),data = selected.matrix)
+            lin.mod <- stats::lm(paste0(target.gene,"~."),data = selected.matrix)
             
             # Create, format, and return the data frame from the lm
             coef.summary <- summary(lin.mod)$coefficients

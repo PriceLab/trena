@@ -33,8 +33,9 @@ lassopv.solver <- LassoPVSolver(mtx.sub, target.gene, tfs)
 \code{\link{solve.LassoPV}}, \code{\link{getAssayData}}
 
 Other Solver class objects: \code{\link{BayesSpikeSolver}},
-  \code{\link{EnsembleSolver}}, \code{\link{LassoSolver}},
-  \code{\link{PearsonSolver}},
+  \code{\link{EnsembleSolver}},
+  \code{\link{GeneOntologyFilter}},
+  \code{\link{LassoSolver}}, \code{\link{PearsonSolver}},
   \code{\link{RandomForestSolver}},
   \code{\link{RidgeSolver}}, \code{\link{Solver-class}},
   \code{\link{SpearmanSolver}},
