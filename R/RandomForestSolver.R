@@ -59,6 +59,22 @@ RandomForestSolver <- function(mtx.assay=matrix(), targetGene, candidateRegulato
 
 } # RandomForestSolver, the constructor
 #----------------------------------------------------------------------------------------------------
+#' Show the Random Forest Solver
+#' 
+#' @rdname show.RandomForestSolver
+#' @aliases show.RandomForestSolver
+#'
+#' @param obj An object of the class RandomForestSolver
+#'
+#' @return A truncated view of the supplied object
+#'
+#' @examples
+#' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+#' target.gene <- "MEF2C"
+#' tfs <- setdiff(rownames(mtx.sub), target.gene)
+#' rf.solver <- RandomForestSolver(mtx.sub, target.gene, tfs)
+#' show(rf.solver)
+
 setMethod('show', 'RandomForestSolver',
 
     function(obj) {

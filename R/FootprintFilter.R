@@ -94,7 +94,7 @@ FootprintFilter <- function(genomeDB, footprintDB, geneCenteredSpec=list(),
 
 } # FootprintFilter, the constructor
 #----------------------------------------------------------------------------------------------------
-#' Get candidate genes using the variance filter
+#' Get candidate genes using the footprint filter
 #'
 #' @aliases getCandidates-FootprintFilter
 #'
@@ -104,8 +104,11 @@ FootprintFilter <- function(genomeDB, footprintDB, geneCenteredSpec=list(),
 #'
 #' @family getCandidate Methods
 #'
-#' @return A vector containing all genes with variances less than the target gene
+#' @return A list, where one element is the transcription factors found in the footprints and the
+#' other is a data frame containing all the meta data for the footprints
 #'
+#' @export
+#' 
 #' @examples
 #'
 #' # Use footprint filter with the included SQLite database for MEF2C to filter candidates

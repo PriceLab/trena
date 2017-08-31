@@ -35,6 +35,7 @@ pearson.solver <- PearsonSolver(mtx.sub, target.gene, tfs)
 Other Solver class objects: \code{\link{BayesSpikeSolver}},
   \code{\link{EnsembleSolver}},
   \code{\link{GeneOntologyFilter}},
+  \code{\link{HumanDHSFilter}},
   \code{\link{LassoPVSolver}}, \code{\link{LassoSolver}},
   \code{\link{RandomForestSolver}},
   \code{\link{RidgeSolver}}, \code{\link{Solver-class}},

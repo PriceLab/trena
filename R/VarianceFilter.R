@@ -66,6 +66,8 @@ VarianceFilter <- function(mtx.assay=matrix(), targetGene, varSize = 0.5, quiet=
 #'
 #' @return A vector containing all genes with variances less than the target gene
 #'
+#' @export
+#' 
 #' @examples
 #'
 #' # Using the included Alzheimer's dataset, filter out only those transcription factors with variance

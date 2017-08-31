@@ -54,6 +54,22 @@ PearsonSolver <- function(mtx.assay = matrix(), targetGene, candidateRegulators,
 
 } #PearsonSolver, the constructor
 #----------------------------------------------------------------------------------------------------
+#' Show the Pearson Solver
+#' 
+#' @rdname show.PearsonSolver
+#' @aliases show.PearsonSolver
+#'
+#' @param obj An object of the class PearsonSolver
+#'
+#' @return A truncated view of the supplied object
+#'
+#' @examples
+#' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+#' target.gene <- "MEF2C"
+#' tfs <- setdiff(rownames(mtx.sub), target.gene)
+#' pearson.solver <- PearsonSolver(mtx.sub, target.gene, tfs)
+#' show(pearson.solver)
+
 setMethod('show', 'PearsonSolver',
 
     function(obj) {

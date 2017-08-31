@@ -16,6 +16,12 @@ A vector containing genes from the assay matrix that are selected by the filter
 Get candidate genes using a CandidateFilter object
 }
 \seealso{
-Other getCandidate Methods: \code{\link{getCandidates,FootprintFilter-method}},
-  \code{\link{getCandidates,VarianceFilter-method}}
+Other getCandidate Methods: \code{\link{geneSymbolToTSS,HumanDHSFilter-method}},
+  \code{\link{getCandidates,FootprintFilter-method}},
+  \code{\link{getCandidates,GeneOntologyFilter-method}},
+  \code{\link{getCandidates,HumanDHSFilter-method}},
+  \code{\link{getCandidates,VarianceFilter-method}},
+  \code{\link{getRegulatoryRegions,HumanDHSFilter-method}},
+  \code{\link{getSequence_tmp,HumanDHSFilter-method}},
+  \code{\link{show,HumanDHSFilter-method}}
 }

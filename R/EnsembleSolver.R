@@ -108,6 +108,22 @@ EnsembleSolver <- function(mtx.assay=matrix(), targetGene, candidateRegulators,
 
 } # EnsembleSolver, the constructor
 #----------------------------------------------------------------------------------------------------
+#' Show the Ensemble Solver
+#' 
+#' @rdname show.EnsembleSolver
+#' @aliases show.EnsembleSolver
+#'
+#' @param obj An object of the class EnsembleSolver
+#'
+#' @return A truncated view of the supplied object
+#'
+#' @examples
+#' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+#' target.gene <- "MEF2C"
+#' tfs <- setdiff(rownames(mtx.sub), target.gene)
+#' ensemble.solver <- EnsembleSolver(mtx.sub, target.gene, tfs)
+#' show(ensemble.solver)
+
 setMethod('show', 'EnsembleSolver',
 
     function(obj) {

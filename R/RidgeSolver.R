@@ -71,6 +71,22 @@ RidgeSolver <- function(mtx.assay=matrix(), targetGene, candidateRegulators,
 
 } # RidgeSolver, the constructor
 #----------------------------------------------------------------------------------------------------
+#' Show the Ridge Solver
+#' 
+#' @rdname show.RidgeSolver
+#' @aliases show.RidgeSolver
+#'
+#' @param obj An object of the class RidgeSolver
+#'
+#' @return A truncated view of the supplied object
+#'
+#' @examples
+#' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+#' target.gene <- "MEF2C"
+#' tfs <- setdiff(rownames(mtx.sub), target.gene)
+#' ridge.solver <- RidgeSolver(mtx.sub, target.gene, tfs)
+#' show(ridge.solver)
+
 setMethod('show', 'RidgeSolver',
 
     function(obj) {

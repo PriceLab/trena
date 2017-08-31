@@ -45,10 +45,8 @@ printf <- function(...) print(noquote(sprintf(...)))
 #' @export
 #'
 #' @examples
-#' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
-#' targetGene <- "MEF2C"
-#' candidateRegulators <- setdiff(rownames(mtx.sub), targetGene)
-#' rf.solver <- RandomForestSolver(mtx.sub, targetGene, candidateRegulators)
+#' # Make a filter for "transcription, DNA-templated"
+#' goFilter <- GeneOntologyFilter(org.Hs.eg.db, GOTerm="GO:0006351")
 
 GeneOntologyFilter <- function(organismDatabase=org.Hs.eg.db::org.Hs.eg.db,
                                GOTerm="GO:0006351", quiet=TRUE)
@@ -59,6 +57,27 @@ GeneOntologyFilter <- function(organismDatabase=org.Hs.eg.db::org.Hs.eg.db,
 
 } # GeneOntologyFilter, the constructor
 #----------------------------------------------------------------------------------------------------
+#' Get candidate genes using a gene ontology filter
+#'
+#' @aliases getCandidates-GeneOntologyFilter
+#'
+#' @param obj An object of class GeneOntologyFilter
+#'
+#' @seealso \code{\link{GeneOntologyFilter}}
+#'
+#' @family getCandidate Methods
+#'
+#' @return A list, where one element a character vector of transcription factors that match
+#' the GO term and the other is an empty data frame. 
+#'
+#' @export
+#' 
+#' @examples
+#'
+#' # Make a filter for "transcription, DNA-templated" and use it to filter candidates
+#' goFilter <- GeneOntologyFilter(org.Hs.eg.db, GOTerm="GO:0006351")
+#' candidates <- getCandidates(goFilter)
+
 setMethod("getCandidates", "GeneOntologyFilter",
 
     function(obj){

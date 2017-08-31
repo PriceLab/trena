@@ -56,6 +56,22 @@ SpearmanSolver <- function(mtx.assay = matrix(), targetGene, candidateRegulators
 
 } #SpearmanSolver, the constructor
 #----------------------------------------------------------------------------------------------------
+#' Show the Spearman Solver
+#' 
+#' @rdname show.SpearmanSolver
+#' @aliases show.SpearmanSolver
+#'
+#' @param obj An object of the class SpearmanSolver
+#'
+#' @return A truncated view of the supplied object
+#'
+#' @examples
+#' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+#' target.gene <- "MEF2C"
+#' tfs <- setdiff(rownames(mtx.sub), target.gene)
+#' spearman.solver <- SpearmanSolver(mtx.sub, target.gene, tfs)
+#' show(spearman.solver)
+
 setMethod('show', 'SpearmanSolver',
 
     function(obj) {

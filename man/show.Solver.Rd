@@ -2,6 +2,7 @@
 % Please edit documentation in R/Solver.R
 \name{show}
 \alias{show}
+\alias{show.Solver}
 \title{Show a Solver object}
 \usage{
 show(obj)

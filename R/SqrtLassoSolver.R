@@ -75,6 +75,22 @@ SqrtLassoSolver <- function(mtx.assay=matrix(), targetGene, candidateRegulators,
 
 } # SqrtLassoSolver, the constructor
 #----------------------------------------------------------------------------------------------------
+#' Show the Square Root Lasso Solver
+#' 
+#' @rdname show.SqrtLassoSolver
+#' @aliases show.SqrtLassoSolver
+#'
+#' @param obj An object of the class SqrtLassoSolver
+#'
+#' @return A truncated view of the supplied object
+#'
+#' @examples
+#' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+#' target.gene <- "MEF2C"
+#' tfs <- setdiff(rownames(mtx.sub), target.gene)
+#' sqrt.solver <- SqrtLassoSolver(mtx.sub, target.gene, tfs)
+#' show(sqrt.solver)
+
 setMethod('show', 'SqrtLassoSolver',
 
     function(obj) {

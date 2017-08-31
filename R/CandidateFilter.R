@@ -31,8 +31,9 @@ setGeneric("getCandidates", signature="obj", function(obj, ...) standardGeneric(
 #----------------------------------------------------------------------------------------------------
 #' CandidateFilter
 #'
-#' A CandidateFilter is an S4 class to represent a gene candidate filter. These filters can employ a variety of methods
-#' to reduce the number of transcription factors used as predictors for solving a TReNA object.
+#' A CandidateFilter is an S4 class to represent a gene candidate filter. These filters can employ
+#' a variety of methods to reduce the number of transcription factors used as predictors for solving
+#' a Solver object.
 #'
 #' @rdname CandidateFilter-class
 #' @aliases CandidateFilter

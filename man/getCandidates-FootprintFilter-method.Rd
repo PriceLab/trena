@@ -4,7 +4,7 @@
 \name{getCandidates,FootprintFilter-method}
 \alias{getCandidates,FootprintFilter-method}
 \alias{getCandidates-FootprintFilter}
-\title{Get candidate genes using the variance filter}
+\title{Get candidate genes using the footprint filter}
 \usage{
 \S4method{getCandidates}{FootprintFilter}(obj)
 }
@@ -12,10 +12,11 @@
 \item{obj}{An object of class FootprintFilter}
 }
 \value{
-A vector containing all genes with variances less than the target gene
+A list, where one element is the transcription factors found in the footprints and the
+other is a data frame containing all the meta data for the footprints
 }
 \description{
-Get candidate genes using the variance filter
+Get candidate genes using the footprint filter
 }
 \examples{
 
@@ -45,6 +46,12 @@ tfs <- getCandidates(footprint.filter)
 \seealso{
 \code{\link{FootprintFilter}}
 
-Other getCandidate Methods: \code{\link{getCandidates,VarianceFilter-method}},
-  \code{\link{getCandidates}}
+Other getCandidate Methods: \code{\link{geneSymbolToTSS,HumanDHSFilter-method}},
+  \code{\link{getCandidates,GeneOntologyFilter-method}},
+  \code{\link{getCandidates,HumanDHSFilter-method}},
+  \code{\link{getCandidates,VarianceFilter-method}},
+  \code{\link{getCandidates}},
+  \code{\link{getRegulatoryRegions,HumanDHSFilter-method}},
+  \code{\link{getSequence_tmp,HumanDHSFilter-method}},
+  \code{\link{show,HumanDHSFilter-method}}
 }

@@ -69,6 +69,22 @@ LassoSolver <- function(mtx.assay=matrix(), targetGene, candidateRegulators,
 
 } # LassoSolver, the constructor
 #----------------------------------------------------------------------------------------------------
+#' Show the Lasso Solver
+#' 
+#' @rdname show.LassoSolver
+#' @aliases show.LassoSolver
+#'
+#' @param obj An object of the class LassoSolver
+#'
+#' @return A truncated view of the supplied object
+#'
+#' @examples
+#' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+#' target.gene <- "MEF2C"
+#' tfs <- setdiff(rownames(mtx.sub), target.gene)
+#' lasso.solver <- LassoSolver(mtx.sub, target.gene, tfs)
+#' show(lasso.solver)
+
 setMethod('show', 'LassoSolver',
 
     function(obj) {

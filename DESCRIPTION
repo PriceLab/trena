@@ -54,7 +54,6 @@ Collate:
     'LassoPVSolver.R'
     'LassoSolver.R'
     'MotifMatcher.R'
-    'NaiveSolver.R'
     'PearsonSolver.R'
     'RandomForestSolver.R'
     'RidgeSolver.R'

@@ -59,6 +59,22 @@ BayesSpikeSolver <- function(mtx.assay=matrix(), targetGene, candidateRegulators
 
 } # BayesSpikeSolver, the constructor
 #----------------------------------------------------------------------------------------------------
+#' Show the Bayes Spike Solver
+#' 
+#' @rdname show.BayesSpikeSolver
+#' @aliases show.BayesSpikeSolver
+#'
+#' @param obj An object of the class BayesSpikeSolver
+#'
+#' @return A truncated view of the supplied object
+#'
+#' @examples
+#' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+#' target.gene <- "MEF2C"
+#' tfs <- setdiff(rownames(mtx.sub), target.gene)
+#' bayes.solver <- BayesSpikeSolver(mtx.sub, target.gene, tfs)
+#' show(bayes.solver)
+
 setMethod('show', 'BayesSpikeSolver',
 
     function(obj) {

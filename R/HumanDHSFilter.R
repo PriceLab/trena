@@ -8,6 +8,7 @@
 #'
 #' @include CandidateFilter.R
 #' @import methods
+#' @import BSgenome
 #'
 #' @name HumanDHSFilter-class
 #' @rdname HumanDHSFilter-class
@@ -37,6 +38,31 @@ setGeneric("getRegulatoryRegions", signature="obj",
 setGeneric("getSequence_tmp", signature="obj", function(obj, tbl.regions) standardGeneric ("getSequence_tmp"))
 setGeneric("geneSymbolToTSS", signature="obj", function(obj, geneSymbol) standardGeneric("geneSymbolToTSS"))
 #----------------------------------------------------------------------------------------------------
+#' Create a CandidateFilter using Human DNAse Hypersensitivity
+#'
+#' @param genomeName
+#' @param encodeTableName (default = "wgEncodeRegDnaseClustered")
+#' @param pwmMatchPercentageThreshold
+#' @param geneInfoDatabase.uri
+#' @param geneCenteredSpec
+#' @param regionsSpec
+#' @param variants
+#' @param quiet A logical denoting whether or not the solver should print output
+#' 
+#' @return A Solver class object with Random Forest as the solver
+#'
+#' @seealso  \code{\link{solve.RandomForest}}, \code{\link{getAssayData}}
+#'
+#' @family Solver class objects
+#'
+#' @export
+#'
+#' @examples
+#' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+#' targetGene <- "MEF2C"
+#' candidateRegulators <- setdiff(rownames(mtx.sub), targetGene)
+#' rf.solver <- RandomForestSolver(mtx.sub, targetGene, candidateRegulators)
+
 HumanDHSFilter <- function(genomeName,
                            encodeTableName="wgEncodeRegDnaseClustered",
                            #fimoDatabase.uri,
@@ -82,6 +108,24 @@ HumanDHSFilter <- function(genomeName,
 
 } # HumanDHSFilter, the constructor
 #----------------------------------------------------------------------------------------------------
+#' Get Encode regulatory tables using a human DHS filter
+#'
+#' @rdname getEncodeRegulatoryTableNames-HumanDHSFilter
+#' @aliases getEncodeRegulatoryTableNames
+#'
+#' @param obj An object of class HumanDHSFilter
+#'
+#' @seealso \code{\link{HumanDHSFilter}}
+#'
+#' @return A character vector containing the names of the Encode regulatory tables for the regions
+#' contained in the HumanDHSFilter object
+#'
+#' @export
+#' 
+#' @examples
+#'
+#' #
+
 setMethod("getEncodeRegulatoryTableNames", "HumanDHSFilter",
 
      function(obj){
@@ -105,6 +149,27 @@ setMethod("getEncodeRegulatoryTableNames", "HumanDHSFilter",
        })
 
 #----------------------------------------------------------------------------------------------------
+#' Get candidate genes using a human DHS filter
+#'
+#' @aliases getCandidates-FootprintFilter
+#'
+#' @param obj An object of class FootprintFilter
+#'
+#' @seealso \code{\link{FootprintFilter}}
+#'
+#' @family getCandidate Methods
+#'
+#' @return A list, where one element a character vector of transcription factors that match
+#' the GO term and the other is an empty data frame. 
+#'
+#' @export
+#' 
+#' @examples
+#'
+#' # Make a filter for "transcription, DNA-templated" and use it to filter candidates
+#' goFilter <- GeneOntologyFilter(org.Hs.eg.db, GOTerm="GO:0006351")
+#' candidates <- getCandidates(goFilter)
+
 setMethod("show", "HumanDHSFilter",
 
      function(obj){
@@ -113,6 +178,27 @@ setMethod("show", "HumanDHSFilter",
         })
 
 #----------------------------------------------------------------------------------------------------
+#' Get candidate genes using a human DHS filter
+#'
+#' @aliases getCandidates-FootprintFilter
+#'
+#' @param obj An object of class FootprintFilter
+#'
+#' @seealso \code{\link{FootprintFilter}}
+#'
+#' @family getCandidate Methods
+#'
+#' @return A list, where one element a character vector of transcription factors that match
+#' the GO term and the other is an empty data frame. 
+#'
+#' @export
+#' 
+#' @examples
+#'
+#' # Make a filter for "transcription, DNA-templated" and use it to filter candidates
+#' goFilter <- GeneOntologyFilter(org.Hs.eg.db, GOTerm="GO:0006351")
+#' candidates <- getCandidates(goFilter)
+
 setMethod("geneSymbolToTSS", "HumanDHSFilter",
 
      function(obj, geneSymbol){
@@ -133,6 +219,27 @@ setMethod("geneSymbolToTSS", "HumanDHSFilter",
         })
 
 #----------------------------------------------------------------------------------------------------
+#' Get candidate genes using a human DHS filter
+#'
+#' @aliases getCandidates-FootprintFilter
+#'
+#' @param obj An object of class FootprintFilter
+#'
+#' @seealso \code{\link{FootprintFilter}}
+#'
+#' @family getCandidate Methods
+#'
+#' @return A list, where one element a character vector of transcription factors that match
+#' the GO term and the other is an empty data frame. 
+#'
+#' @export
+#' 
+#' @examples
+#'
+#' # Make a filter for "transcription, DNA-templated" and use it to filter candidates
+#' goFilter <- GeneOntologyFilter(org.Hs.eg.db, GOTerm="GO:0006351")
+#' candidates <- getCandidates(goFilter)
+
 setMethod("getCandidates", "HumanDHSFilter",
 
     function(obj){
@@ -188,6 +295,27 @@ setMethod("getCandidates", "HumanDHSFilter",
     }) # getCandidates
 
 #----------------------------------------------------------------------------------------------------
+#' Get candidate genes using a human DHS filter
+#'
+#' @aliases getCandidates-FootprintFilter
+#'
+#' @param obj An object of class FootprintFilter
+#'
+#' @seealso \code{\link{FootprintFilter}}
+#'
+#' @family getCandidate Methods
+#'
+#' @return A list, where one element a character vector of transcription factors that match
+#' the GO term and the other is an empty data frame. 
+#'
+#' @export
+#' 
+#' @examples
+#'
+#' # Make a filter for "transcription, DNA-templated" and use it to filter candidates
+#' goFilter <- GeneOntologyFilter(org.Hs.eg.db, GOTerm="GO:0006351")
+#' candidates <- getCandidates(goFilter)
+
 setMethod("getRegulatoryRegions", "HumanDHSFilter",
 
     function(obj, encode.table.name, chromosome, start, end, score.threshold=0) {
@@ -280,11 +408,32 @@ setMethod("getRegulatoryRegions", "HumanDHSFilter",
    }) # getRegulatoryRegions
 
 #----------------------------------------------------------------------------------------------------
+#' Get candidate genes using a human DHS filter
+#'
+#' @aliases getCandidates-FootprintFilter
+#'
+#' @param obj An object of class FootprintFilter
+#'
+#' @seealso \code{\link{FootprintFilter}}
+#'
+#' @family getCandidate Methods
+#'
+#' @return A list, where one element a character vector of transcription factors that match
+#' the GO term and the other is an empty data frame. 
+#'
+#' @export
+#' 
+#' @examples
+#'
+#' # Make a filter for "transcription, DNA-templated" and use it to filter candidates
+#' goFilter <- GeneOntologyFilter(org.Hs.eg.db, GOTerm="GO:0006351")
+#' candidates <- getCandidates(goFilter)
+
 setMethod("getSequence_tmp", "HumanDHSFilter",
 
    function(obj, tbl.regions){
      gr.regions <- with(tbl.regions, GRanges(seqnames=chrom, IRanges(start=chromStart, end=chromEnd)))
-     seqs <- getSeq(obj@genome, gr.regions)
+     seqs <- BSgenome::getSeq(obj@genome, gr.regions)
      as.character(seqs)
      })  # getSequence_tmp
 

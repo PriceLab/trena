@@ -28,6 +28,12 @@ tfs <- getCandidates(variance.filter)
 \seealso{
 \code{\link{VarianceFilter}}
 
-Other getCandidate Methods: \code{\link{getCandidates,FootprintFilter-method}},
-  \code{\link{getCandidates}}
+Other getCandidate Methods: \code{\link{geneSymbolToTSS,HumanDHSFilter-method}},
+  \code{\link{getCandidates,FootprintFilter-method}},
+  \code{\link{getCandidates,GeneOntologyFilter-method}},
+  \code{\link{getCandidates,HumanDHSFilter-method}},
+  \code{\link{getCandidates}},
+  \code{\link{getRegulatoryRegions,HumanDHSFilter-method}},
+  \code{\link{getSequence_tmp,HumanDHSFilter-method}},
+  \code{\link{show,HumanDHSFilter-method}}
 }

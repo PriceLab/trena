@@ -25,16 +25,15 @@ A Solver class object with Random Forest as the solver
 Create a CandidateFilter using Gene Ontology
 }
 \examples{
-load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
-targetGene <- "MEF2C"
-candidateRegulators <- setdiff(rownames(mtx.sub), targetGene)
-rf.solver <- RandomForestSolver(mtx.sub, targetGene, candidateRegulators)
+# Make a filter for "transcription, DNA-templated"
+goFilter <- GeneOntologyFilter(org.Hs.eg.db, GOTerm="GO:0006351")
 }
 \seealso{
 \code{\link{solve.RandomForest}}, \code{\link{getAssayData}}
 
 Other Solver class objects: \code{\link{BayesSpikeSolver}},
   \code{\link{EnsembleSolver}},
+  \code{\link{HumanDHSFilter}},
   \code{\link{LassoPVSolver}}, \code{\link{LassoSolver}},
   \code{\link{PearsonSolver}},
   \code{\link{RandomForestSolver}},

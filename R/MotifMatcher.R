@@ -5,7 +5,8 @@
 #' matrices to where they occur in the supplied genome. 
 #'
 #' @import methods
-#'
+#' @import BSgenome
+#' 
 #' @name MotifMatcher-class
 #' @rdname MotifMatcher-class
 #' @aliases MotifMatcher
@@ -17,14 +18,18 @@
                                          quiet="logical")
                           )
 #----------------------------------------------------------------------------------------------------
+#' @export
 setGeneric("getPfms",            signature="obj",
            function(obj) standardGeneric ("getPfms"))
+#' @export
 setGeneric("getSequence",        signature="obj",
            function(obj,tbl.regions,variants=NA_character_)
                standardGeneric ("getSequence"))
+#' @export
 setGeneric(".parseVariantString", signature="obj",
            function(obj, variantString)
                standardGeneric (".parseVariantString"))
+#' @export
 setGeneric("findMatchesByChromosomalRegion", signature="obj",
            function(obj, tbl.regions, pwmMatchMinimumAsPercentage, variants=NA_character_)
               standardGeneric ("findMatchesByChromosomalRegion"))
@@ -120,6 +125,8 @@ setMethod("show", "MotifMatcher",
 #' @return A list containing a data frame of the motifs in the given regions and a character
 #' vector of their associated transcription factors
 #'
+#' @export
+#' 
 #' @examples
 #' # Perform a simple match in the rs13384219 neighborhood 
 #' motifMatcher <- MotifMatcher(name="rs13384219.neighborhood", genomeName="hg38", quiet=FALSE)
@@ -193,6 +200,8 @@ setMethod("findMatchesByChromosomalRegion", "MotifMatcher",
 #'
 #' @return The list of motif matrices stored in the pfms slot. 
 #'
+#' @export
+#' 
 #' @examples
 #' 
 #' # Return the default matrix of JASPAR motifs
@@ -425,6 +434,8 @@ setMethod("getPfms", "MotifMatcher",
 #' @return The \code{tbl.regions} data frame with an added column containing the sequence for each
 #' entry
 #'
+#' @export
+#' 
 #' @examples
 #' # Retrieve the sequences for the rs13384219 neighborhood
 #' motifMatcher <- MotifMatcher(name="rs13384219.neighborhood", genomeName="hg38", quiet=FALSE)
@@ -442,7 +453,7 @@ setMethod("getSequence", "MotifMatcher",
      stopifnot(nrow(tbl.regions) == 1)
      # stopifnot(is.na(variants) || nrow(tbl.regions) == length(variants))
      gr.regions <- with(tbl.regions, GRanges(seqnames=chrom, IRanges(start=start, end=end)))
-     seqs <- as.character(getSeq(obj@genome, gr.regions))
+     seqs <- as.character(BSgenome::getSeq(obj@genome, gr.regions))
      tbl.regions$seq <- seqs
      if(!all(is.na(variants))){  # successively inject each variant
         tbl.variants <- do.call(rbind, lapply(variants, function(variant) .parseVariantString(obj, variant)))
@@ -529,7 +540,7 @@ setMethod(".parseVariantString", "MotifMatcher",
           ambiguity.code <- snp.info$alleles_as_ambig
           elements.string <- Biostrings::IUPAC_CODE_MAP[[ambiguity.code]]
           elements <- strsplit(elements.string,'')[[1]]
-          wt <- as.character(getSeq(obj@genome, chrom, start, start))
+          wt <- as.character(BSgenome::getSeq(obj@genome, chrom, start, start))
           mut <- setdiff(elements, wt)
           snp <- list(chrom=chrom, loc=start, wt=wt, mut=mut)
           variant.count <- length(snp$mut)
@@ -578,7 +589,7 @@ setMethod(".parseVariantString", "MotifMatcher",
       ambiguity.code <- snp.info$alleles_as_ambig
       elements.string <- Biostrings::IUPAC_CODE_MAP[[ambiguity.code]]
       elements <- strsplit(elements.string,'')[[1]]
-      wt <- as.character(getSeq(genomeName, chrom, start, start))
+      wt <- as.character(BSgenome::getSeq(genomeName, chrom, start, start))
       mut <- setdiff(elements, wt)
       snp <- list(chrom=chrom, loc=start, wt=wt, mut=mut)
       variant.count <- length(snp$mut)
