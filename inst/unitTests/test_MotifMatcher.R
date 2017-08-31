@@ -59,14 +59,17 @@ test_.getScoredMotifs <- function()
    printf("--- test_.getScoredMotifs")
    seqs <- test_getSequence(indirect=TRUE)
 
-   motifs <- trena:::.getScoredMotifs(seqs, min.match.percentage=80)  # relatexed threshold
-   checkEquals(unlist(lapply(motifs, nrow)), c(2, 0, 20))
+   jaspar.human.pfms <- as.list(query (query(MotifDb, "sapiens"), "jaspar"))
+
+   motifs <- trena:::.getScoredMotifs(seqs, jaspar.human.pfms,
+                                      min.match.percentage=80)  # relatexed threshold
+   checkEquals(unlist(lapply(motifs, nrow)), c(1, 0, 24))
    checkEquals(colnames(motifs[[1]]),
                         c("start", "end", "width", "score", "maxScore", "relativeScore", "motif", "match", "strand"))
    checkEquals(colnames(motifs[[3]]),
                         c("start", "end", "width", "score", "maxScore", "relativeScore", "motif", "match", "strand"))
 
-   motifs <- trena:::.getScoredMotifs(seqs, min.match.percentage=100)  # nigh impossible threshold
+   motifs <- trena:::.getScoredMotifs(seqs, jaspar.human.pfms, min.match.percentage=100)  # nigh impossible threshold
    checkEquals(unlist(lapply(motifs, nrow)), c(0, 0, 0))
 
 } # test_.getScoredMotifs
