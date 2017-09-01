@@ -4,9 +4,12 @@ exportClasses(
     FootprintFilter,
     HumanDHSFilter,
     GeneOntologyFilter,
-    RandomForestSolver)
+    RandomForestSolver,
+    TrenaUtils
+    )
 
 export(
+    TrenaUtils,
     Solver,
     BayesSpikeSolver,
     EnsembleSolver,
@@ -50,7 +53,14 @@ exportMethods(
     getRegulatoryRegions,
     geneSymbolToTSS,
     getPfms,
-    findMatchesByChromosomalRegion
+    findMatchesByChromosomalRegion,
+
+    getRegulatoryChromosomalRegions,
+    getRegulatoryTableColumnNames,
+    getGeneModelTableColumnNames,
+    createGeneModel,
+    buildMultiModelGraph,
+    assessSnp
 )
 
 import(
