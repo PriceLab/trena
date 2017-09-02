@@ -3,6 +3,16 @@ library(RUnit)
 #----------------------------------------------------------------------------------------------------
 printf <- function(...) print(noquote(sprintf(...)))
 #----------------------------------------------------------------------------------------------------
+if(!exists("mtx")){
+   load("~/github/projects/examples/microservices/trenaGeneModel/datasets/coryAD/rosmap_counts_matrix_normalized_geneSymbols_25031x638.RData")
+   # load(system.file(package="TReNA", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+   mtx <- asinh(mtx)
+   mtx.var <- apply(mtx, 1, var)
+   deleters <- which(mtx.var < 0.01)
+   if(length(deleters) > 0)   # 15838 x 638
+      mtx <- mtx[-deleters,]
+   }
+#----------------------------------------------------------------------------------------------------
 runTests <- function()
 {
    test_basicConstructor()
@@ -145,19 +155,22 @@ test_getRegulatoryRegions_twoFootprintSources <- function()
 test_createGeneModel <- function()
 {
    printf("--- test_createGeneModel")
-   aqp4.tss <- 26865884
-   fp.source <- "postgres://whovian/brain_hint_20"
-   sources <- c(fp.source)
 
-   prep <- TrenaPrep("AQP4", aqp4.tss, "chr18", aqp4.tss-100, aqp4.tss+100, regulatoryRegionSources=sources)
-   x <- getRegulatoryRegions(prep)
+   trena <- TrenaUtils("hg38")
+   targetGene <- "AQP4"
+   aqp4.tss <- 26865884
+   chromosome <- "chr18"
+   fp.source <- c("postgres://whovian/brain_hint_20")
+
+   x <- getRegulatoryChromosomalRegions(trena, chromosome, aqp4.tss-100, aqp4.tss+100, fp.source, "AQP4", aqp4.tss)
    closeAllPostgresConnections()
+
    tbl.regulatoryRegions <- x[[fp.source]]
 
-   tbl.geneModel <- createGeneModel(prep, "randomForest", tbl.regulatoryRegions, mtx)
-   checkTrue(all(getGeneModelTableColumnNames(prep) == colnames(tbl.geneModel)))
-   tbl.strong <- subset(tbl.geneModel, randomForest > 3)
-   checkTrue(all(c("TEAD1", "SP3", "KLF3", "NEUROD2") %in% tbl.strong$tf))
+   tbl.geneModel <- createGeneModel(trena, targetGene, c("lasso", "randomForest"), tbl.regulatoryRegions, mtx)
+   #checkTrue(all(getGeneModelTableColumnNames(trena) == colnames(tbl.geneModel)))
+   tbl.strong <- subset(tbl.geneModel, rf.score > 3)
+   checkTrue(all(c("TEAD1", "SP3", "KLF3", "NEUROD2") %in% tbl.strong$gene))
 
    invisible(list(tbl.regulatoryRegions=tbl.regulatoryRegions,
                   tbl.geneModel=tbl.geneModel))

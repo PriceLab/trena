@@ -10,10 +10,10 @@ setGeneric('getRegulatoryChromosomalRegions',  signature='obj',
 
 setGeneric('getRegulatoryTableColumnNames',  signature='obj', function(obj) standardGeneric ('getRegulatoryTableColumnNames'))
 setGeneric('getGeneModelTableColumnNames',  signature='obj', function(obj) standardGeneric ('getGeneModelTableColumnNames'))
-#setGeneric('expandRegulatoryRegionsTableByTF', signature='obj', function(obj, tbl.reg) standardGeneric('expandRegulatoryRegionsTableByTF'))
-setGeneric('createGeneModel', signature='obj', function(obj,  solvers, tbl.regulatoryRegions, mtx)
+setGeneric('createGeneModel', signature='obj', function(obj, targetGene,  solverNames, tbl.regulatoryRegions, mtx)
               standardGeneric('createGeneModel'))
 setGeneric('buildMultiModelGraph', signature='obj', function(obj, models) standardGeneric('buildMultiModelGraph'))
+#setGeneric('expandRegulatoryRegionsTableByTF', signature='obj', function(obj, tbl.reg) standardGeneric('expandRegulatoryRegionsTableByTF'))
 #setGeneric('addGeneModelLayout', signature='obj', function(obj, g, xPos.span=1500) standardGeneric('addGeneModelLayout'))
 setGeneric('assessSnp', signature='obj', function(obj, pfms, variant, shoulder, pwmMatchMinimumAsPercentage, genomeName="hg38")
               standardGeneric('assessSnp'))
@@ -159,26 +159,25 @@ setMethod('getRegulatoryChromosomalRegions', 'TrenaUtils',
 #------------------------------------------------------------------------------------------------------------------------
 setMethod('createGeneModel', 'TrenaUtils',
 
-      function(obj, solvers, tbl.regulatoryRegions, mtx){
+      function(obj, targetGene, solverNames, tbl.regulatoryRegions, mtx){
 
-         stopifnot(solvers=="randomForest")  # more solvers to come
-         tbl.small <- subset(tbl.regulatoryRegions,
-                             chrom==obj@chromosome & motifStart >= obj@chromStart & motifEnd <= obj@chromEnd)
-
-         tfs <- sort(unique(unlist(strsplit(tbl.small$tf, ";"))))
+         #stopifnot(solvers=="randomForest")  # more solvers to come
+         tfs <- sort(unique(unlist(strsplit(tbl.regulatoryRegions$tf, ";"))))
          tfs <- intersect(tfs, rownames(mtx))
          printf("tf candidate count: %d", length(tfs))
-         solver.wt <- RandomForestSolver(mtx, targetGene=obj@targetGene, candidateRegulators=tfs)
-         model.wt  <-run(solver.wt)
-         count <- nrow(model.wt$edges)
-         tbl.model <- data.frame(tf=rownames(model.wt$edges),
-                                 randomForest=model.wt$edges$IncNodePurity,
-                                 pearson=model.wt$edges$gene.cor,
-                                 spearman=rep(0, count),
-                                 betaLasso=rep(0, count),
-                                 pcaMax=rep(0, count),
-                                 concordance=rep(0, count),
-                                 stringsAsFactors=FALSE)
+
+         #solver.wt <- RandomForestSolver(mtx, targetGene=targetGene, candidateRegulators=tfs)
+         solver <- EnsembleSolver(mtx, targetGene=targetGene, candidateRegulators=tfs, solverNames)
+         tbl.model  <-run(solver)
+         #count <- nrow(model.wt$edges)
+         #tbl.model <- data.frame(tf=rownames(model.wt$edges),
+         #                        randomForest=model.wt$edges$IncNodePurity,
+         #                        pearson=model.wt$edges$gene.cor,
+         #                        spearman=rep(0, count),
+         #                        betaLasso=rep(0, count),
+         #                        pcaMax=rep(0, count),
+         #                        concordance=rep(0, count),
+         #                        stringsAsFactors=FALSE)
          tbl.model
       }) # createGeneModel
 
