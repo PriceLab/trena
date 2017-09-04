@@ -12,8 +12,7 @@ setGeneric('getRegulatoryTableColumnNames',  signature='obj', function(obj) stan
 setGeneric('getGeneModelTableColumnNames',  signature='obj', function(obj) standardGeneric ('getGeneModelTableColumnNames'))
 setGeneric('createGeneModel', signature='obj', function(obj, targetGene,  solverNames, tbl.regulatoryRegions, mtx)
               standardGeneric('createGeneModel'))
-setGeneric('buildMultiModelGraph', signature='obj', function(obj, models) standardGeneric('buildMultiModelGraph'))
-#setGeneric('expandRegulatoryRegionsTableByTF', signature='obj', function(obj, tbl.reg) standardGeneric('expandRegulatoryRegionsTableByTF'))
+setGeneric('expandRegulatoryRegionsTableByTF', signature='obj', function(obj, tbl.reg) standardGeneric('expandRegulatoryRegionsTableByTF'))
 #setGeneric('addGeneModelLayout', signature='obj', function(obj, g, xPos.span=1500) standardGeneric('addGeneModelLayout'))
 setGeneric('assessSnp', signature='obj', function(obj, pfms, variant, shoulder, pwmMatchMinimumAsPercentage, genomeName="hg38")
               standardGeneric('assessSnp'))
@@ -142,20 +141,20 @@ setMethod('getRegulatoryChromosomalRegions', 'TrenaUtils',
          }) # getRegulatoryChromosomalRegions
 
 #------------------------------------------------------------------------------------------------------------------------
-#setMethod('expandRegulatoryRegionsTableByTF', 'TrenaUtils',
-#
-#     function(obj, tbl.reg){
-#        tbl.trimmed <- subset(tbl.reg, nchar(tf) != 0)
-#        tfs.split <- strsplit(tbl.trimmed$tf, ";")
-#        #length(tfs.split) # [1] 36929
-#        counts <- unlist(lapply(tfs.split, length))
-#        tfs.split.vec <- unlist(tfs.split)
-#        tbl.expanded <- expandRows(tbl.trimmed, counts, count.is.col=FALSE, drop=FALSE)
-#        stopifnot(length(tfs.split.vec) == nrow(tbl.expanded))
-#        tbl.expanded$tf <- tfs.split.vec
-#        tbl.expanded
-#        }) # expandRegulatoryRegionsTableByTF
-#
+setMethod('expandRegulatoryRegionsTableByTF', 'TrenaUtils',
+
+     function(obj, tbl.reg){
+        tbl.trimmed <- subset(tbl.reg, nchar(tf) != 0)
+        tfs.split <- strsplit(tbl.trimmed$tf, ";")
+        #length(tfs.split) # [1] 36929
+        counts <- unlist(lapply(tfs.split, length))
+        tfs.split.vec <- unlist(tfs.split)
+        tbl.expanded <- expandRows(tbl.trimmed, counts, count.is.col=FALSE, drop=FALSE)
+        stopifnot(length(tfs.split.vec) == nrow(tbl.expanded))
+        tbl.expanded$tf <- tfs.split.vec
+        tbl.expanded
+        }) # expandRegulatoryRegionsTableByTF
+
 #------------------------------------------------------------------------------------------------------------------------
 setMethod('createGeneModel', 'TrenaUtils',
 
@@ -182,100 +181,6 @@ setMethod('createGeneModel', 'TrenaUtils',
       }) # createGeneModel
 
 #------------------------------------------------------------------------------------------------------------------------
-setMethod('buildMultiModelGraph', 'TrenaUtils',
-
-  function (obj, models){
-
-    g <- graphNEL(edgemode = "directed")
-    model.names <- names(models)
-
-    node.attribute.specs <- list(type="undefined",
-                                 label="default node label",
-                                 distance=0,
-                                 pearson=0,
-                                 randomForest=0,
-                                 pcaMax=0,
-                                 concordance=0,
-                                 betaLasso=0,
-                                 motif="",
-                                 xPos=0,
-                                 yPos=0)
-    edge.attribute.spec <- list(edgeType="undefined")
-    attribute.classes <- c("", model.names)  # "" (no prefix) is the currently displayed set of attibutes
-
-      # create current version of these attributes, and then
-      # per-model versions, which get mapped to current
-      # in response to user's interactive choice on the cyjs user interface
-      # the "current version" is, e.g., "distance".
-      # per-model ("wt" and "mut" versions) become "wt.distance" and "mut.distance"
-      # and are used by copying e.g. all wt.xxx attributes into the current (non-prefixed)
-      # attribute, upon which the cyjs style is defined
-
-    for(class.name in attribute.classes){
-       class.name.prefix <- class.name  # with possible "." appended, permits standard and model-specific attributes
-       if(nchar(class.name) > 0)
-          class.name.prefix <- sprintf("%s.", class.name)
-       noa.names.without.prefix <- names(node.attribute.specs)
-       noa.names <- sprintf("%s%s", class.name.prefix, noa.names.without.prefix)
-       noa.count <- length(node.attribute.specs)
-       for(i in 1:noa.count){
-          nodeDataDefaults(g, attr=noa.names[i]) <- node.attribute.specs[[noa.names.without.prefix[i]]]
-          }
-       } # for class
-
-    edgeDataDefaults(g, attr = "edgeType") <- "undefined"
-
-    tfs <- c()
-    regulatoryRegions <- c()
-
-    for(model in models){  # collect all the tf and regulatory region nodes
-       tbl.model <- model$tbl.geneModel
-       tfs <- unique(c(tfs, tbl.model$tf))
-       tbl.reg <- model$tbl.regulatoryRegions
-       regulatoryRegions <- unique(c(regulatoryRegions, tbl.reg$id))
-       } # for model
-
-    all.nodes <- unique(c(obj@targetGene, tfs, regulatoryRegions))
-    g <- addNode(all.nodes, g)
-
-    nodeData(g, obj@targetGene, "type") <- "targetGene"
-    nodeData(g, tfs, "type")         <- "TF"
-    nodeData(g, regulatoryRegions, "type")  <- "regulatoryRegion"
-    nodeData(g, all.nodes, "label")  <- all.nodes
-
-      # add edges, edge attribute, and the constant attributes for all of the regulatoryRegion nodes
-
-    for(model in models){
-       tfs <- model$tbl.regulatoryRegions$tf
-       regRegions <- model$tbl.regulatoryRegions$id
-       suppressWarnings(g <- addEdge(tfs, regRegions, g))
-       edgeData(g,  tfs, regRegions, "edgeType") <- "bindsTo"
-       suppressWarnings(g <- addEdge(regRegions, obj@targetGene, g))
-       edgeData(g, regRegions, obj@targetGene, "edgeType") <- "regulatorySiteFor"
-       nodeData(g, tbl.reg$id, "label") <- tbl.reg$motifName
-       nodeData(g, tbl.reg$id, "distance") <- tbl.reg$distance.from.tss
-       nodeData(g, tbl.reg$id, "motif") <- tbl.reg$motifName
-       } # for model
-
-      # now copy in the first model's tf node data
-
-    tbl.model <- models[[1]]$tbl.geneModel
-    nodeData(g, tbl.model$tf, attr="randomForest") <- tbl.model$randomForest
-    nodeData(g, tbl.model$tf, attr="pearson") <- tbl.model$pearson
-
-     # now copy in each of the model's tf node data in turn
-    model.names <- names(models)
-    for(model.name in model.names){
-       tbl.model <- models[[model.name]]$tbl.geneModel
-       noa.name <- sprintf("%s.%s", model.name, "randomForest")
-       nodeData(g,  tbl.model$tf, attr=noa.name) <- tbl.model$randomForest
-       noa.name <- sprintf("%s.%s", model.name, "pearson")
-       nodeData(g,  tbl.model$tf, attr=noa.name) <- tbl.model$pearson
-      } # for model.name
-
-    g
-
-    }) # buildMultiModelGraph
 
 #------------------------------------------------------------------------------------------------------------------------
 #setMethod('addGeneModelLayout', 'TrenaUtils',

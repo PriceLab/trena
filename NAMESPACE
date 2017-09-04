@@ -59,7 +59,7 @@ exportMethods(
     getRegulatoryTableColumnNames,
     getGeneModelTableColumnNames,
     createGeneModel,
-    buildMultiModelGraph,
+    expandRegulatoryRegionsTableByTF,
     assessSnp
 )
 
