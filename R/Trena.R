@@ -1,6 +1,6 @@
-.TrenaUtils <- setClass ("TrenaUtils",
-                        representation = representation(
-                           genomeName="character")
+.Trena <- setClass ("Trena",
+                    representation = representation(
+                        genomeName="character")
                         )
 #------------------------------------------------------------------------------------------------------------------------
 setGeneric('getRegulatoryChromosomalRegions',  signature='obj',
@@ -20,24 +20,24 @@ setGeneric('assessSnp', signature='obj', function(obj, pfms, variant, shoulder, 
 # a temporary hack: some constants
 genome.db.uri <- "postgres://bddsrds.globusgenomics.org/hg38"   # has gtf and motifsgenes tables
 #------------------------------------------------------------------------------------------------------------------------
-TrenaUtils = function(genomeName, quiet=TRUE)
+Trena = function(genomeName, quiet=TRUE)
 {
    stopifnot(genomeName %in% c("hg19", "hg38", "mm10"))
 
-   obj <- .TrenaUtils(genomeName=genomeName)
+   obj <- .Trena(genomeName=genomeName)
 
    obj
 
 } # constructor
 #------------------------------------------------------------------------------------------------------------------------
-setMethod('getRegulatoryTableColumnNames', 'TrenaUtils',
+setMethod('getRegulatoryTableColumnNames', 'Trena',
 
       function(obj){
          c("chrom", "motifStart", "motifEnd", "motifName", "strand", "score", "length", "distance.from.tss", "id", "tf")
          })
 
 #------------------------------------------------------------------------------------------------------------------------
-setMethod('getGeneModelTableColumnNames', 'TrenaUtils',
+setMethod('getGeneModelTableColumnNames', 'Trena',
 
       function(obj){
          c("tf", "randomForest", "pearson", "spearman", "betaLasso", "pcaMax", "concordance")
@@ -102,7 +102,7 @@ setMethod('getGeneModelTableColumnNames', 'TrenaUtils',
 
 } # .callHumanDHSFilter
 #------------------------------------------------------------------------------------------------------------------------
-setMethod('getRegulatoryChromosomalRegions', 'TrenaUtils',
+setMethod('getRegulatoryChromosomalRegions', 'Trena',
 
     function(obj, chromosome, chromStart, chromEnd, regulatoryRegionSources, targetGene, targetGeneTSS,
              combine=FALSE, quiet=FALSE){
@@ -141,7 +141,7 @@ setMethod('getRegulatoryChromosomalRegions', 'TrenaUtils',
          }) # getRegulatoryChromosomalRegions
 
 #------------------------------------------------------------------------------------------------------------------------
-setMethod('expandRegulatoryRegionsTableByTF', 'TrenaUtils',
+setMethod('expandRegulatoryRegionsTableByTF', 'Trena',
 
      function(obj, tbl.reg){
         tbl.trimmed <- subset(tbl.reg, nchar(tf) != 0)
@@ -156,7 +156,7 @@ setMethod('expandRegulatoryRegionsTableByTF', 'TrenaUtils',
         }) # expandRegulatoryRegionsTableByTF
 
 #------------------------------------------------------------------------------------------------------------------------
-setMethod('createGeneModel', 'TrenaUtils',
+setMethod('createGeneModel', 'Trena',
 
       function(obj, targetGene, solverNames, tbl.regulatoryRegions, mtx){
 
@@ -180,69 +180,6 @@ setMethod('createGeneModel', 'TrenaUtils',
          tbl.model
       }) # createGeneModel
 
-#------------------------------------------------------------------------------------------------------------------------
-
-#------------------------------------------------------------------------------------------------------------------------
-#setMethod('addGeneModelLayout', 'TrenaUtils',
-#
-#  function (obj, g, xPos.span=1500){
-#    printf("--- addGeneModelLayout")
-#    all.distances <- sort(unique(unlist(nodeData(g, attr='distance'), use.names=FALSE)))
-#    print(all.distances)
-#
-#    fp.nodes <- nodes(g)[which(unlist(nodeData(g, attr="type"), use.names=FALSE) == "regulatoryRegion")]
-#    tf.nodes <- nodes(g)[which(unlist(nodeData(g, attr="type"), use.names=FALSE) == "TF")]
-#    targetGene.nodes <- nodes(g)[which(unlist(nodeData(g, attr="type"), use.names=FALSE) == "targetGene")]
-#
-#     # add in a zero in case all of the footprints are up or downstream of the 0 coordinate, the TSS
-#    span.endpoints <- range(c(0, as.numeric(nodeData(g, fp.nodes, attr="distance"))))
-#    span <- max(span.endpoints) - min(span.endpoints)
-#    footprintLayoutFactor <- 1
-#    printf("initial:  span: %d  footprintLayoutFactor: %f", span, footprintLayoutFactor)
-#
-#    footprintLayoutFactor <- xPos.span/span
-#
-#    #if(span < 600)  #
-#    #   footprintLayoutFactor <- 600/span
-#    #if(span > 1000)
-#    #   footprintLayoutFactor <- span/1000
-#
-#    printf("corrected:  span: %d  footprintLayoutFactor: %f", span, footprintLayoutFactor)
-#
-#    xPos <- as.numeric(nodeData(g, fp.nodes, attr="distance")) * footprintLayoutFactor
-#    yPos <- 0
-#    nodeData(g, fp.nodes, "xPos") <- xPos
-#    nodeData(g, fp.nodes, "yPos") <- yPos
-#
-#    adjusted.span.endpoints <- range(c(0, as.numeric(nodeData(g, fp.nodes, attr="xPos"))))
-#    printf("raw span of footprints: %d   footprintLayoutFactor: %f  new span: %8.0f",
-#           span, footprintLayoutFactor, abs(max(adjusted.span.endpoints) - min(adjusted.span.endpoints)))
-#
-#    tfs <- names(which(nodeData(g, attr="type") == "TF"))
-#
-#    for(tf in tfs){
-#       footprint.neighbors <- edges(g)[[tf]]
-#       if(length(footprint.neighbors) > 0){
-#          footprint.positions <- as.integer(nodeData(g, footprint.neighbors, attr="xPos"))
-#          new.xPos <- mean(footprint.positions)
-#          if(is.na(new.xPos)) browser()
-#          if(is.nan(new.xPos)) browser()
-#          #printf("%8s: %5d", tf, new.xPos)
-#          }
-#       else{
-#          new.xPos <- 0
-#          }
-#       nodeData(g, tf, "yPos") <- sample(300:1200, 1)
-#       nodeData(g, tf, "xPos") <- new.xPos
-#       } # for tf
-#
-#    nodeData(g, targetGene.nodes, "xPos") <- 0
-#    nodeData(g, targetGene.nodes, "yPos") <- -200
-#
-#    g
-#
-#    }) # addGeneModelLayout
-#
 #------------------------------------------------------------------------------------------------------------------------
 setMethod('assessSnp', 'TrenaUtils',
 

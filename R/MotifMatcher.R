@@ -15,12 +15,16 @@
                           representation(name="character",
                                          genome="BSgenome",
                                          pfms="list",
+                                         pfm.metadata="data.frame",
                                          quiet="logical")
                           )
 #----------------------------------------------------------------------------------------------------
 #' @export
 setGeneric("getPfms",            signature="obj",
            function(obj) standardGeneric ("getPfms"))
+#' @export
+setGeneric("getPfmMetadata",        signature="obj",
+           function(obj) standardGeneric ("getPfmMetadata"))
 #' @export
 setGeneric("getSequence",        signature="obj",
            function(obj,tbl.regions,variants=NA_character_)
@@ -31,8 +35,12 @@ setGeneric(".parseVariantString", signature="obj",
                standardGeneric (".parseVariantString"))
 #' @export
 setGeneric("findMatchesByChromosomalRegion", signature="obj",
-           function(obj, tbl.regions, pwmMatchMinimumAsPercentage, variants=NA_character_)
+           function(obj, tbl.regions, pwmMatchMinimumAsPercentage, variants=NA_character_, expandByTf=FALSE)
               standardGeneric ("findMatchesByChromosomalRegion"))
+#' @export
+setGeneric("tfGeneSymbolForMotif", signature="obj",
+           function(obj, motifNames)
+              standardGeneric ("tfGeneSymbolForMotif"))
 #----------------------------------------------------------------------------------------------------
 #' @title Class MotifMatcher
 #' @name MotifMatcher-class
@@ -69,17 +77,33 @@ setGeneric("findMatchesByChromosomalRegion", signature="obj",
 #' pfms=as.list(query(MotifDb, "sapiens")))
 
 MotifMatcher <- function(name=NA_character_,
-                         genomeName="hg38",
-                         pfms=list(),
+                         genomeName,
+                         pfms=NA,
+                         pfms.metadata=NA,
                          quiet=TRUE)
 {
-    if(length(pfms) == 0){
+    if(class(pfms) == "MotifList"){
+       pfm.metadata <- as.data.frame(mcols(pfms))
+       pfms <- as.list(pfms)
+       }
+
+    else if(is.list(pfms)){
+       if(is.na(pfms.metadata)){
+          print("no metadata supplied; using motif/tfGeneName mapping in trena/extdata/motifGenes.tsv")
+          pfm.metadata <-read.table(system.file(package="trena", "extdata", "motifGenes.tsv"), sep="\t", as.is=TRUE, header=TRUE)
+          }
+        }
+
+   else if(all(is.na(pfms))){
         uri <- "http://jaspar.genereg.net/html/DOWNLOAD/JASPAR_CORE/pfm/nonredundant/pfm_vertebrates.txt"
+        print(sprintf("no pfms supplied, using %s", uri))
         x <- .readRawJasparMatrices(uri)
-        # normalize, so that a frequency sum of 1.0 is true across the 4 possible bases at each position
+          # normalize, so that a frequency sum of 1.0 is true across the 4 possible bases at each position
         pfms <- lapply(x, function(e) apply(e$matrix, 2, function(col) col/sum(col)))
         names(pfms) <- as.character(lapply(x, function(e) e$title))
-   }
+        print("no metadata supplied; using motif/tfGeneName mapping in trena/extdata/motifGenes.tsv")
+        pfm.metadata <- read.table(system.file(package="trena", "extdata", "motifGenes.tsv"), sep="\t", as.is=TRUE, header=TRUE)
+        }
 
    if(genomeName == "hg38"){
        # library(BSgenome.Hsapiens.UCSC.hg38) ## Remove the library reference
@@ -99,8 +123,7 @@ MotifMatcher <- function(name=NA_character_,
        stop(sprintf("MotifMatch, genomeName not in hg19, hg38: '%s'", genomeName))
    }
 
-    .MotifMatcher(name=name, genome=reference.genome,
-                  pfms=pfms, quiet=quiet)
+    .MotifMatcher(name=name, genome=reference.genome, pfms=pfms, pfm.metadata=pfm.metadata, quiet=quiet)
 
 } # MotifMatcher constructor
 #----------------------------------------------------------------------------------------------------
@@ -143,7 +166,7 @@ setMethod("show", "MotifMatcher",
 
 setMethod("findMatchesByChromosomalRegion", "MotifMatcher",
 
-          function(obj, tbl.regions, pwmMatchMinimumAsPercentage, variants=NA_character_){
+          function(obj, tbl.regions, pwmMatchMinimumAsPercentage, variants=NA_character_, expandByTf=FALSE){
 
               x <- lapply(1:nrow(tbl.regions),
                           function(r) getSequence(obj, tbl.regions[r,], variants))
@@ -185,9 +208,8 @@ setMethod("findMatchesByChromosomalRegion", "MotifMatcher",
               tbl.out <- tbl.out[order(tbl.out$motifScore, decreasing=TRUE),]
 
               # tbl.mg will soon come from MotifDb
-              tbl.mg <- utils::read.table(system.file(package="trena", "extdata", "motifGenes.tsv"),
-                                          sep="\t", as.is=TRUE, header=TRUE)
-              tfs.by.motif <- lapply(tbl.out$motifName, function(m) subset(tbl.mg, motif==m)$tf.gene)
+              tbl.mg <- tfGeneSymbolForMotif(obj, tbl.out$motifName)
+              tfs.by.motif <- lapply(tbl.out$motifName, function(m) subset(tbl.mg, motif==m)$geneSymbol)
               all.tfs <- sort(unique(unlist(tfs.by.motif)))
               tfs.by.motif.joined <- unlist(lapply(tfs.by.motif, function(m) paste(m, collapse=";")))
               tbl.out$tf <- tfs.by.motif.joined
@@ -217,6 +239,33 @@ setMethod("getPfms", "MotifMatcher",
           function(obj){
               return(obj@pfms)
           })
+#----------------------------------------------------------------------------------------------------
+setMethod("getPfmMetadata", "MotifMatcher",
+
+          function(obj){
+              return(obj@pfm.metadata)
+          })
+#----------------------------------------------------------------------------------------------------
+setMethod("tfGeneSymbolForMotif", "MotifMatcher",
+          function(obj, motifNames){
+             if("geneSymbol" %in% colnames(obj@pfm.metadata)){
+                tokens <- strsplit(motifNames, "-")
+                short.names <- unlist(lapply(tokens, function(tokenSet){ tokenSet[length(tokenSet)]}))
+                #browser()
+                matches <- unlist(lapply(short.names, function(motif) grep(motif, obj@pfm.metadata$providerId)))
+                tbl.result <- unique(obj@pfm.metadata[matches, c("providerId", "geneSymbol")])
+                colnames(tbl.result) <- c("motif", "geneSymbol")
+                }
+             else if("tf.gene" %in% colnames(obj@pfm.metadata)){
+                matches <- unlist(lapply(motifNames, function(motif) grep(motif, obj@pfm.metadata$motif)))
+                tbl.result <- obj@pfm.metadata[matches,]
+                rownames(tbl.result) <- NULL
+                tbl.result <- tbl.result[, c("motif", "tf.gene")]
+                colnames(tbl.result) <- c("motif", "geneSymbol")
+                }
+             tbl.result
+             })
+
 #----------------------------------------------------------------------------------------------------
 .matchPwmForwardAndReverse <- function(sequence, pfm, motifName, min.match.percentage=95, quiet=TRUE)
 {

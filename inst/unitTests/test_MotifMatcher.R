@@ -4,9 +4,7 @@ library(RUnit)
 
 #----------------------------------------------------------------------------------------------------
 printf <- function(...) print(noquote(sprintf(...)))
-# the vrk2 promoter snp
-# chr2:57907313-57907333
-sequence <- "ACCAGCATGCAAATTAGACAA"
+#sequence <- "ACCAGCATGCAAATTAGACAA"
 #----------------------------------------------------------------------------------------------------
 runTests <- function()
 {
@@ -17,6 +15,9 @@ runTests <- function()
    test_.injectSnp()
    test_getSequenceWithVariants()
    test_.getScoredMotifs()
+
+   test_tfGeneSymbolForMotif()
+
    test_findMatchesByChromosomalRegion()
    test_findMatchesByChromosomalRegion_contrastReferenceWithVariant()
    test_findMatchesByChromosomalRegion.twoAlternateAlleles()
@@ -27,8 +28,23 @@ test_basicConstructor <- function(reuse=FALSE)
 {
    if(!reuse)  printf("--- test_basicConstructor")
 
-   mm <- MotifMatcher()
-   mm <- MotifMatcher(name="rs13384219.neighborhood", genomeName="hg38")
+   mm <- MotifMatcher(genomeName="hg38")
+   pfms <- getPfms(mm)            # jaspar pfms used, real-time download
+   checkTrue(is.list(pfms))
+   checkTrue(is.matrix(pfms[[1]]))
+   tbl.md <- getPfmMetadata(mm)   # scant "german truck" metadata, mapping tfs to motifs
+   checkTrue(is.data.frame(tbl.md))
+   checkTrue(nrow(tbl.md) > 9000)
+   checkEquals(colnames(tbl.md),  c("motif", "tf.gene", "tf.ensg"))
+   checkTrue(length(intersect(names(pfms), tbl.md$motif)) > 500)
+
+   jaspar.human.pfms <- query(query(MotifDb, "jaspar"), "sapiens")
+   motifMatcher <- MotifMatcher(genomeName="hg38", pfms=jaspar.human.pfms)
+   pfms <- getPfms(motifMatcher)            # jaspar pfms used, real-time download
+   checkTrue(is.list(pfms))
+   checkTrue(is.matrix(pfms[[1]]))
+   tbl.md <- getPfmMetadata(motifMatcher)   # scant "german truck" metadata, mapping tfs to motifs
+   checkEquals(dim(tbl.md), c(length(pfms), 15))
 
 } # test_basicConstructor
 #----------------------------------------------------------------------------------------------------
@@ -73,6 +89,43 @@ test_.getScoredMotifs <- function()
    checkEquals(unlist(lapply(motifs, nrow)), c(0, 0, 0))
 
 } # test_.getScoredMotifs
+#----------------------------------------------------------------------------------------------------
+test_tfGeneSymbolForMotif <- function()
+{
+   printf("--- test_tfGeneSymbolForMotif")
+
+   jaspar.human.pfms <- query(query(MotifDb, "jaspar"), "sapiens")  # 625 human pfms from jaspar
+   mm.mdb <- MotifMatcher(genomeName="hg38", pfms=jaspar.human.pfms)
+
+     # get the underlying matrix and metadata for testing
+   matrix.list <- getPfms(mm.mdb)
+   matrix.metadata <- getPfmMetadata(mm.mdb)
+
+   set.seed(31)
+   matrix.count <- length(matrix.list)
+   random.indices <- sample(seq_len(matrix.count), 5)
+   motif.names <- names(matrix.list)[random.indices]
+
+   tbl.1 <- tfGeneSymbolForMotif(mm.mdb, motif.names[1])
+   checkEquals(nrow(tbl.1), 1)
+   checkEquals(tbl.1$motif, "MA0473.1")
+   checkEquals(tbl.1$geneSymbol, "ELF1")
+
+   tbl.5 <- tfGeneSymbolForMotif(mm.mdb, motif.names)
+   checkEquals(tbl.5$motif, c("MA0473.1", "MA0865.1", "MA0103.2", "MA0101.1", "MA0855.1"))
+   checkEquals(tbl.5$geneSymbol,  c("ELF1", "E2F8", "ZEB1", "REL", "RXRB"))
+
+     # now use the default pfms (jaspar vertebrate) and metadata (trena/extdata/motifGenes.tsv)
+   mm.default <- MotifMatcher(genomeName="hg38")
+
+      #         1 tf         2 tfs       6tfs
+   motifs <- c("MA0038.1", "MA0615.1", "MA0803.1")
+   tbl.3 <- tfGeneSymbolForMotif(mm.default, motifs)
+   checkEquals(dim(tbl.3), c(9, 2))
+   checkEquals(tbl.3$motif, c("MA0038.1", rep("MA0615.1",2), rep("MA0803.1", 6)))
+   checkEquals(tbl.3$geneSymbol, c("GFI1", "GMEB1", "GMEB2", "TBX15", "TBX1", "TBX10", "TBX18", "TBX20", "TBX22"))
+
+} # test_tfGeneSymbolForMotif
 #----------------------------------------------------------------------------------------------------
 test_getSequence <- function(indirect=FALSE)
 {

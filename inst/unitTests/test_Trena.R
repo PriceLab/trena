@@ -1,5 +1,6 @@
 library(trena)
 library(RUnit)
+library(MotifDb)
 #----------------------------------------------------------------------------------------------------
 printf <- function(...) print(noquote(sprintf(...)))
 #----------------------------------------------------------------------------------------------------
@@ -21,17 +22,19 @@ runTests <- function()
    test_getRegulatoryRegions_encodeDHS()
    test_getRegulatoryRegions_twoFootprintSources()
 
+   test_createGeneModel()
+
 } # runTests
 #------------------------------------------------------------------------------------------------------------------------
 test_basicConstructor <- function()
 {
    printf("--- test_basicConstructor")
 
-   trena <- TrenaUtils("hg38")
-   checkEquals(is(trena), "TrenaUtils")
+   trena <- Trena("hg38")
+   checkEquals(is(trena), "Trena")
 
-   checkException(TrenaUtils("hg00"), silent=TRUE)
-   checkException(TrenaUtils(""), silent=TRUE)
+   checkException(Trena("hg00"), silent=TRUE)
+   checkException(Trena(""), silent=TRUE)
 
 } # test_basicConstructor
 #----------------------------------------------------------------------------------------------------
@@ -39,7 +42,7 @@ test_getRegulatoryRegions_oneFootprintSource <- function()
 {
    printf("--- test_getRegulatoryRegions_oneFootprintSource")
 
-   trena <- TrenaUtils("hg38")
+   trena <- Trena("hg38")
      # the package's demo sqlite database is limited to in and around hg38 MEF2C
    chromosome <- "chr5"
    mef2c.tss <- 88904257   # minus strand
@@ -80,7 +83,7 @@ test_getRegulatoryRegions_encodeDHS <- function()
 {
    printf("--- test_getRegulatoryRegions_encodeDHS")
 
-   trena <- TrenaUtils("hg38")
+   trena <- Trena("hg38")
    #chromosome <- "chr5"
    #mef2c.tss <- 88904257   # minus strand
    #loc.start <- mef2c.tss - 10000
@@ -116,7 +119,7 @@ test_getRegulatoryRegions_twoFootprintSources <- function()
 {
    printf("--- test_getRegulatoryRegions_twoFootprintSources")
 
-   trena <- TrenaUtils("hg38")
+   trena <- Trena("hg38")
      # the package's demo sqlite database is limited to in and around hg38 MEF2C
    chromosome <- "chr5"
    mef2c.tss <- 88904257   # minus strand
@@ -156,7 +159,7 @@ test_createGeneModel <- function()
 {
    printf("--- test_createGeneModel")
 
-   trena <- TrenaUtils("hg38")
+   trena <- Trena("hg38")
    targetGene <- "AQP4"
    aqp4.tss <- 26865884
    chromosome <- "chr18"
@@ -188,4 +191,24 @@ closeAllPostgresConnections <- function()
       } # for i
 
 } # closeAllPostgresConnections
+#------------------------------------------------------------------------------------------------------------------------
+test_createGeneModel <- function()
+{
+   jaspar.human.pfms <- as.list(query(query(MotifDb, "jaspar"), "sapiens"))
+   motifMatcher <- MotifMatcher(genomeName="hg38", pfms=jaspar.human.pfms)
+
+      # pretend that all motifs are potentially active transcription sites - that is, ignore
+      # what could be learned from open chromatin or dnasei footprints
+      # use MEF2C, and 100 bases downstream, and 500 bases upstream of one of its transcripts TSS chr5:88825894
+
+   tss <- 88825894
+   tbl.region <- data.frame(chrom="chr5", start=tss-100, end=tss+400, stringsAsFactors=FALSE)
+   motif.info <- findMatchesByChromosomalRegion(motifMatcher, tbl.region, pwmMatchMinimumAsPercentage=92)
+
+   solver.names <- c("lasso", "lassopv", "pearson", "randomForest", "ridge", "spearman")
+   trena <- Trena("hg38")
+   tbl.geneModel <- createGeneModel(trena, "MEF2C", solver.names, tbl.motifs, mtx.rna)
+
+
+} # test_createGeneModel
 #------------------------------------------------------------------------------------------------------------------------
