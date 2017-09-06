@@ -207,7 +207,12 @@ setMethod("findMatchesByChromosomalRegion", "MotifMatcher",
               tbl.out <- tbl.out[, desired.column.order]
               tbl.out <- tbl.out[order(tbl.out$motifScore, decreasing=TRUE),]
 
-              # tbl.mg will soon come from MotifDb
+                 # for MotifDb motif names, simplify, keeping only the final token:
+                 # "Hsapiens-jaspar2016-FOXH1-MA0479.1" -> "MA0479.1"
+              tokens <- strsplit(tbl.out$motifName, "-")
+              short.motif.names <- unlist(lapply(tokens, function(tokenSet) tokenSet[length(tokenSet)]))
+              tbl.out$motifName <- short.motif.names
+                 # tbl.mg will soon come from MotifDb
               tbl.mg <- tfGeneSymbolForMotif(obj, tbl.out$motifName)
               tfs.by.motif <- lapply(tbl.out$motifName, function(m) subset(tbl.mg, motif==m)$geneSymbol)
               all.tfs <- sort(unique(unlist(tfs.by.motif)))

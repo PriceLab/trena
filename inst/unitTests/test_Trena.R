@@ -194,7 +194,7 @@ closeAllPostgresConnections <- function()
 #------------------------------------------------------------------------------------------------------------------------
 test_createGeneModel <- function()
 {
-   jaspar.human.pfms <- as.list(query(query(MotifDb, "jaspar"), "sapiens"))
+   jaspar.human.pfms <- query(query(MotifDb, "jaspar2016"), "sapiens")
    motifMatcher <- MotifMatcher(genomeName="hg38", pfms=jaspar.human.pfms)
 
       # pretend that all motifs are potentially active transcription sites - that is, ignore
@@ -207,8 +207,8 @@ test_createGeneModel <- function()
 
    solver.names <- c("lasso", "lassopv", "pearson", "randomForest", "ridge", "spearman")
    trena <- Trena("hg38")
-   tbl.geneModel <- createGeneModel(trena, "MEF2C", solver.names, tbl.motifs, mtx.rna)
-
+   tbl.motifs <- motif.info$tbl
+   tbl.geneModel <- createGeneModel(trena, "MEF2C", solver.names, tbl.motifs, mtx)
 
 } # test_createGeneModel
 #------------------------------------------------------------------------------------------------------------------------
