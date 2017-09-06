@@ -53,8 +53,6 @@ exportMethods(
     getRegulatoryRegions,
     geneSymbolToTSS,
     getPfms,
-    getPfmMetadata,
-    tfGeneSymbolForMotif,
     findMatchesByChromosomalRegion,
 
     getRegulatoryChromosomalRegions,

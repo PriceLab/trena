@@ -16,8 +16,6 @@ runTests <- function()
    test_getSequenceWithVariants()
    test_.getScoredMotifs()
 
-   test_tfGeneSymbolForMotif()
-
    test_findMatchesByChromosomalRegion()
    test_findMatchesByChromosomalRegion_contrastReferenceWithVariant()
    test_findMatchesByChromosomalRegion.twoAlternateAlleles()
@@ -28,23 +26,21 @@ test_basicConstructor <- function(reuse=FALSE)
 {
    if(!reuse)  printf("--- test_basicConstructor")
 
-   mm <- MotifMatcher(genomeName="hg38")
+   checkException(mm <- MotifMatcher(genomeName="hg38"), silent=TRUE)
+
+   matrices <- as.list(MotifDb)  # use all matrices
+   mm <- MotifMatcher(genomeName="hg38", as.list(MotifDb))
    pfms <- getPfms(mm)            # jaspar pfms used, real-time download
    checkTrue(is.list(pfms))
    checkTrue(is.matrix(pfms[[1]]))
-   tbl.md <- getPfmMetadata(mm)   # scant "german truck" metadata, mapping tfs to motifs
-   checkTrue(is.data.frame(tbl.md))
-   checkTrue(nrow(tbl.md) > 9000)
-   checkEquals(colnames(tbl.md),  c("motif", "tf.gene", "tf.ensg"))
-   checkTrue(length(intersect(names(pfms), tbl.md$motif)) > 500)
+   checkEquals(length(pfms), length(matrices))
 
-   jaspar.human.pfms <- query(query(MotifDb, "jaspar"), "sapiens")
+   jaspar.human.pfms <- as.list(query(query(MotifDb, "jaspar"), "sapiens"))
    motifMatcher <- MotifMatcher(genomeName="hg38", pfms=jaspar.human.pfms)
    pfms <- getPfms(motifMatcher)            # jaspar pfms used, real-time download
    checkTrue(is.list(pfms))
    checkTrue(is.matrix(pfms[[1]]))
-   tbl.md <- getPfmMetadata(motifMatcher)   # scant "german truck" metadata, mapping tfs to motifs
-   checkEquals(dim(tbl.md), c(length(pfms), 15))
+   checkEquals(length(pfms), length(jaspar.human.pfms))
 
 } # test_basicConstructor
 #----------------------------------------------------------------------------------------------------
@@ -90,49 +86,49 @@ test_.getScoredMotifs <- function()
 
 } # test_.getScoredMotifs
 #----------------------------------------------------------------------------------------------------
-test_tfGeneSymbolForMotif <- function()
-{
-   printf("--- test_tfGeneSymbolForMotif")
-
-   jaspar.human.pfms <- query(query(MotifDb, "jaspar"), "sapiens")  # 625 human pfms from jaspar
-   mm.mdb <- MotifMatcher(genomeName="hg38", pfms=jaspar.human.pfms)
-
-     # get the underlying matrix and metadata for testing
-   matrix.list <- getPfms(mm.mdb)
-   matrix.metadata <- getPfmMetadata(mm.mdb)
-
-   set.seed(31)
-   matrix.count <- length(matrix.list)
-   random.indices <- sample(seq_len(matrix.count), 5)
-   motif.names <- names(matrix.list)[random.indices]
-
-   tbl.1 <- tfGeneSymbolForMotif(mm.mdb, motif.names[1])
-   checkEquals(nrow(tbl.1), 1)
-   checkEquals(tbl.1$motif, "MA0473.1")
-   checkEquals(tbl.1$geneSymbol, "ELF1")
-
-   tbl.5 <- tfGeneSymbolForMotif(mm.mdb, motif.names)
-   checkEquals(tbl.5$motif, c("MA0473.1", "MA0865.1", "MA0103.2", "MA0101.1", "MA0855.1"))
-   checkEquals(tbl.5$geneSymbol,  c("ELF1", "E2F8", "ZEB1", "REL", "RXRB"))
-
-     # now use the default pfms (jaspar vertebrate) and metadata (trena/extdata/motifGenes.tsv)
-   mm.default <- MotifMatcher(genomeName="hg38")
-
-      #         1 tf         2 tfs       6tfs
-   motifs <- c("MA0038.1", "MA0615.1", "MA0803.1")
-   tbl.3 <- tfGeneSymbolForMotif(mm.default, motifs)
-   checkEquals(dim(tbl.3), c(9, 2))
-   checkEquals(tbl.3$motif, c("MA0038.1", rep("MA0615.1",2), rep("MA0803.1", 6)))
-   checkEquals(tbl.3$geneSymbol, c("GFI1", "GMEB1", "GMEB2", "TBX15", "TBX1", "TBX10", "TBX18", "TBX20", "TBX22"))
-
-} # test_tfGeneSymbolForMotif
+#test_tfGeneSymbolForMotif <- function()
+#{
+#   printf("--- test_tfGeneSymbolForMotif")
+#
+#   jaspar.human.pfms <- query(query(MotifDb, "jaspar"), "sapiens")  # 625 human pfms from jaspar
+#   mm.mdb <- MotifMatcher(genomeName="hg38", pfms=jaspar.human.pfms)
+#
+#     # get the underlying matrix and metadata for testing
+#   matrix.list <- getPfms(mm.mdb)
+#   matrix.metadata <- getPfmMetadata(mm.mdb)
+#
+#   set.seed(31)
+#   matrix.count <- length(matrix.list)
+#   random.indices <- sample(seq_len(matrix.count), 5)
+#   motif.names <- names(matrix.list)[random.indices]
+#
+#   tbl.1 <- tfGeneSymbolForMotif(mm.mdb, motif.names[1])
+#   checkEquals(nrow(tbl.1), 1)
+#   checkEquals(tbl.1$motif, "MA0473.1")
+#   checkEquals(tbl.1$geneSymbol, "ELF1")
+#
+#   tbl.5 <- tfGeneSymbolForMotif(mm.mdb, motif.names)
+#   checkEquals(tbl.5$motif, c("MA0473.1", "MA0865.1", "MA0103.2", "MA0101.1", "MA0855.1"))
+#   checkEquals(tbl.5$geneSymbol,  c("ELF1", "E2F8", "ZEB1", "REL", "RXRB"))
+#
+#     # now use the default pfms (jaspar vertebrate) and metadata (trena/extdata/motifGenes.tsv)
+#   mm.default <- MotifMatcher(genomeName="hg38")
+#
+#      #         1 tf         2 tfs       6tfs
+#   motifs <- c("MA0038.1", "MA0615.1", "MA0803.1")
+#   tbl.3 <- tfGeneSymbolForMotif(mm.default, motifs)
+#   checkEquals(dim(tbl.3), c(9, 2))
+#   checkEquals(tbl.3$motif, c("MA0038.1", rep("MA0615.1",2), rep("MA0803.1", 6)))
+#   checkEquals(tbl.3$geneSymbol, c("GFI1", "GMEB1", "GMEB2", "TBX15", "TBX1", "TBX10", "TBX18", "TBX20", "TBX22"))
+#
+#} # test_tfGeneSymbolForMotif
 #----------------------------------------------------------------------------------------------------
 test_getSequence <- function(indirect=FALSE)
 {
    if(!indirect)
       printf("--- test_getSequence")
 
-   mm <- MotifMatcher(genomeName="hg38")
+   mm <- MotifMatcher(genomeName="hg38", pfms=list())
 
    chroms <- rep("chr5", 3)
    starts <- c(88819700, 88820700, 88820980)
@@ -157,7 +153,7 @@ test_getSequence <- function(indirect=FALSE)
 #----------------------------------------------------------------------------------------------------
 test_.parseVariantString <- function()
 {
-   mm <- MotifMatcher(name="rs13384219.neighborhood", genomeName="hg38")
+   mm <- MotifMatcher(genomeName="hg38", pfms=list())
 
    tbl.variant <- trena:::.parseVariantString(mm, "rs13384219")
    checkEquals(dim(tbl.variant), c(1, 4))
@@ -206,7 +202,7 @@ test_.injectSnp <- function()
 {
    printf("--- test_.injectSnp")
 
-   mm <- MotifMatcher(genomeName="hg38")
+   mm <- MotifMatcher(genomeName="hg38", pfms=list())
    tbl.regions.noSeq <- data.frame(chrom="chr2", start=57907318, end=57907328, stringsAsFactors=FALSE)
    tbl.regions <- getSequence(mm, tbl.regions.noSeq)
    checkEquals(tbl.regions$seq, "CATGCAAATTA")
@@ -258,7 +254,7 @@ test_.injectSnp <- function()
 
       # now try two variants in one region, different locations
 
-   mm <- MotifMatcher(genomeName="hg38")
+   mm <- MotifMatcher(genomeName="hg38", pfms=list())
    tbl.variants <- data.frame(chrom=c("chr18", "chr18"),
                               loc=c(26865466, 26865469),
                               wt=c("G", "T"),
@@ -282,7 +278,7 @@ test_getSequenceWithVariants <- function()
 {
    printf("--- test_getSequenceWithVariants")
 
-   mm <- MotifMatcher(genomeName="hg38")
+   mm <- MotifMatcher(genomeName="hg38", pfms=list())
 
    chroms <- "chr2"
    starts <- 57907318
@@ -339,22 +335,20 @@ test_getSequenceWithVariants <- function()
 test_findMatchesByChromosomalRegion <- function()
 {
    printf("--- test_findMatchesByChromosomalRegion")
-     # the vrk2 promoter snp,  chr2:57907313-57907333
+   jaspar.human.pfms <- as.list(query (query(MotifDb, "sapiens"), "jaspar"))
 
-   motifMatcher <- MotifMatcher(name="rs13384219.neighborhood", genomeName="hg38", quiet=FALSE)
+   motifMatcher <- MotifMatcher(genomeName="hg38", pfms=jaspar.human.pfms, quiet=FALSE)
 
    tbl.regions <- data.frame(chrom="chr2", start=57907313, end=57907333, stringsAsFactors=FALSE)
-   x <- findMatchesByChromosomalRegion(motifMatcher, tbl.regions, pwmMatchMinimumAsPercentage=92)
-   checkEquals(sort(names(x)), c("tbl", "tfs"))
-   checkEquals(dim(x$tbl), c(7, 13))
-   checkEquals(unique(x$tbl$status), "wt")
-   checkTrue(length(x$tfs) > 50)
+   tbl.hits <- findMatchesByChromosomalRegion(motifMatcher, tbl.regions, pwmMatchMinimumAsPercentage=92)
+   checkEquals(dim(tbl.hits), c(5, 12))
+   checkEquals(unique(tbl.hits$status), "wt")
 
       # the best match (longest, all bases in agreement with the motif:
       # http://jaspar.genereg.net/cgi-bin/jaspar_db.pl?rm=present&collection=CORE&ID=MA0792.1
 
-   best <- as.list(x$tbl[1,])
-   checkEquals(best$motifName, "MA0792.1")
+   best <- as.list(tbl.hits[1,])
+   checkEquals(best$motifName, "Hsapiens-jaspar2016-POU5F1B-MA0792.1")
    checkEquals(best$chrom, "chr2")
    checkEquals(best$motifStart, 57907318)
    checkEquals(best$motifEnd, 57907326)
@@ -366,7 +360,6 @@ test_findMatchesByChromosomalRegion <- function()
    checkEquals(best$chromEnd, 57907333)
    checkEquals(best$seq, "ACCAGCATGCAAATTAGACAA")
    checkEquals(best$status, "wt")
-   checkEquals(best$tf, "POU5F1B")
 
 } # test_findMatchesByChromosomalRegion
 #----------------------------------------------------------------------------------------------------
@@ -376,36 +369,41 @@ test_findMatchesByChromosomalRegion_contrastReferenceWithVariant <- function()
 
      # the vrk2 promoter snp,  chr2:57907313-57907333
 
-   motifMatcher <- MotifMatcher(name="rs13384219.neighborhood", genomeName="hg38", quiet=TRUE)
+   jaspar.human.pfms <- as.list(query (query(MotifDb, "sapiens"), "jaspar"))
+
+   motifMatcher <- MotifMatcher(genomeName="hg38", pfms=jaspar.human.pfms, quiet=FALSE)
 
    tbl.regions <- data.frame(chrom="chr2", start=57907313, end=57907333, stringsAsFactors=FALSE)
-   x.wt <- findMatchesByChromosomalRegion(motifMatcher, tbl.regions, pwmMatchMinimumAsPercentage=92)
-   x.mut <- findMatchesByChromosomalRegion(motifMatcher, tbl.regions, pwmMatchMinimumAsPercentage=92, "rs13384219")
+   tbl.wt <- findMatchesByChromosomalRegion(motifMatcher, tbl.regions, pwmMatchMinimumAsPercentage=92)
+   tbl.mut <- findMatchesByChromosomalRegion(motifMatcher, tbl.regions, pwmMatchMinimumAsPercentage=92, "rs13384219")
 
-   tbl <- rbind(x.wt$tbl[, c(1,12, 2,3,4,5,7,8,13)], x.mut$tbl[, c(1,12, 2,3,4,5,7,8,13)])
+   tbl <- rbind(tbl.wt[, c(1,12, 2,3,4,5,7,8)], tbl.mut[, c(1,12, 2,3,4,5,7,8)])
    tbl <- tbl[order(tbl$motifName, tbl$motifRelativeScore, decreasing=TRUE),]
    motifs.in.both <- tbl$motifName[which(duplicated(tbl$motifName))]
-   tbl.summary <- subset(tbl, !motifName %in% motifs.in.both)
-      # three wt motifs lost: MA0792.1, MA0701.1, MA0075.2
-   checkTrue(all(c("MA0792.1", "MA0701.1", "MA0075.2") %in% tbl.summary$motifName))
-   checkEquals(unique(tbl.summary$status), "wt")
+   tbl.lost.in.mut <- subset(tbl, !motifName %in% motifs.in.both)
+      # two wt motifs lost, not found in mut:
+      #
+   motifs.only.in.wt <- c("Hsapiens-jaspar2016-POU5F1B-MA0792.1", "Hsapiens-jaspar2016-LHX9-MA0701.1")
+   checkTrue(all(motifs.only.in.wt %in% tbl.lost.in.mut$motifName))
+   checkEquals(unique(tbl.lost.in.mut$status), "wt")
 
       # now try again with a more permissive matching threshold
-   x.wt <- findMatchesByChromosomalRegion(motifMatcher, tbl.regions, pwmMatchMinimumAsPercentage=80)
-   x.mut <- findMatchesByChromosomalRegion(motifMatcher, tbl.regions, pwmMatchMinimumAsPercentage=80, "rs13384219")
-   tbl <- rbind(x.wt$tbl[, c(1,12, 2,3,4,5,7,8,13)], x.mut$tbl[, c(1,12, 2,3,4,5,7,8,13)])
+   tbl.wt <- findMatchesByChromosomalRegion(motifMatcher, tbl.regions, pwmMatchMinimumAsPercentage=80)
+   tbl.mut <- findMatchesByChromosomalRegion(motifMatcher, tbl.regions, pwmMatchMinimumAsPercentage=80, "rs13384219")
+   tbl <- rbind(tbl.wt[, c(1,12, 2,3,4,5,7,8)], tbl.mut[, c(1,12, 2,3,4,5,7,8)])
    tbl <- tbl[order(tbl$motifName, tbl$motifRelativeScore, decreasing=TRUE),]
 
      # the POU5F1B motif MA0792.1 drops from a 92% to an 83% match.
      # assessing the relevance of this will be up to the biologist...
 
-   checkEqualsNumeric(subset(tbl, motifName=="MA0792.1")$motifRelativeScore, c(0.92, 0.83), tol=1e-2)
+   checkEqualsNumeric(subset(tbl, motifName=="Hsapiens-jaspar2016-POU5F1B-MA0792.1")$motifRelativeScore, c(0.92, 0.83), tol=1e-2)
    motifs.in.both <- tbl$motifName[which(duplicated(tbl$motifName))]
    tbl.summary <- subset(tbl, !motifName %in% motifs.in.both)
 
    # two possible new binding motifs: MA0891.1, MA0648.1
    tbl.deNovoMut <- subset(tbl.summary, motifRelativeScore > 0.85)
-   checkEquals(sort(tbl.deNovoMut$motifName), c("MA0648.1", "MA0891.1"))
+   checkEquals(sort(tbl.deNovoMut$motifName),
+               c("Hsapiens-jaspar2016-GSC-MA0648.1", "Hsapiens-jaspar2016-GSC2-MA0891.1"))
    checkEquals(unique(tbl.deNovoMut$status), "mut")
 
 } # test_findMatchesByChromosomalRegion_contrastReferenceWithVariant
@@ -413,8 +411,11 @@ test_findMatchesByChromosomalRegion_contrastReferenceWithVariant <- function()
 test_findMatchesByMultipleChromosomalRegions <- function()
 {
    printf("--- test_findMatchesByMultipleChromosomalRegions")
-     # the vrk2 promoter snp,  chr2:57907313-57907333
-   motifMatcher <- MotifMatcher(name="rs13384219.neighborhood", genomeName="hg38")
+
+     # 442 explicitly human pfms from the JASPAR2016.
+     # as.list carves out just the matrices (pfms) omitting metadata
+   pfms <- as.list(query(query(MotifDb, "jaspar2016"), "sapiens"))
+   motifMatcher <- MotifMatcher(genomeName="hg38", pfms)
 
      # 21 bases on chr2, 21 bases on chr18
    tbl.regions <- data.frame(chrom=c("chr2", "chr18"),
@@ -422,13 +423,11 @@ test_findMatchesByMultipleChromosomalRegions <- function()
                              end  =c(57907333, 26864420),
                              stringsAsFactors=FALSE)
 
-   x <- findMatchesByChromosomalRegion(motifMatcher, tbl.regions, pwmMatchMinimumAsPercentage=93)
-   checkEquals(sort(names(x)), c("tbl", "tfs"))
-   tbl <- x$tbl
+   tbl.hits <- findMatchesByChromosomalRegion(motifMatcher, tbl.regions, pwmMatchMinimumAsPercentage=93)
 
-   m1 <- as.list(tbl[1,])
+   m1 <- as.list(tbl.hits[1,])
 
-   checkEquals(m1$motifName, "MA0630.1")
+   checkEquals(m1$motifName, "Hsapiens-jaspar2016-SHOX-MA0630.1")
    checkEquals(m1$chrom, "chr2")
    checkEquals(m1$motifStart, 57907317)
    checkEquals(m1$motifEnd, 57907324)
@@ -439,13 +438,10 @@ test_findMatchesByMultipleChromosomalRegions <- function()
    checkEquals(m1$chromStart, 57907313)
    checkEquals(m1$chromEnd, 57907333)
    checkEquals(m1$seq, "ACCAGCATGCAAATTAGACAA")
-   checkEquals(m1$alt, "wt")
-   tfs <- strsplit(m1$tf, ";")[[1]]
-   checkTrue("SHOX" %in% tfs)     # the one tf associated to this motif by jaspar
-   checkEquals(length(tfs), 43)   # do we believe this?
+   checkEquals(m1$status, "wt")
 
-   m2 <- as.list(tbl[2,])
-   checkEquals(m2$motifName, "MA0130.1")
+   m2 <- as.list(tbl.hits[2,])
+   checkEquals(m2$motifName, "Hsapiens-jaspar2016-ZNF354C-MA0130.1")
    checkEquals(m2$chrom, "chr18")
    checkEquals(m2$motifStart, 26864401)
    checkEquals(m2$motifEnd, 26864406)
@@ -456,19 +452,17 @@ test_findMatchesByMultipleChromosomalRegions <- function()
    checkEquals(m2$chromStart, 26864400)
    checkEquals(m2$chromEnd, 26864420)
    checkEquals(m2$seq, "GCTCCACAGGGGGGTGGCCAG")
-   checkEquals(m2$alt, "wt")
-   checkEquals(m2$tf,  "ZNF354C")
+   checkEquals(m2$status, "wt")
 
       # now repeat with a looser match threshold
-    x <- findMatchesByChromosomalRegion(motifMatcher, tbl.regions, pwmMatchMinimumAsPercentage=80)
-    tbl.freq <- as.data.frame(table(x$tbl$chrom))
+   tbl.hits2 <- findMatchesByChromosomalRegion(motifMatcher, tbl.regions, pwmMatchMinimumAsPercentage=90)
+   tbl.freq <- as.data.frame(table(tbl.hits2$chrom))
 
       # one match each found for these two regions at the stringent match threshold
-   checkEquals(dim(x$tbl), c(2, 13))
-   checkTrue(length(x$tfs) > 40)
+   checkEquals(dim(tbl.hits2), c(18, 12))
       # two motifs from chr18, the rest from chr2
-   checkEquals(nrow(subset(x$tbl, chrom=="chr18")), 2)
-   checkEquals(nrow(subset(x$tbl, chrom=="chr2")), 20)
+   checkEquals(nrow(subset(tbl.hits2, chrom=="chr18")), 1)
+   checkEquals(nrow(subset(tbl.hits2, chrom=="chr2")), 17)
 
 } # test_findMatchesByMultipleChromosomalRegions
 #----------------------------------------------------------------------------------------------------
@@ -487,21 +481,22 @@ test_findMatchesByChromosomalRegion.twoAlternateAlleles <- function()
    chromosome <- "chr18"
    loc <- 26864410
 
-   mm <- MotifMatcher(name="rs3763040, two alternate alleles", genomeName="hg38")
+   jaspar.human.pfms <- as.list(query (query(MotifDb, "sapiens"), "jaspar2016"))
+   mm <- MotifMatcher(genomeName="hg38", pfms=jaspar.human.pfms)
    tbl.regions <- data.frame(chrom=chromosome, start=loc-6, end=loc+3, stringsAsFactors=FALSE)
-   xwt <- findMatchesByChromosomalRegion(mm, tbl.regions, pwmMatchMinimumAsPercentage=80L)
-   xmut <- findMatchesByChromosomalRegion(mm, tbl.regions, pwmMatchMinimumAsPercentage=80L, "chr18:26864410:G:T")
+   tbl.wt <- findMatchesByChromosomalRegion(mm, tbl.regions, pwmMatchMinimumAsPercentage=80L)
+   tbl.mut <- findMatchesByChromosomalRegion(mm, tbl.regions, pwmMatchMinimumAsPercentage=80L, "chr18:26864410:G:T")
 
-   checkEquals(unique(xwt$tbl$seq), "CACAGGGGGG")
-   checkEquals(unique(xmut$tbl$seq), "CACAGGTGGG")
+   checkEquals(unique(tbl.wt$seq), "CACAGGGGGG")
+   checkEquals(unique(tbl.mut$seq), "CACAGGTGGG")
 
       # two motifs are shared
-   motifs.shared <- sort(intersect(xwt$tbl$motifName, xmut$tbl$motifName))
-   checkEquals(motifs.shared, c("MA0522.2", "MA0830.1"))
+   motifs.shared <- sort(intersect(tbl.wt$motifName, tbl.mut$motifName))
+   checkEquals(motifs.shared, c("Hsapiens-jaspar2016-TCF3-MA0522.2", "Hsapiens-jaspar2016-TCF4-MA0830.1"))
 
       # the snp increases the scores of these two
-   checkEqualsNumeric(subset(xwt$tbl,  motifName %in% motifs.shared[1])$motifScore, 5.79, tol=1e-2)
-   checkEqualsNumeric(subset(xmut$tbl, motifName %in% motifs.shared[1])$motifScore, 6.79, tol=1e-2)
+   checkEqualsNumeric(subset(tbl.wt,  motifName %in% motifs.shared[1])$motifScore, 5.79, tol=1e-2)
+   checkEqualsNumeric(subset(tbl.mut, motifName %in% motifs.shared[1])$motifScore, 6.79, tol=1e-2)
 
        # MA0522.2, TCF3, class: bHLH, family: E2A-related factors, reverse complement, from JASPAR
        #                                                          relative score   motif score
@@ -512,8 +507,8 @@ test_findMatchesByChromosomalRegion.twoAlternateAlleles <- function()
        # G  [1393 3014   21   35 7799 7799    5 7799 1321 2123 ]
        # T  [2066  253   27   43    0    0 7799    0 3423 2823 ]
 
-   checkEqualsNumeric(subset(xwt$tbl,  motifName %in% motifs.shared[2])$motifScore, 5.89, tol=1e-2)
-   checkEqualsNumeric(subset(xmut$tbl, motifName %in% motifs.shared[2])$motifScore, 6.89, tol=1e-2)
+   checkEqualsNumeric(subset(tbl.wt,  motifName %in% motifs.shared[2])$motifScore, 5.89, tol=1e-2)
+   checkEqualsNumeric(subset(tbl.mut, motifName %in% motifs.shared[2])$motifScore, 6.89, tol=1e-2)
 
 
        # MA0830.1, TCF4, class: bHLH, family: E2A-related factors, reverse complement, from JASPAR
@@ -526,9 +521,9 @@ test_findMatchesByChromosomalRegion.twoAlternateAlleles <- function()
        # T  [ 5305   374    27   117    56     0 20335     6  7822  4738 ]
 
      # motifs lost and gained
-   motifs.lost   <- sort(setdiff(xwt$tbl$motifName, xmut$tbl$motifName))
-   motifs.gained <- sort(setdiff(xmut$tbl$motifName, xwt$tbl$motifName))
-   checkEquals(motifs.lost, "MA0056.1")
+   motifs.lost   <- sort(setdiff(tbl.wt$motifName, tbl.mut$motifName))
+   motifs.gained <- sort(setdiff(tbl.mut$motifName, tbl.wt$motifName))
+   checkEquals(motifs.lost, "Hsapiens-jaspar2016-MZF1-MA0056.1")
 
        # MA0056.1, MZF1, class: C2H@ zinc finger factors, family: more than 3 adjacent zinc finger factors, from JASPAR
        #                                                                    relative score   motif score
@@ -538,7 +533,11 @@ test_findMatchesByChromosomalRegion.twoAlternateAlleles <- function()
        # G  [ 4 19 18 19 20  2 ]
        # T  [ 8  1  0  1  0  0 ]
 
-   checkEquals(motifs.gained, c("MA0004.1", "MA0104.3", "MA0622.1", "MA0626.1", "MA0745.1", "MA0820.1", "MA0824.1"))
+   checkEquals(motifs.gained, c("Hsapiens-jaspar2016-FIGLA-MA0820.1",
+                                "Hsapiens-jaspar2016-ID4-MA0824.1"  ,
+                                "Hsapiens-jaspar2016-SNAI2-MA0745.1",
+                                "Hsapiens-jaspar2016-USF1-MA0093.1"))
+
 
        # look at (for now( just one of the gain motifs
        # MA0745.1, SNAi2, class C2H2 zinc finger factors, more than 3 adjacent zinc finger factors
@@ -550,24 +549,32 @@ test_findMatchesByChromosomalRegion.twoAlternateAlleles <- function()
        # T  [ 21733  16594   4022   3454   3864    323 110706  21327  37949 ]
 
 
-   checkEquals(sort(unique(xmut$tbl$motifName)),
-       c("MA0004.1", "MA0104.3", "MA0522.2", "MA0622.1", "MA0626.1", "MA0745.1", "MA0820.1", "MA0824.1","MA0830.1"))
+   checkEquals(sort(unique(tbl.mut$motifName)),
+               c("Hsapiens-jaspar2016-FIGLA-MA0820.1",
+                 "Hsapiens-jaspar2016-ID4-MA0824.1"  ,
+                 "Hsapiens-jaspar2016-SNAI2-MA0745.1",
+                 "Hsapiens-jaspar2016-TCF3-MA0522.2" ,
+                 "Hsapiens-jaspar2016-TCF4-MA0830.1" ,
+                 "Hsapiens-jaspar2016-USF1-MA0093.1"))
+
       # two low-scoring ~80% matches to the sequence with C substituted
       #              |
       #        CACAGGTGGG
-   checkEquals(length(grep("CAGGTG", xmut$tbl$match)), nrow(xmut$tbl))
+   checkEquals(length(grep("CAGGTG", tbl.mut$match)), nrow(tbl.mut))
 
       # now substitute, not G->T, but G->A
       # this results in the loss of the GGGGGG motif from the wildtype, but the consequences
       # for the other two wt motifs are undetectable in the scores: both wt and this mutant
       # provide a poor match to the T expected at that position
-   x1 <- findMatchesByChromosomalRegion(mm, tbl.regions, pwmMatchMinimumAsPercentage=80L, "chr18:26864410:G:A")
-   checkEqualsNumeric(x1$tbl$motifRelativeScore[1], 0.805, tol=10e-2)
-   checkEqualsNumeric(x1$tbl$motifRelativeScore[2], 0.802, tol=10e-2)
-      # 10 often higher-scoring matches to the core of the sequence with T substituted
-      #              |
-      #          CAGGTG
-   checkEquals(length(grep("CAGGAG", x1$tbl$match)), nrow(x1$tbl))
+   tbl <- findMatchesByChromosomalRegion(mm, tbl.regions, pwmMatchMinimumAsPercentage=80L, "chr18:26864410:G:A")
+   checkEqualsNumeric(tbl$motifRelativeScore[1], 0.805, tol=10e-2)
+   checkEqualsNumeric(tbl$motifRelativeScore[2], 0.802, tol=10e-2)
+      # matches to the core of the sequence with T replaced by A
+      #             |
+      #          AGGAGG
+
+    # all four
+   checkEquals(length(grep("AGGAGG", tbl$match)), nrow(tbl))
 
 
 } # test_findMatchesByChromosomalRegion.twoAlternateAlleles
