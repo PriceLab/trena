@@ -11,6 +11,8 @@ runTests <- function()
    test_basicConstructor()
    test_getSequence()
    test_.matchPwmForwardAndReverse()
+   test_bugInStartEndOfMinusStrandHits()
+
    test_.parseVariantString()
    test_.injectSnp()
    test_getSequenceWithVariants()
@@ -19,6 +21,8 @@ runTests <- function()
    test_findMatchesByChromosomalRegion()
    test_findMatchesByChromosomalRegion_contrastReferenceWithVariant()
    test_findMatchesByChromosomalRegion.twoAlternateAlleles()
+
+   test_bug()
 
 } # runTests
 #------------------------------------------------------------------------------------------------------------------------
@@ -53,16 +57,26 @@ test_.matchPwmForwardAndReverse <- function()
    motifName.2 <- "MA0063.1" #"MA0627.1"
    mtx.2 <- query(MotifDb, motifName.2)[[1]];
 
-   sequence <- "TTGTCTAATTTGCATGCTGGT"
+   test.sequence <- "TTGTCTAATTTGCATGCTGGT"
 
-   tbl.1 <- trena:::.matchPwmForwardAndReverse(sequence, mtx.1, motifName.1, min.match.percentage=90, quiet=TRUE)
+   tbl.1 <- trena:::.matchPwmForwardAndReverse(test.sequence, mtx.1, motifName.1, min.match.percentage=90, quiet=TRUE)
    checkEquals(nrow(tbl.1), 1)
    checkEquals(colnames(tbl.1),
                c("start","end","width","score","maxScore","relativeScore","motif","match","strand"))
-   tbl.2 <- trena:::.matchPwmForwardAndReverse(sequence, mtx.2, motifName.2, min.match.percentage=60, quiet=TRUE)
+   checkEquals(unlist(gregexpr(tbl.1$match[1], test.sequence)), tbl.1$start[1])
+   checkEquals(tbl.1$end, (tbl.1$start[1] + nchar(tbl.1$match)) - 1)
+
+   tbl.2 <- trena:::.matchPwmForwardAndReverse(test.sequence, mtx.2, motifName.2, min.match.percentage=60, quiet=TRUE)
    checkEquals(nrow(tbl.2), 4)
    checkEquals(colnames(tbl.2),
                c("start","end","width","score","maxScore","relativeScore","motif","match","strand"))
+
+     # the reported match, for both + AND -, are done with forward strand sequence
+     # thus the same start and end tests apply to both
+   for(r in seq_len(nrow(tbl.2))){
+     checkEquals(unlist(gregexpr(tbl.2$match[r], test.sequence)), tbl.2$start[r])
+     checkEquals(tbl.2$end[r], (tbl.2$start[r] + nchar(tbl.2$match[r])) - 1)
+     } # for r
 
 } # test_.matchForwardAndReverse
 #----------------------------------------------------------------------------------------------------
@@ -71,10 +85,12 @@ test_.getScoredMotifs <- function()
    printf("--- test_.getScoredMotifs")
    seqs <- test_getSequence(indirect=TRUE)
 
-   jaspar.human.pfms <- as.list(query (query(MotifDb, "sapiens"), "jaspar"))
+   jaspar.human.pfms <- as.list(query (query(MotifDb, "sapiens"), "jaspar2016"))
 
-   motifs <- trena:::.getScoredMotifs(seqs, jaspar.human.pfms,
-                                      min.match.percentage=80)  # relatexed threshold
+   motifs.3 <- trena:::.getScoredMotifs(seqs[3], jaspar.human.pfms, min.match.percentage=90)[[1]]
+
+
+   motifs <- trena:::.getScoredMotifs(seqs, jaspar.human.pfms, min.match.percentage=80)  # relatexed threshold
    checkEquals(unlist(lapply(motifs, nrow)), c(1, 0, 24))
    checkEquals(colnames(motifs[[1]]),
                         c("start", "end", "width", "score", "maxScore", "relativeScore", "motif", "match", "strand"))
@@ -597,4 +613,34 @@ test_useMotifDbMatrices <- function()
    ### Is this incomplete??? ###
 
 } # test_useMotifDbMatrices
+#----------------------------------------------------------------------------------------------------
+# after finding and fixing and testing the start/end calculation for minus strand hits
+# in .matchPwmForwardAndReverse, this exploratory function now tests that those results
+# truly show up in higher level calling functions
+test_bugInStartEndOfMinusStrandHits <- function()
+{
+   printf("--- test_bugInStartEndOfMinusStrandHits")
+
+   tbl.regions.a <- data.frame(chrom="chr5", start=134115542, end=134115562, stringsAsFactors=FALSE)
+   tbl.regions.b <- data.frame(chrom="chr5", start=134115542, end=134115572, stringsAsFactors=FALSE)
+
+   pfms <- as.list(query(query(MotifDb, "sapiens"), "jaspar2016"))
+   mm <- MotifMatcher(genomeName="hg38", pfms=pfms)
+
+   tbl.a <- findMatchesByChromosomalRegion(mm, tbl.regions.a, pwmMatchMinimumAsPercentage=94)
+   tbl.b <- findMatchesByChromosomalRegion(mm, tbl.regions.b, pwmMatchMinimumAsPercentage=94)
+
+     # tbl.b should have everything in tbl.a
+   matches <- grep(tbl.a$motifName, tbl.b$motifName)
+   checkEquals(length(matches), nrow(tbl.a))
+   otherHit.indices <- setdiff(1:nrow(tbl.b), matches)
+
+     # all the other (new) matches, found in tbl.b but not tbl.a, must end AFTER the end tbl.regions.a
+   checkTrue(all(tbl.b$motifEnd[otherHit.indices] > tbl.regions.a$end))
+     # not likely -- unless the motif is VERY wide - that any of these new matches in tbl.b
+     # start before the single match in tbl.a
+   checkTrue(all(tbl.b$motifStart[otherHit.indices] > tbl.regions.a$motifStart))
+
+
+} # test_bugInStartEndOfMinusStrandHits
 #----------------------------------------------------------------------------------------------------

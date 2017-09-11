@@ -141,6 +141,9 @@ setMethod("findMatchesByChromosomalRegion", "MotifMatcher",
               x <- lapply(1:nrow(tbl.regions),
                           function(r) getSequence(obj, tbl.regions[r,], variants))
               tbl.regions <- do.call(rbind, x)
+              printf("---- MotifMatcher::findMatchesByChromosomalRegion")
+              print(tbl.regions)
+              browser()
               tbl.motifs.list <- .getScoredMotifs(tbl.regions$seq, obj@pfms,
                                                   pwmMatchMinimumAsPercentage, obj@quiet)
 
@@ -268,10 +271,10 @@ setMethod("getPfms", "MotifMatcher",
                             motif=motifName, match=match, strand="-",
                             stringsAsFactors=FALSE)
          # transform the start/end so that they are forward-strand relative
-      true.start <- 1 + nchar(sequence) - tbl.rev$end
-      true.end   <- 1 + nchar(sequence) - tbl.rev$start
-      tbl.rev$start <- true.start
-      tbl.rev$end   <- true.end
+      #true.start <- 1 + nchar(sequence) - tbl.rev$end
+      #true.end   <- 1 + nchar(sequence) - tbl.rev$start
+      #tbl.rev$start <- true.start
+      #tbl.rev$end   <- true.end
       tbl <- rbind(tbl, tbl.rev)
       }
 

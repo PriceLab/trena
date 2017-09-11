@@ -160,14 +160,14 @@ setMethod('createGeneModel', 'Trena',
 
       function(obj, targetGene, solverNames, tbl.regulatoryRegions, mtx){
 
-         #stopifnot(solvers=="randomForest")  # more solvers to come
-         tfs <- sort(unique(unlist(strsplit(tbl.regulatoryRegions$tf, ";"))))
-         tfs <- intersect(tfs, rownames(mtx))
-         printf("tf candidate count: %d", length(tfs))
+         stopifnot("geneSymbol" %in% colnames(tbl.regulatoryRegions))
+         unique.tfs.from.regulatory.regions <- unique(tbl.regulatoryRegions$geneSymbol)
+         tfs <- intersect(unique.tfs.from.regulatory.regions, rownames(mtx))
+         printf("tf candidate count, in mtx, in tbl.regulatory.regions: %d/%d", length(tfs),
+                length(unique.tfs.from.regulatory.regions))
 
-         #solver.wt <- RandomForestSolver(mtx, targetGene=targetGene, candidateRegulators=tfs)
          solver <- EnsembleSolver(mtx, targetGene=targetGene, candidateRegulators=tfs, solverNames)
-         tbl.model  <-run(solver)
+         tbl.model <- run(solver)
          #count <- nrow(model.wt$edges)
          #tbl.model <- data.frame(tf=rownames(model.wt$edges),
          #                        randomForest=model.wt$edges$IncNodePurity,
