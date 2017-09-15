@@ -73,18 +73,19 @@ FootprintFilter <- function(genomeDB, footprintDB, geneCenteredSpec=list(),
     if(length(geneCenteredSpec) == 3){
         fpFinder <- FootprintFinder(genomeDB, footprintDB, quiet=quiet)
         
-        new.region <- try(with(geneCenteredSpec,                            
-                            getGenePromoterRegion(fpFinder,                                                  
-                                                  targetGene,                                                  
-                                                  tssUpstream,                                                  
-                                                  tssDownstream)))
-        if(class(new.region) != "try-error"){
-       new.region.chromLocString <- with(new.region, sprintf("%s:%d-%d", chr, start, end))       
-       regions <- c(regions, new.region.chromLocString)
-        } else {
-            warning("No regions found for supplied gene-centered spec")
+        new.region <- with(geneCenteredSpec,                            
+                           getGenePromoterRegion(fpFinder,                                                 
+                                                 targetGene,                                                 
+                                                 tssUpstream,                                                 
+                                                 tssDownstream))        
+        if(class(new.region) == "list"){            
+            new.region.chromLocString <- with(new.region, sprintf("%s:%d-%d", chr, start, end))            
+            regions <- c(regions, new.region.chromLocString)            
+        } else {            
+            warning("No regions found for supplied gene-centered spec")                        
+            regions <- c()
         }
-        closeDatabaseConnections(fpFinder)
+        closeDatabaseConnections(fpFinder)        
     }    
 
    if(length(regionsSpec) > 0)
