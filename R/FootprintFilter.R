@@ -68,20 +68,24 @@ printf <- function(...) print(noquote(sprintf(...)))
 FootprintFilter <- function(genomeDB, footprintDB, geneCenteredSpec=list(),
                             regionsSpec=list(), quiet=TRUE)
 {
-   fpFinder <- FootprintFinder(genomeDB, footprintDB, quiet=quiet)
-
-
    regions <- c();   # one or more chromLoc strings: "chr5:88903257-88905257"
 
-   if(length(geneCenteredSpec) == 3){
-       new.region <- with (geneCenteredSpec,
-                           getGenePromoterRegion(fpFinder,
-                                                 targetGene,
-                                                 tssUpstream,
-                                                 tssDownstream))
+    if(length(geneCenteredSpec) == 3){
+        fpFinder <- FootprintFinder(genomeDB, footprintDB, quiet=quiet)
+        
+        new.region <- try(with(geneCenteredSpec,                            
+                            getGenePromoterRegion(fpFinder,                                                  
+                                                  targetGene,                                                  
+                                                  tssUpstream,                                                  
+                                                  tssDownstream)))
+        if(class(new.region) != "try-error"){
        new.region.chromLocString <- with(new.region, sprintf("%s:%d-%d", chr, start, end))       
-       regions <- c(regions, new.region.chromLocString)       
-      }
+       regions <- c(regions, new.region.chromLocString)
+        } else {
+            warning("No regions found for supplied gene-centered spec")
+        }
+        closeDatabaseConnections(fpFinder)
+    }    
 
    if(length(regionsSpec) > 0)
       regions <- c(regions, regionsSpec)
@@ -89,8 +93,7 @@ FootprintFilter <- function(genomeDB, footprintDB, geneCenteredSpec=list(),
    .FootprintFilter(CandidateFilter(quiet = quiet),
                     genomeDB=genomeDB,
                     footprintDB=footprintDB,
-                    regions=regions,
-                    footprintFinder=fpFinder)
+                    regions=regions)
 
 } # FootprintFilter, the constructor
 #----------------------------------------------------------------------------------------------------
@@ -140,7 +143,7 @@ setMethod("getCandidates", "FootprintFilter",
      function(obj){
 
          # Retrieve the FootprintFinder object and find the footprints
-         fp <- obj@footprintFinder
+         fp <- FootprintFinder(obj@genomeDB, obj@footprintDB)
          tbl.out <- data.frame()
 
         for(region in obj@regions){
