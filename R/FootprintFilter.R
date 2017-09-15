@@ -139,8 +139,8 @@ setMethod("getCandidates", "FootprintFilter",
 
      function(obj){
 
-         # Create a FootprintFinder object and find the footprints
-         fp <- FootprintFinder(obj@genomeDB, obj@footprintDB, quiet=TRUE)
+         # Retrieve the FootprintFinder object and find the footprints
+         fp <- obj@footprintFinder
          tbl.out <- data.frame()
 
         for(region in obj@regions){
