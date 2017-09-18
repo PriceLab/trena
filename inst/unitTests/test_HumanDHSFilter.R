@@ -578,7 +578,7 @@ test_getCandidates.emptyRegion <- function()
                           regionsSpec=c("chr18:26850560-268505"),
                           quiet=FALSE)
    tbl <- getCandidates(hdf)
-   checkTrue(is.na(tbl))
+   checkEquals(nrow(tbl), 0)
 
 } # test_getCandidates.emptyRegion
 #----------------------------------------------------------------------------------------------------
@@ -724,7 +724,7 @@ test_getCandidates.twoAlternateAllelesInVariant <- function()
    tbl <- getCandidates(hdf)
       # TODO: this test is completely useless, written by me, long forgotten or ignored
       # TODO: when time permits, rewrite this.
-   checkTrue(is.na(tbl))
+   checkEquals(nrow(tbl), 0)
 
 
 } # test_getCandidates.twoAlternateAllelesInVariant
