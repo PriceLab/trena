@@ -176,7 +176,7 @@ setMethod('assessSnp', 'TrenaUtils',
 
      function(obj, pfms=list(), variant, shoulder, pwmMatchMinimumAsPercentage, genomeName="hg38"){
 
-        motifMatcher <- MotifMatcher(name=variant, genomeName=genomeName, pfms=pfms, quiet=TRUE)
+        motifMatcher <- MotifMatcher(genomeName=genomeName, pfms=pfms, quiet=TRUE)
         tbl.variant <- trena:::.parseVariantString(motifMatcher, variant)
         tbl.regions <- data.frame(chrom=tbl.variant$chrom,
                                   start=tbl.variant$loc-shoulder,
