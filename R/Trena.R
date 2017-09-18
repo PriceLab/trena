@@ -33,7 +33,7 @@ Trena = function(genomeName, quiet=TRUE)
 setMethod('getRegulatoryTableColumnNames', 'Trena',
 
       function(obj){
-         c("chrom", "motifStart", "motifEnd", "motifName", "strand", "score", "length", "distance.from.tss", "id", "tf")
+         c("chrom", "motifStart", "motifEnd", "motifName", "strand", "score", "length", "distance.from.tss", "id")
          })
 
 #------------------------------------------------------------------------------------------------------------------------
@@ -79,20 +79,17 @@ setMethod('getGeneModelTableColumnNames', 'Trena',
                                 geneCenteredSpec=list(),
                                 regionsSpec=chromLocString)
 
-    x.dhs <- getCandidates(dhsFilter)
+    tbl.dhs <- getCandidates(dhsFilter)
+    if(nrow(tbl.dhs) == 0)
+      return(tbl.dhs)
 
-    if(all(is.na(x.dhs))){
-       return(data.frame())
-       }
-
-    tbl.dhs <- x.dhs$tbl
     tbl.dhs$length <- nchar(tbl.dhs$match)
     distance <- tbl.dhs$motifStart - targetGeneTSS
     direction <- rep("upstream", length(distance))
     direction[which(distance < 0)] <- "downstream"
 
     colnames(tbl.dhs)[grep("motifRelativeScore", colnames(tbl.dhs))] <- "score"
-    colnames(tbl.dhs)[grep("tfs", colnames(tbl.dhs))] <- "tf"
+    #colnames(tbl.dhs)[grep("tfs", colnames(tbl.dhs))] <- "tf"
     tbl.dhs$distance.from.tss <- distance
     tbl.dhs$id <- sprintf("%s.dhs.%s.%06d.%s", targetGene, direction, abs(distance), tbl.dhs$motifName)
 
