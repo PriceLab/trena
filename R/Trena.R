@@ -168,15 +168,6 @@ setMethod('createGeneModel', 'Trena',
 
          solver <- EnsembleSolver(mtx, targetGene=targetGene, candidateRegulators=tfs, solverNames)
          tbl.model <- run(solver)
-         #count <- nrow(model.wt$edges)
-         #tbl.model <- data.frame(tf=rownames(model.wt$edges),
-         #                        randomForest=model.wt$edges$IncNodePurity,
-         #                        pearson=model.wt$edges$gene.cor,
-         #                        spearman=rep(0, count),
-         #                        betaLasso=rep(0, count),
-         #                        pcaMax=rep(0, count),
-         #                        concordance=rep(0, count),
-         #                        stringsAsFactors=FALSE)
          tbl.model
       }) # createGeneModel
 

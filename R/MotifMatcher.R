@@ -143,7 +143,6 @@ setMethod("findMatchesByChromosomalRegion", "MotifMatcher",
               tbl.regions <- do.call(rbind, x)
               printf("---- MotifMatcher::findMatchesByChromosomalRegion")
               print(tbl.regions)
-              browser()
               tbl.motifs.list <- .getScoredMotifs(tbl.regions$seq, obj@pfms,
                                                   pwmMatchMinimumAsPercentage, obj@quiet)
 
