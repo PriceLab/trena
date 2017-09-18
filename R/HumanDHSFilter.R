@@ -276,7 +276,7 @@ setMethod("getCandidates", "HumanDHSFilter",
           printf("found %d DHS regions in %d requested regions", nrow(tbl.dhs), nrow(tbl.regions))
 
        if(nrow(tbl.dhs) == 0){
-          return(NA)
+          return(tbl.dhs)
           }
 
        colnames(tbl.dhs) <- c("chrom", "start", "end", "count", "score")
