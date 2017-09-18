@@ -48,7 +48,7 @@ setGeneric("geneSymbolToTSS", signature="obj", function(obj, geneSymbol) standar
 #' @param regionsSpec
 #' @param variants
 #' @param quiet A logical denoting whether or not the solver should print output
-#' 
+#'
 #' @return A Solver class object with Random Forest as the solver
 #'
 #' @seealso  \code{\link{solve.RandomForest}}, \code{\link{getAssayData}}
@@ -121,7 +121,7 @@ HumanDHSFilter <- function(genomeName,
 #' contained in the HumanDHSFilter object
 #'
 #' @export
-#' 
+#'
 #' @examples
 #'
 #' #
@@ -160,10 +160,10 @@ setMethod("getEncodeRegulatoryTableNames", "HumanDHSFilter",
 #' @family getCandidate Methods
 #'
 #' @return A list, where one element a character vector of transcription factors that match
-#' the GO term and the other is an empty data frame. 
+#' the GO term and the other is an empty data frame.
 #'
 #' @export
-#' 
+#'
 #' @examples
 #'
 #' # Make a filter for "transcription, DNA-templated" and use it to filter candidates
@@ -189,10 +189,10 @@ setMethod("show", "HumanDHSFilter",
 #' @family getCandidate Methods
 #'
 #' @return A list, where one element a character vector of transcription factors that match
-#' the GO term and the other is an empty data frame. 
+#' the GO term and the other is an empty data frame.
 #'
 #' @export
-#' 
+#'
 #' @examples
 #'
 #' # Make a filter for "transcription, DNA-templated" and use it to filter candidates
@@ -230,10 +230,10 @@ setMethod("geneSymbolToTSS", "HumanDHSFilter",
 #' @family getCandidate Methods
 #'
 #' @return A list, where one element a character vector of transcription factors that match
-#' the GO term and the other is an empty data frame. 
+#' the GO term and the other is an empty data frame.
 #'
 #' @export
-#' 
+#'
 #' @examples
 #'
 #' # Make a filter for "transcription, DNA-templated" and use it to filter candidates
@@ -280,18 +280,22 @@ setMethod("getCandidates", "HumanDHSFilter",
           }
 
        colnames(tbl.dhs) <- c("chrom", "start", "end", "count", "score")
-       mm <- MotifMatcher(name="untitltedMotifMatcher", genomeName=obj@genomeName)
-       x <- findMatchesByChromosomalRegion(mm, tbl.dhs,
-                                           pwmMatchMinimumAsPercentage=obj@pwmMatchPercentageThreshold,
-                                           variants=obj@variants)
+       jaspar.human.pfms <- as.list(query(query(MotifDb, "hsapiens"), "jaspar2016"))
+       mm <- MotifMatcher(genomeName=obj@genomeName, pfms=jaspar.human.pfms)
+       tbl <- findMatchesByChromosomalRegion(mm, tbl.dhs[, 1:3],
+                                             pwmMatchMinimumAsPercentage=obj@pwmMatchPercentageThreshold,
+                                             variants=obj@variants)
        if(!obj@quiet)
-          printf(" and %d motifs", nrow(x$tbl))
+          printf(" and %d motifs", nrow(tbl))
 
-       colnames(x$tbl) <- c("motifName", "chrom", "motifStart", "motifEnd", "strand", "motifScore", "motifRelativeScore",
-                            "match", "regulatoryRegionStart", "regualtoryRegionEnd", "regulatorySequence", "variant", "tfs")
-       if(nchar(x$tbl$regulatorySequence[1]) > 20)
-          x$tbl$regulatorySequence <- paste(substr(x$tbl$regulatorySequence, 1, 17), "...", sep="")
-       x
+       preferred.colnames <- c("motifName", "chrom", "motifStart", "motifEnd", "strand", "motifScore", "motifRelativeScore",
+                               "match", "regulatoryRegionStart", "regualtoryRegionEnd", "regulatorySequence", "variant")
+       colnames(tbl) <- preferred.colnames
+       long.sequences <- which(tbl$regulatorySequence > 20)
+       if(length(long.sequences) > 0){
+          tbl$regulatorySequence[long.sequences] <- paste(substr(tbl$regulatorySequence[long.sequences], 1, 17), "...", sep="")
+          }
+       tbl
     }) # getCandidates
 
 #----------------------------------------------------------------------------------------------------
@@ -306,10 +310,10 @@ setMethod("getCandidates", "HumanDHSFilter",
 #' @family getCandidate Methods
 #'
 #' @return A list, where one element a character vector of transcription factors that match
-#' the GO term and the other is an empty data frame. 
+#' the GO term and the other is an empty data frame.
 #'
 #' @export
-#' 
+#'
 #' @examples
 #'
 #' # Make a filter for "transcription, DNA-templated" and use it to filter candidates
@@ -419,10 +423,10 @@ setMethod("getRegulatoryRegions", "HumanDHSFilter",
 #' @family getCandidate Methods
 #'
 #' @return A list, where one element a character vector of transcription factors that match
-#' the GO term and the other is an empty data frame. 
+#' the GO term and the other is an empty data frame.
 #'
 #' @export
-#' 
+#'
 #' @examples
 #'
 #' # Make a filter for "transcription, DNA-templated" and use it to filter candidates
