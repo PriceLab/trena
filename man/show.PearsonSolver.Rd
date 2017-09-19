@@ -6,10 +6,10 @@
 \alias{show.PearsonSolver}
 \title{Show the Pearson Solver}
 \usage{
-\S4method{show}{PearsonSolver}(obj)
+\S4method{show}{PearsonSolver}(object)
 }
 \arguments{
-\item{obj}{An object of the class PearsonSolver}
+\item{object}{An object of the class PearsonSolver}
 }
 \value{
 A truncated view of the supplied object

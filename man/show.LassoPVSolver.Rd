@@ -6,10 +6,10 @@
 \alias{show.LassoPVSolver}
 \title{Show the Lasso PV Solver}
 \usage{
-\S4method{show}{LassoPVSolver}(obj)
+\S4method{show}{LassoPVSolver}(object)
 }
 \arguments{
-\item{obj}{An object of the class LassoPVSolver}
+\item{object}{An object of the class LassoPVSolver}
 }
 \value{
 A truncated view of the supplied object

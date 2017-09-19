@@ -10,7 +10,20 @@ HumanDHSFilter(genomeName, encodeTableName = "wgEncodeRegDnaseClustered",
   variants = NA_character_, quiet = TRUE)
 }
 \arguments{
+\item{genomeName}{A character string indicating the reference genome; currently, the only
+accepted strings are "hg38" and "hg19", both of which are human genomes.}
+
 \item{encodeTableName}{(default = "wgEncodeRegDnaseClustered")}
+
+\item{pwmMatchPercentageThreshold}{A numeric from 0-100 to serve as a threshold for a match}
+
+\item{geneInfoDatabase.uri}{An address for a gene database}
+
+\item{geneCenteredSpec}{A gene-centered spec}
+
+\item{regionsSpec}{A regions spec}
+
+\item{variants}{Variants}
 
 \item{quiet}{A logical denoting whether or not the solver should print output}
 }

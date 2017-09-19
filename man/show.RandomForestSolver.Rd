@@ -6,10 +6,10 @@
 \alias{show.RandomForestSolver}
 \title{Show the Random Forest Solver}
 \usage{
-\S4method{show}{RandomForestSolver}(obj)
+\S4method{show}{RandomForestSolver}(object)
 }
 \arguments{
-\item{obj}{An object of the class RandomForestSolver}
+\item{object}{An object of the class RandomForestSolver}
 }
 \value{
 A truncated view of the supplied object

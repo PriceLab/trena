@@ -64,7 +64,7 @@ RandomForestSolver <- function(mtx.assay=matrix(), targetGene, candidateRegulato
 #' @rdname show.RandomForestSolver
 #' @aliases show.RandomForestSolver
 #'
-#' @param obj An object of the class RandomForestSolver
+#' @param object An object of the class RandomForestSolver
 #'
 #' @return A truncated view of the supplied object
 #'
@@ -77,18 +77,18 @@ RandomForestSolver <- function(mtx.assay=matrix(), targetGene, candidateRegulato
 
 setMethod('show', 'RandomForestSolver',
 
-    function(obj) {
-       regulator.count <- length(getRegulators(obj))
+    function(object) {
+       regulator.count <- length(getRegulators(object))
        if(regulator.count > 10){
-          regulatorString <- paste(getRegulators(obj)[1:10], collapse=",")
+          regulatorString <- paste(getRegulators(object)[1:10], collapse=",")
           regulatorString <- sprintf("%s...", regulatorString);
           }
        else
-          regulatorString <- paste(getRegulators(obj), collapse=",")
+          regulatorString <- paste(getRegulators(object), collapse=",")
 
        msg = sprintf("RandomForestSolver with mtx.assay (%d, %d), targetGene %s, %d candidate regulators %s",
-                     nrow(getAssayData(obj)), ncol(getAssayData(obj)),
-                     getTarget(obj), regulator.count, regulatorString)
+                     nrow(getAssayData(object)), ncol(getAssayData(object)),
+                     getTarget(object), regulator.count, regulatorString)
        cat (msg, '\n', sep='')
     })
 #----------------------------------------------------------------------------------------------------

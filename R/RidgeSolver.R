@@ -76,7 +76,7 @@ RidgeSolver <- function(mtx.assay=matrix(), targetGene, candidateRegulators,
 #' @rdname show.RidgeSolver
 #' @aliases show.RidgeSolver
 #'
-#' @param obj An object of the class RidgeSolver
+#' @param object An object of the class RidgeSolver
 #'
 #' @return A truncated view of the supplied object
 #'
@@ -89,18 +89,18 @@ RidgeSolver <- function(mtx.assay=matrix(), targetGene, candidateRegulators,
 
 setMethod('show', 'RidgeSolver',
 
-    function(obj) {
-       regulator.count <- length(getRegulators(obj))
+    function(object) {
+       regulator.count <- length(getRegulators(object))
        if(regulator.count > 10){
-          regulatorString <- paste(getRegulators(obj)[1:10], collapse=",")
+          regulatorString <- paste(getRegulators(object)[1:10], collapse=",")
           regulatorString <- sprintf("%s...", regulatorString);
           }
        else
-          regulatorString <- paste(getRegulators(obj), collapse=",")
+          regulatorString <- paste(getRegulators(object), collapse=",")
 
        msg = sprintf("RidgeSolver with mtx.assay (%d, %d), targetGene %s, %d candidate regulators %s, alpha = %f",
-                     nrow(getAssayData(obj)), ncol(getAssayData(obj)),
-                     getTarget(obj), regulator.count, regulatorString, obj@alpha)
+                     nrow(getAssayData(object)), ncol(getAssayData(object)),
+                     getTarget(object), regulator.count, regulatorString, object@alpha)
        cat (msg, '\n', sep='')
     })
 #----------------------------------------------------------------------------------------------------

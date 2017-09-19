@@ -113,7 +113,7 @@ EnsembleSolver <- function(mtx.assay=matrix(), targetGene, candidateRegulators,
 #' @rdname show.EnsembleSolver
 #' @aliases show.EnsembleSolver
 #'
-#' @param obj An object of the class EnsembleSolver
+#' @param object An object of the class EnsembleSolver
 #'
 #' @return A truncated view of the supplied object
 #'
@@ -126,19 +126,19 @@ EnsembleSolver <- function(mtx.assay=matrix(), targetGene, candidateRegulators,
 
 setMethod('show', 'EnsembleSolver',
 
-    function(obj) {
-       regulator.count <- length(getRegulators(obj))
+    function(object) {
+       regulator.count <- length(getRegulators(object))
        if(regulator.count > 10){
-          regulatorString <- paste(getRegulators(obj)[1:10], collapse=",")
+          regulatorString <- paste(getRegulators(object)[1:10], collapse=",")
           regulatorString <- sprintf("%s...", regulatorString);
           }
        else
-          regulatorString <- paste(getRegulators(obj), collapse=",")
+          regulatorString <- paste(getRegulators(object), collapse=",")
 
        msg = sprintf("EnsembleSolver with mtx.assay (%d, %d), targetGene %s, %d candidate regulators %s,  solvers: %s",
-                     nrow(getAssayData(obj)), ncol(getAssayData(obj)),
-                     getTarget(obj), regulator.count, regulatorString,
-                     paste(obj@solverNames,collapse = ", "))
+                     nrow(getAssayData(object)), ncol(getAssayData(object)),
+                     getTarget(object), regulator.count, regulatorString,
+                     paste(object@solverNames,collapse = ", "))
        cat (msg, '\n', sep='')
     })
 #----------------------------------------------------------------------------------------------------

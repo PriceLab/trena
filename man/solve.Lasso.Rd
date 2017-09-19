@@ -16,7 +16,7 @@
 A data frame containing the coefficients relating the target gene to each transcription factor, plus other fit parameters.
 }
 \description{
-Given a TReNA object with LASSO as the solver, use the \code{\link{glmnet}} function
+Given a LassoSolver object, use the \code{\link{glmnet}} function
 to estimate coefficients for each transcription factor as a predictor of the target gene's
 expression level.
 }

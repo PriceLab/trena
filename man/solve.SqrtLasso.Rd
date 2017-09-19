@@ -17,10 +17,9 @@ A data frame containing the coefficients relating the target gene to
 each transcription factor, plus other fit parameters.
 }
 \description{
-Given a TReNA object with Square Root LASSO as the solver,
-use the \code{\link{slim}} function to estimate coefficients
-for each transcription factor as a predictor of the target gene's expression level.
-This method should be called using the \code{\link{solve}} method on an appropriate TReNA object.
+Given SqrtLassoSolver object, use the \code{\link{slim}} function to
+estimate coefficients for each transcription factor as a predictor of the
+target gene's expression level.
 }
 \examples{
 # Load included Alzheimer's data, create a TReNA object with Square Root LASSO as solver, and solve

@@ -80,7 +80,7 @@ SqrtLassoSolver <- function(mtx.assay=matrix(), targetGene, candidateRegulators,
 #' @rdname show.SqrtLassoSolver
 #' @aliases show.SqrtLassoSolver
 #'
-#' @param obj An object of the class SqrtLassoSolver
+#' @param object An object of the class SqrtLassoSolver
 #'
 #' @return A truncated view of the supplied object
 #'
@@ -93,18 +93,18 @@ SqrtLassoSolver <- function(mtx.assay=matrix(), targetGene, candidateRegulators,
 
 setMethod('show', 'SqrtLassoSolver',
 
-    function(obj) {
-       regulator.count <- length(getRegulators(obj))
+    function(object) {
+       regulator.count <- length(getRegulators(object))
        if(regulator.count > 10){
-          regulatorString <- paste(getRegulators(obj)[1:10], collapse=",")
+          regulatorString <- paste(getRegulators(object)[1:10], collapse=",")
           regulatorString <- sprintf("%s...", regulatorString);
           }
        else
-          regulatorString <- paste(getRegulators(obj), collapse=",")
+          regulatorString <- paste(getRegulators(object), collapse=",")
 
        msg = sprintf("SqrtLassoSolver with mtx.assay (%d, %d), targetGene %s, %d candidate regulators %s,  with %d cores",
-                     nrow(getAssayData(obj)), ncol(getAssayData(obj)),
-                     getTarget(obj), regulator.count, regulatorString, obj@nCores)
+                     nrow(getAssayData(object)), ncol(getAssayData(object)),
+                     getTarget(object), regulator.count, regulatorString, object@nCores)
        cat (msg, '\n', sep='')
     })
 #----------------------------------------------------------------------------------------------------
@@ -113,10 +113,9 @@ setMethod('show', 'SqrtLassoSolver',
 #' @rdname solve.SqrtLasso
 #' @aliases run.SqrtLassoSolver solve.SqrtLasso
 #' 
-#' @description Given a TReNA object with Square Root LASSO as the solver,
-#' use the \code{\link{slim}} function to estimate coefficients
-#' for each transcription factor as a predictor of the target gene's expression level.
-#' This method should be called using the \code{\link{solve}} method on an appropriate TReNA object.
+#' @description Given SqrtLassoSolver object, use the \code{\link{slim}} function to
+#' estimate coefficients for each transcription factor as a predictor of the
+#' target gene's expression level.
 #' 
 #' @param obj An object of class Solver with "sqrtlasso" as the solver string
 #'

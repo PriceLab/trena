@@ -5,9 +5,8 @@ library(MotifDb)
 printf <- function(...) print(noquote(sprintf(...)))
 #----------------------------------------------------------------------------------------------------
 if(!exists("mtx")){
-   load("~/github/projects/examples/microservices/trenaGeneModel/datasets/coryAD/rosmap_counts_matrix_normalized_geneSymbols_25031x638.RData")
-   # load(system.file(package="TReNA", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
-   mtx <- asinh(mtx)
+   load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+   mtx <- asinh(mtx.sub)
    mtx.var <- apply(mtx, 1, var)
    deleters <- which(mtx.var < 0.01)
    if(length(deleters) > 0)   # 15838 x 638
@@ -195,7 +194,7 @@ closeAllPostgresConnections <- function()
 test_createGeneModel <- function()
 {
    jaspar.human.pfms <- query(query(MotifDb, "jaspar2016"), "sapiens")
-   motifMatcher <- MotifMatcher(genomeName="hg38", pfms=jaspar.human.pfms)
+   motifMatcher <- MotifMatcher(genomeName="hg38", pfms=as.list(jaspar.human.pfms))
 
       # pretend that all motifs are potentially active transcription sites - that is, ignore
       # what could be learned from open chromatin or dnasei footprints
@@ -203,11 +202,10 @@ test_createGeneModel <- function()
 
    tss <- 88825894
    tbl.region <- data.frame(chrom="chr5", start=tss-100, end=tss+400, stringsAsFactors=FALSE)
-   motif.info <- findMatchesByChromosomalRegion(motifMatcher, tbl.region, pwmMatchMinimumAsPercentage=92)
+   tbl.motifs <- findMatchesByChromosomalRegion(motifMatcher, tbl.region, pwmMatchMinimumAsPercentage=92)
 
    solver.names <- c("lasso", "lassopv", "pearson", "randomForest", "ridge", "spearman")
    trena <- Trena("hg38")
-   tbl.motifs <- motif.info$tbl
    tbl.geneModel <- createGeneModel(trena, "MEF2C", solver.names, tbl.motifs, mtx)
 
 } # test_createGeneModel

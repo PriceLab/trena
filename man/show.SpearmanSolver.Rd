@@ -6,10 +6,10 @@
 \alias{show.SpearmanSolver}
 \title{Show the Spearman Solver}
 \usage{
-\S4method{show}{SpearmanSolver}(obj)
+\S4method{show}{SpearmanSolver}(object)
 }
 \arguments{
-\item{obj}{An object of the class SpearmanSolver}
+\item{object}{An object of the class SpearmanSolver}
 }
 \value{
 A truncated view of the supplied object

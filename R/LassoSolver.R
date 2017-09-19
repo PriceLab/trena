@@ -74,7 +74,7 @@ LassoSolver <- function(mtx.assay=matrix(), targetGene, candidateRegulators,
 #' @rdname show.LassoSolver
 #' @aliases show.LassoSolver
 #'
-#' @param obj An object of the class LassoSolver
+#' @param object An object of the class LassoSolver
 #'
 #' @return A truncated view of the supplied object
 #'
@@ -87,18 +87,18 @@ LassoSolver <- function(mtx.assay=matrix(), targetGene, candidateRegulators,
 
 setMethod('show', 'LassoSolver',
 
-    function(obj) {
-       regulator.count <- length(getRegulators(obj))
+    function(object) {
+       regulator.count <- length(getRegulators(object))
        if(regulator.count > 10){
-          regulatorString <- paste(getRegulators(obj)[1:10], collapse=",")
+          regulatorString <- paste(getRegulators(object)[1:10], collapse=",")
           regulatorString <- sprintf("%s...", regulatorString);
           }
        else
-          regulatorString <- paste(getRegulators(obj), collapse=",")
+          regulatorString <- paste(getRegulators(object), collapse=",")
 
        msg = sprintf("LassoSolver with mtx.assay (%d, %d), targetGene %s, %d candidate regulators %s, alpha = %f",
-                     nrow(getAssayData(obj)), ncol(getAssayData(obj)),
-                     getTarget(obj), regulator.count, regulatorString, obj@alpha)
+                     nrow(getAssayData(object)), ncol(getAssayData(object)),
+                     getTarget(object), regulator.count, regulatorString, object@alpha)
        cat (msg, '\n', sep='')
     })
 #----------------------------------------------------------------------------------------------------
@@ -107,7 +107,7 @@ setMethod('show', 'LassoSolver',
 #' @rdname solve.Lasso
 #' @aliases run.LassoSolver solve.Lasso
 #' 
-#' @description Given a TReNA object with LASSO as the solver, use the \code{\link{glmnet}} function
+#' @description Given a LassoSolver object, use the \code{\link{glmnet}} function
 #' to estimate coefficients for each transcription factor as a predictor of the target gene's
 #' expression level.
 #'

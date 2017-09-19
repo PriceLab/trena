@@ -6,10 +6,10 @@
 \alias{show.SqrtLassoSolver}
 \title{Show the Square Root Lasso Solver}
 \usage{
-\S4method{show}{SqrtLassoSolver}(obj)
+\S4method{show}{SqrtLassoSolver}(object)
 }
 \arguments{
-\item{obj}{An object of the class SqrtLassoSolver}
+\item{object}{An object of the class SqrtLassoSolver}
 }
 \value{
 A truncated view of the supplied object

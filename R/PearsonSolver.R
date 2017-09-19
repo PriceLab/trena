@@ -59,7 +59,7 @@ PearsonSolver <- function(mtx.assay = matrix(), targetGene, candidateRegulators,
 #' @rdname show.PearsonSolver
 #' @aliases show.PearsonSolver
 #'
-#' @param obj An object of the class PearsonSolver
+#' @param object An object of the class PearsonSolver
 #'
 #' @return A truncated view of the supplied object
 #'
@@ -72,18 +72,18 @@ PearsonSolver <- function(mtx.assay = matrix(), targetGene, candidateRegulators,
 
 setMethod('show', 'PearsonSolver',
 
-    function(obj) {
-       regulator.count <- length(getRegulators(obj))
+    function(object) {
+       regulator.count <- length(getRegulators(object))
        if(regulator.count > 10){
-          regulatorString <- paste(getRegulators(obj)[1:10], collapse=",")
+          regulatorString <- paste(getRegulators(object)[1:10], collapse=",")
           regulatorString <- sprintf("%s...", regulatorString);
           }
        else
-          regulatorString <- paste(getRegulators(obj), collapse=",")
+          regulatorString <- paste(getRegulators(object), collapse=",")
 
        msg = sprintf("PearsonSolver with mtx.assay (%d, %d), targetGene %s, %d candidate regulators %s",
-                     nrow(getAssayData(obj)), ncol(getAssayData(obj)),
-                     getTarget(obj), regulator.count, regulatorString)
+                     nrow(getAssayData(object)), ncol(getAssayData(object)),
+                     getTarget(object), regulator.count, regulatorString)
        cat (msg, '\n', sep='')
     })
 #----------------------------------------------------------------------------------------------------
@@ -92,8 +92,8 @@ setMethod('show', 'PearsonSolver',
 #' @rdname solve.Pearson
 #' @aliases run.PearsonSolver solve.Pearson
 #'
-#' @description Given a TReNA object with Pearson as the solver, use the \code{\link{cor}} function
-#' to estimate coefficients for each transcription factor as a perdictor of the target gene's
+#' @description Given a PearsonSolver object, use the \code{\link{cor}} function
+#' to estimate coefficients for each transcription factor as a predictor of the target gene's
 #' expression level. 
 #'
 #' @param obj An object of class PearsonSolver

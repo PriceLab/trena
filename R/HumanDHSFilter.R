@@ -40,13 +40,14 @@ setGeneric("geneSymbolToTSS", signature="obj", function(obj, geneSymbol) standar
 #----------------------------------------------------------------------------------------------------
 #' Create a CandidateFilter using Human DNAse Hypersensitivity
 #'
-#' @param genomeName
+#' @param genomeName A character string indicating the reference genome; currently, the only
+#' accepted strings are "hg38" and "hg19", both of which are human genomes. 
 #' @param encodeTableName (default = "wgEncodeRegDnaseClustered")
-#' @param pwmMatchPercentageThreshold
-#' @param geneInfoDatabase.uri
-#' @param geneCenteredSpec
-#' @param regionsSpec
-#' @param variants
+#' @param pwmMatchPercentageThreshold A numeric from 0-100 to serve as a threshold for a match
+#' @param geneInfoDatabase.uri An address for a gene database
+#' @param geneCenteredSpec A gene-centered spec
+#' @param regionsSpec A regions spec
+#' @param variants Variants
 #' @param quiet A logical denoting whether or not the solver should print output
 #' 
 #' @return A Solver class object with Random Forest as the solver
@@ -172,7 +173,7 @@ setMethod("getEncodeRegulatoryTableNames", "HumanDHSFilter",
 
 setMethod("show", "HumanDHSFilter",
 
-     function(obj){
+     function(object){
         s <- sprintf("HumanDHSFilter...")
         cat(s, sep="\n")
         })

@@ -31,7 +31,7 @@ pull out a list containing a data frame of the motifs in those regions and a cha
 of their associated transcription factors.
 }
 \examples{
-# Perform a simple match in the rs13384219 neighborhood 
+# Perform a simple match in the rs13384219 neighborhood
 motifMatcher <- MotifMatcher(name="rs13384219.neighborhood", genomeName="hg38", quiet=FALSE)
 tbl.regions <- data.frame(chrom="chr2", start=57907313, end=57907333, stringsAsFactors=FALSE)
 x <- findMatchesByChromosomalRegion(motifMatcher, tbl.regions, pwmMatchMinimumAsPercentage=92)

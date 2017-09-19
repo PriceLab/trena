@@ -9,12 +9,9 @@
 \alias{MotifMatcher}
 \title{Create a MotifMatcher object}
 \usage{
-MotifMatcher(name = NA_character_, genomeName = "hg38", pfms = list(),
-  quiet = TRUE)
+MotifMatcher(genomeName, pfms, quiet = TRUE)
 }
 \arguments{
-\item{name}{A character string used to name a given MotifMatcher object (default = NA_character_)}
-
 \item{genomeName}{A character string identifying an object of type BSgenome. The genome object
 contains the information for a specific human genome and should be either "hg38" or "hg19". The
 supplied genome serves as the search space for matching motifs (default = "hg38").}
@@ -25,6 +22,8 @@ example below). If unspecified, the motifs will default to all vertebrates in th
 database (default = list())}
 
 \item{quiet}{A logical denoting whether or not the MotifMatcher object should print output}
+
+\item{name}{A character string used to name a given MotifMatcher object (default = NA_character_)}
 }
 \value{
 An object of the MotifMatcher class

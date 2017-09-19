@@ -6,10 +6,10 @@
 \alias{show.LassoSolver}
 \title{Show the Lasso Solver}
 \usage{
-\S4method{show}{LassoSolver}(obj)
+\S4method{show}{LassoSolver}(object)
 }
 \arguments{
-\item{obj}{An object of the class LassoSolver}
+\item{object}{An object of the class LassoSolver}
 }
 \value{
 A truncated view of the supplied object

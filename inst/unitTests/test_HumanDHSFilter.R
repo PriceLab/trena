@@ -175,7 +175,8 @@ test_basicConstructor <- function(reuse=FALSE)
                               pwmMatchPercentageThreshold=85L,
                               geneInfoDatabase.uri=geneInfoDB,
                               regionsSpec=regionsSpec,
-                              geneCenteredSpec=geneCenteredSpec)))
+                              geneCenteredSpec=geneCenteredSpec)),
+                    silent = TRUE)
    if(reuse)
       return(hdf)
 

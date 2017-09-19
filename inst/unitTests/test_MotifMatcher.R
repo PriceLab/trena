@@ -22,8 +22,6 @@ runTests <- function()
    test_findMatchesByChromosomalRegion_contrastReferenceWithVariant()
    test_findMatchesByChromosomalRegion.twoAlternateAlleles()
 
-   test_bug()
-
 } # runTests
 #------------------------------------------------------------------------------------------------------------------------
 test_basicConstructor <- function(reuse=FALSE)
@@ -90,8 +88,8 @@ test_.getScoredMotifs <- function()
    motifs.3 <- trena:::.getScoredMotifs(seqs[3], jaspar.human.pfms, min.match.percentage=90)[[1]]
 
 
-   motifs <- trena:::.getScoredMotifs(seqs, jaspar.human.pfms, min.match.percentage=80)  # relatexed threshold
-   checkEquals(unlist(lapply(motifs, nrow)), c(1, 0, 24))
+   motifs <- trena:::.getScoredMotifs(seqs, jaspar.human.pfms, min.match.percentage=75)  # relatexed threshold
+   checkEquals(unlist(lapply(motifs, nrow)), c(7, 0, 30))
    checkEquals(colnames(motifs[[1]]),
                         c("start", "end", "width", "score", "maxScore", "relativeScore", "motif", "match", "strand"))
    checkEquals(colnames(motifs[[3]]),
@@ -445,8 +443,8 @@ test_findMatchesByMultipleChromosomalRegions <- function()
 
    checkEquals(m1$motifName, "Hsapiens-jaspar2016-SHOX-MA0630.1")
    checkEquals(m1$chrom, "chr2")
-   checkEquals(m1$motifStart, 57907317)
-   checkEquals(m1$motifEnd, 57907324)
+   checkEquals(m1$motifStart, 57907322)
+   checkEquals(m1$motifEnd, 57907329)
    checkEquals(m1$strand, "-")
    checkEqualsNumeric(m1$motifScore, 5.23, tol=1e-2)
    checkEqualsNumeric(m1$motifRelativeScore, 0.93, tol=1e-2)
@@ -594,25 +592,6 @@ test_findMatchesByChromosomalRegion.twoAlternateAlleles <- function()
 
 
 } # test_findMatchesByChromosomalRegion.twoAlternateAlleles
-#----------------------------------------------------------------------------------------------------
-test_useMotifDbMatrices <- function()
-{
-   printf("--- test_useMotifDbMatrices")
-   mm <- MotifMatcher(name="motifDB.test", genomeName="hg38", pfms=as.list(query(MotifDb, "sapiens")))
-   mm <- MotifMatcher(name="motifDB.test", genomeName="hg38", pfms=as.list(query(MotifDb, "MESP1")))
-
-     # an alzheimer's-related snp
-   SNP <- "rs9357347"
-   snp.loc <-  list(chrom="chr6", start=41182853L, end=41182853L)  #  A>C
-   tbl.region <- with(snp.loc, data.frame(chrom=chrom, start=start-8, end=end+8), stringsAsFactors=FALSE)
-   x.wt <- findMatchesByChromosomalRegion(mm, tbl.region, pwmMatchMinimumAsPercentage=60)
-   x.mut <- findMatchesByChromosomalRegion(mm, tbl.region, pwmMatchMinimumAsPercentage=60, SNP)
-   tbl <- rbind(x.wt$tbl[, c(1,12, 2,3,4,5,7,8,13)], x.mut$tbl[, c(1,12, 2,3,4,5,7,8,13)])
-   tbl <- tbl[order(tbl$motifName, tbl$motifStart, tbl$motifRelativeScore, decreasing=TRUE),]
-
-   ### Is this incomplete??? ###
-
-} # test_useMotifDbMatrices
 #----------------------------------------------------------------------------------------------------
 # after finding and fixing and testing the start/end calculation for minus strand hits
 # in .matchPwmForwardAndReverse, this exploratory function now tests that those results

@@ -6,10 +6,10 @@
 \alias{show.RidgeSolver}
 \title{Show the Ridge Solver}
 \usage{
-\S4method{show}{RidgeSolver}(obj)
+\S4method{show}{RidgeSolver}(object)
 }
 \arguments{
-\item{obj}{An object of the class RidgeSolver}
+\item{object}{An object of the class RidgeSolver}
 }
 \value{
 A truncated view of the supplied object

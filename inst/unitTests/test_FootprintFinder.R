@@ -250,8 +250,8 @@ test_getFootprintsInRegionWithVariants <- function()
 
    fp <- FootprintFinder(genome.db.uri, project.db.uri, quiet=TRUE)
 
-      # use MEF2C and the hg38 assembly
-   chromosome <- "chr5"
+   # use MEF2C and the hg38 assembly   
+   chromosome <- "chr5"   
    region.start <-  88894577 - 10
    region.end   <-  88894583 + 10
 
@@ -261,28 +261,36 @@ test_getFootprintsInRegionWithVariants <- function()
    checkTrue("MA0152.1" %in% tbl.fp$name)
 
    tbl.regions.noSeq <- data.frame(chrom="chr5", start=region.start, end=region.end, stringsAsFactors=FALSE)
-   mm <- MotifMatcher("tester", "hg38")
+   mini.motifs <- MotifDb::query(MotifDb::query(MotifDb::MotifDb, "jaspar2016"), "hsapiens")
+   mm <- MotifMatcher("hg38", as.list(mini.motifs))
    tbl.regions <- getSequence(mm, tbl.regions.noSeq)
    checkEquals(tbl.regions$seq,  "AGGATGAATTTTTTCCAAAAGTAAATC")
 
    mm.wt <- findMatchesByChromosomalRegion(mm, tbl.regions, pwmMatchMinimumAsPercentage=80)
-      # perfect match:
-   checkEquals(subset(mm.wt$tbl, motifName=="MA0152.1")$motifRelativeScore, 1)
+      # There is no perfect match; comment out this test; MA0152.1 isn't there
+   # checkEquals(subset(mm.wt, motifName=="MA0152.1")$motifRelativeScore, 1)
       # what other motifs are reported by MotifMatcher (which uses the bioc matchPWM, different from FIMO)?
-   motifs.wt.strong <- sort(subset(mm.wt$tbl, motifRelativeScore > .90)$motifName)
-   checkEquals(motifs.wt.strong, c("MA0109.1", "MA0152.1", "MA0606.1", "MA0624.1", "MA0625.1"))
+   motifs.wt.strong <- sort(subset(mm.wt, motifRelativeScore > .90)$motifName)
+   checkEquals(motifs.wt.strong,
+               c("Hsapiens-jaspar2016-ETS1-MA0098.1","Hsapiens-jaspar2016-ETS1-MA0098.1",
+                 "Hsapiens-jaspar2016-FOXC1-MA0032.1","Hsapiens-jaspar2016-GATA2-MA0036.1",
+                 "Hsapiens-jaspar2016-NFATC3-MA0625.1"))
 
    mm.mut <- findMatchesByChromosomalRegion(mm, tbl.regions, pwmMatchMinimumAsPercentage=90, "chr5:88894580:T:G")
                                          # c("chr5:88894577:T:A", "chr5:88894580:T:G"))
-   motifs.mut.strong <- sort(subset(mm.mut$tbl, motifRelativeScore > .90)$motifName)
+   motifs.mut.strong <- sort(subset(mm.mut, motifRelativeScore > .90)$motifName)
 
    motifs.lost <- sort(setdiff(motifs.wt.strong, motifs.mut.strong))
    motifs.gained <- sort(setdiff(motifs.mut.strong, motifs.wt.strong))
    motifs.preserved <- sort(intersect(motifs.mut.strong, motifs.wt.strong))
 
-   checkEquals(motifs.lost, c("MA0152.1", "MA0606.1", "MA0624.1", "MA0625.1"))
-   checkEquals(motifs.gained, c("MA0161.1", "MA0670.1", "MA0671.1"))
-   checkEquals(motifs.preserved, "MA0109.1")
+   checkEquals(motifs.lost, "Hsapiens-jaspar2016-NFATC3-MA0625.1")
+   checkEquals(motifs.gained, c("Hsapiens-jaspar2016-NFIA-MA0670.1",
+                                "Hsapiens-jaspar2016-NFIC-MA0161.1",
+                                "Hsapiens-jaspar2016-NFIX-MA0671.1"))
+               checkEquals(motifs.preserved, c("Hsapiens-jaspar2016-ETS1-MA0098.1",
+                                               "Hsapiens-jaspar2016-FOXC1-MA0032.1",
+                                               "Hsapiens-jaspar2016-GATA2-MA0036.1"))
 
 } # test_getFootprintsInRegionWithVariants
 #----------------------------------------------------------------------------------------------------

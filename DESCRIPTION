@@ -43,7 +43,7 @@ Description: Methods for reconstructing transcriptional regulatory networks, esp
 License: GPL-3
 biocViews: Transcription, GeneRegulation, NetworkInference, FeatureExtraction, Regression,
     SystemsBiology, GeneExpression
-Collate:
+Collate: 
     'Solver.R'
     'BayesSpikeSolver.R'
     'CandidateFilter.R'
@@ -60,9 +60,9 @@ Collate:
     'RidgeSolver.R'
     'SpearmanSolver.R'
     'SqrtLassoSolver.R'
+    'Trena.R'
     'VarianceFilter.R'
     'help.R'
     'sharedFunctions.R'
     'utils.R'
-    'Trena.R'
 RoxygenNote: 6.0.1

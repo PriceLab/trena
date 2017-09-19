@@ -64,7 +64,7 @@ BayesSpikeSolver <- function(mtx.assay=matrix(), targetGene, candidateRegulators
 #' @rdname show.BayesSpikeSolver
 #' @aliases show.BayesSpikeSolver
 #'
-#' @param obj An object of the class BayesSpikeSolver
+#' @param object An object of the class BayesSpikeSolver
 #'
 #' @return A truncated view of the supplied object
 #'
@@ -77,18 +77,18 @@ BayesSpikeSolver <- function(mtx.assay=matrix(), targetGene, candidateRegulators
 
 setMethod('show', 'BayesSpikeSolver',
 
-    function(obj) {
-       regulator.count <- length(getRegulators(obj))
+    function(object) {
+       regulator.count <- length(getRegulators(object))
        if(regulator.count > 10){
-          regulatorString <- paste(getRegulators(obj)[1:10], collapse=",")
+          regulatorString <- paste(getRegulators(object)[1:10], collapse=",")
           regulatorString <- sprintf("%s...", regulatorString);
           }
        else
-          regulatorString <- paste(getRegulators(obj), collapse=",")
+          regulatorString <- paste(getRegulators(object), collapse=",")
 
        msg = sprintf("BayesSpikeSolver with mtx.assay (%d, %d), targetGene %s, %d candidate regulators %s, %d orderings",
-                     nrow(getAssayData(obj)), ncol(getAssayData(obj)),
-                     getTarget(obj), regulator.count, regulatorString, obj@nOrderings)
+                     nrow(getAssayData(object)), ncol(getAssayData(object)),
+                     getTarget(object), regulator.count, regulatorString, object@nOrderings)
        cat (msg, '\n', sep='')
     })
 #----------------------------------------------------------------------------------------------------

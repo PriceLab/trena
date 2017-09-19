@@ -99,7 +99,7 @@ MotifMatcher <- function(genomeName,
 #----------------------------------------------------------------------------------------------------
 setMethod("show", "MotifMatcher",
 
-          function(obj){
+          function(object){
               s <- sprintf("MotifMatcher...")
               cat(s, sep="\n")
           })

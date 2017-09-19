@@ -6,10 +6,10 @@
 \alias{show.BayesSpikeSolver}
 \title{Show the Bayes Spike Solver}
 \usage{
-\S4method{show}{BayesSpikeSolver}(obj)
+\S4method{show}{BayesSpikeSolver}(object)
 }
 \arguments{
-\item{obj}{An object of the class BayesSpikeSolver}
+\item{object}{An object of the class BayesSpikeSolver}
 }
 \value{
 A truncated view of the supplied object

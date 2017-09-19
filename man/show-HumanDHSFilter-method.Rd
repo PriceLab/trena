@@ -6,7 +6,7 @@
 \alias{getCandidates-FootprintFilter}
 \title{Get candidate genes using a human DHS filter}
 \usage{
-\S4method{show}{HumanDHSFilter}(obj)
+\S4method{show}{HumanDHSFilter}(object)
 }
 \arguments{
 \item{obj}{An object of class FootprintFilter}

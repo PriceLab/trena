@@ -80,25 +80,7 @@ setGeneric("getTarget", signature = "obj", function(obj) standardGeneric("getTar
 #' @export
 setGeneric("getRegulators", signature = "obj", function(obj) standardGeneric("getRegulators"))
 
-#' Show a Solver object
-#'
-#' @rdname show.Solver
-#' @aliases show.Solver
-#'
-#' @param obj An object of class Solver
-#'
-#' @return The names of the top 10 candidate regulators, plus statistics on the assay matrix, the
-#' target gene, and the total number of candidate regulators
-#'
-#' @export
-#' 
-#' @examples
-#' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
-#' tfs <- setdiff(rownames(mtx.sub),"MEF2C")
-#' pearson.solver <- PearsonSolver(mtx.sub, "MEF2C", tfs)
-#' show(pearson.solver)
 
-setGeneric("show", signature = "obj", function(obj) standardGeneric("show"))
 #----------------------------------------------------------------------------------------------------
 #' Define an object of class Solver
 #'

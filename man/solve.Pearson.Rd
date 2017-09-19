@@ -16,8 +16,8 @@
 The set of Pearson Correlation Coefficients between each transcription factor and the target gene.
 }
 \description{
-Given a TReNA object with Pearson as the solver, use the \code{\link{cor}} function
-to estimate coefficients for each transcription factor as a perdictor of the target gene's
+Given a PearsonSolver object, use the \code{\link{cor}} function
+to estimate coefficients for each transcription factor as a predictor of the target gene's
 expression level.
 }
 \examples{

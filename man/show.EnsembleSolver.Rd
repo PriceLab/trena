@@ -6,10 +6,10 @@
 \alias{show.EnsembleSolver}
 \title{Show the Ensemble Solver}
 \usage{
-\S4method{show}{EnsembleSolver}(obj)
+\S4method{show}{EnsembleSolver}(object)
 }
 \arguments{
-\item{obj}{An object of the class EnsembleSolver}
+\item{object}{An object of the class EnsembleSolver}
 }
 \value{
 A truncated view of the supplied object
