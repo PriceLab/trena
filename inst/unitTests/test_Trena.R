@@ -1,6 +1,7 @@
 library(trena)
 library(RUnit)
 library(MotifDb)
+library(RPostgreSQL)
 #----------------------------------------------------------------------------------------------------
 printf <- function(...) print(noquote(sprintf(...)))
 #----------------------------------------------------------------------------------------------------
@@ -23,6 +24,8 @@ runTests <- function()
 
    test_createGeneModel()
 
+   checkEquals(openPostgresConnections(), 0)
+
 } # runTests
 #------------------------------------------------------------------------------------------------------------------------
 test_basicConstructor <- function()
@@ -34,6 +37,7 @@ test_basicConstructor <- function()
 
    checkException(Trena("hg00"), silent=TRUE)
    checkException(Trena(""), silent=TRUE)
+   checkEquals(openPostgresConnections(), 0)
 
 } # test_basicConstructor
 #----------------------------------------------------------------------------------------------------
@@ -74,7 +78,8 @@ test_getRegulatoryRegions_oneFootprintSource <- function()
    checkTrue(all(tbl.reg$distance.from.tss >= -1000))
    checkTrue(all(tbl.reg$distance.from.tss <=  1000))
 
-   closeAllPostgresConnections()
+   checkEquals(openPostgresConnections(), 0)
+
 
 } # test_getRegulatoryRegions_oneFootprintSource
 #----------------------------------------------------------------------------------------------------
@@ -92,10 +97,12 @@ test_getRegulatoryRegions_encodeDHS <- function()
    aqp4.tss <- 26865884
    chromosome <- "chr18"
    sources <- c("encodeHumanDHS")
-   # prep <- TrenaPrep("AQP4", aqp4.tss, "chr18", aqp4.tss-100, aqp4.tss+100, regulatoryRegionSources=sources)
 
-   x <- getRegulatoryChromosomalRegions(trena, chromosome, aqp4.tss-1, aqp4.tss+10, sources, "AQP4", aqp4.tss)
-   checkEquals(nrow(x[["encodeHumanDHS"]]), 0)
+        # first submit a tiny region with no regulatory regions
+   tbl <- getRegulatoryChromosomalRegions(trena, chromosome, aqp4.tss-1, aqp4.tss+3, sources, "AQP4", aqp4.tss)
+   checkEquals(nrow(tbl[["encodeHumanDHS"]]), 0)
+
+        # now a larger region
    x <- getRegulatoryChromosomalRegions(trena, chromosome, aqp4.tss-100, aqp4.tss+100, sources, "AQP4", aqp4.tss)
 
    checkTrue(is(x, "list"))
@@ -107,7 +114,7 @@ test_getRegulatoryRegions_encodeDHS <- function()
    checkTrue(nrow(tbl.reg) > 20)
    checkEquals(length(grep("AQP4.dhs", tbl.reg$id)), nrow(tbl.reg))
 
-   closeAllPostgresConnections()
+   checkEquals(openPostgresConnections(), 0)
 
 } # test_getRegulatoryRegions_encodeDHS
 #------------------------------------------------------------------------------------------------------------------------
@@ -150,7 +157,7 @@ test_getRegulatoryRegions_twoFootprintSources <- function()
    checkTrue(all(tbl.reg$distance.from.tss >= -1000))
    checkTrue(all(tbl.reg$distance.from.tss <=  1000))
 
-   closeAllPostgresConnections()
+   checkEquals(openPostgresConnections(), 0)
 
 } # test_getRegulatoryRegions_twoFootprintSources
 #----------------------------------------------------------------------------------------------------
@@ -165,7 +172,6 @@ test_createGeneModel <- function()
    fp.source <- c("postgres://whovian/brain_hint_20")
 
    x <- getRegulatoryChromosomalRegions(trena, chromosome, aqp4.tss-100, aqp4.tss+100, fp.source, "AQP4", aqp4.tss)
-   closeAllPostgresConnections()
 
    tbl.regulatoryRegions <- x[[fp.source]]
 
@@ -174,27 +180,25 @@ test_createGeneModel <- function()
    tbl.strong <- subset(tbl.geneModel, rf.score > 3)
    checkTrue(all(c("TEAD1", "SP3", "KLF3", "NEUROD2") %in% tbl.strong$gene))
 
+   checkEquals(openPostgresConnections(), 0)
+
    invisible(list(tbl.regulatoryRegions=tbl.regulatoryRegions,
                   tbl.geneModel=tbl.geneModel))
 
 } # test_createGeneModel
 #------------------------------------------------------------------------------------------------------------------------
 # temporary hack.  the database-accessing classes should clean up after themselves
-closeAllPostgresConnections <- function()
+openPostgresConnections <- function()
 {
-   library(RPostgreSQL)
    connections <- RPostgreSQL::dbListConnections(RPostgreSQL::PostgreSQL())
-   printf(" TODO, nasty hack!  found %d Postgres connections open, now closing...", length(connections))
-   if(length(connections) > 0) for(i in 1:length(connections)){
-      dbDisconnect(connections[[i]])
-      } # for i
+   length(connections)
 
-} # closeAllPostgresConnections
+} # openPostgresConnections
 #------------------------------------------------------------------------------------------------------------------------
 test_createGeneModel <- function()
 {
-   jaspar.human.pfms <- query(query(MotifDb, "jaspar2016"), "sapiens")
-   motifMatcher <- MotifMatcher(genomeName="hg38", pfms=as.list(jaspar.human.pfms))
+   jaspar.human.pfms <- as.list(query(query(MotifDb, "jaspar2016"), "sapiens"))
+   motifMatcher <- MotifMatcher(genomeName="hg38", pfms=jaspar.human.pfms)
 
       # pretend that all motifs are potentially active transcription sites - that is, ignore
       # what could be learned from open chromatin or dnasei footprints
@@ -203,10 +207,19 @@ test_createGeneModel <- function()
    tss <- 88825894
    tbl.region <- data.frame(chrom="chr5", start=tss-100, end=tss+400, stringsAsFactors=FALSE)
    tbl.motifs <- findMatchesByChromosomalRegion(motifMatcher, tbl.region, pwmMatchMinimumAsPercentage=92)
-
+   tbl.motifs.tfs <- associateTranscriptionFactors(MotifDb, tbl.motifs, source="MotifDb", expand.rows=FALSE)
    solver.names <- c("lasso", "lassopv", "pearson", "randomForest", "ridge", "spearman")
    trena <- Trena("hg38")
-   tbl.geneModel <- createGeneModel(trena, "MEF2C", solver.names, tbl.motifs, mtx)
+   tbl.geneModel <- createGeneModel(trena, "MEF2C", solver.names, tbl.motifs.tfs, mtx)
+
+   checkTrue(is.data.frame(tbl.geneModel))
+
+   expected.colnames <- c("gene", "beta.lasso", "lasso.p.value", "pearson.coeff", "rf.score", "beta.ridge",
+                          "spearman.coeff", "concordance", "pcaMax")
+   checkTrue(all(expected.colnames %in% colnames(tbl.geneModel)))
+   checkTrue("FOXC1" %in% tbl.geneModel$gene)
+
+   checkEquals(openPostgresConnections(), 0)
 
 } # test_createGeneModel
 #------------------------------------------------------------------------------------------------------------------------

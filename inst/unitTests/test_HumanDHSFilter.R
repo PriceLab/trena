@@ -578,8 +578,8 @@ test_getCandidates.emptyRegion <- function()
                           geneInfoDatabase.uri="postgres://whovian/gtf",
                           regionsSpec=c("chr18:26850560-268505"),
                           quiet=FALSE)
-   x <- getCandidates(hdf)
-   checkTrue(is.na(x))
+   tbl <- getCandidates(hdf)
+   checkEquals(nrow(tbl), 0)
 
 } # test_getCandidates.emptyRegion
 #----------------------------------------------------------------------------------------------------
@@ -596,26 +596,23 @@ test_getCandidates.vrk2.twoRegions <- function()
                                       geneCenteredSpec=geneCenteredSpec,
                                       quiet=FALSE))
 
-   x <- getCandidates(hdf)
-   checkEquals(sort(names(x)), c("tbl", "tfs"))
-   checkEquals(ncol(x$tbl), 13)
-   checkEquals(colnames(x$tbl),
+   tbl <- getCandidates(hdf)
+   checkEquals(ncol(tbl), 12)
+   checkEquals(colnames(tbl),
                c("motifName", "chrom", "motifStart", "motifEnd", "strand", "motifScore", "motifRelativeScore", "match",
-                 "regulatoryRegionStart", "regualtoryRegionEnd", "regulatorySequence", "variant", "tfs"))
+                 "regulatoryRegionStart", "regualtoryRegionEnd", "regulatorySequence", "variant"))
 
     # make sure all motifs fall within the specified restions
     # cfSpec$regionsSpec: [1] "chr2:57906700-57906870" "chr2:57907740-57908150"
-   starts <- x$tbl$motifStart
-   ends   <- x$tbl$motifEnd
+   starts <- tbl$motifStart
+   ends   <- tbl$motifEnd
    starts.in.region.1 <- intersect(which(starts >= 57906700), which(starts <= 57906870))
    starts.in.region.2 <- intersect(which(starts >= 57907740), which(starts <= 57908150))
      # did we find them all?
-   checkEquals(nrow(x$tbl), 9)
-   checkTrue(all(sort(c(starts.in.region.1, starts.in.region.2)) == 1:9))
+   checkEquals(nrow(tbl), 11)
+   checkTrue(all(sort(c(starts.in.region.1, starts.in.region.2)) == seq_len(nrow(tbl))))
    checkTrue(all(ends[starts.in.region.1] <= 57906870))
    checkTrue(all(ends[starts.in.region.2] <= 57908150))
-
-   checkTrue(length(x$tfs) > 100)  # 422
 
 } # test_getCandidates.vrk2.twoRegions
 #----------------------------------------------------------------------------------------------------
@@ -640,14 +637,11 @@ test_getCandidates.vrk2.rs13384219.neighborhood.with.withoutVariants <- function
                               regionsSpec=regionsSpec,         # note that no variants passed in
                               geneCenteredSpec=geneCenteredSpec,
                               quiet=TRUE))
-   x.wt <- getCandidates(hdf)
-   checkEquals(sort(names(x.wt)), c("tbl", "tfs"))
-   checkEquals(dim(x.wt$tbl), c(66, 13))
-   checkEquals(colnames(x.wt$tbl),
+   tbl.wt <- getCandidates(hdf)
+   checkEquals(dim(tbl.wt), c(53, 12))
+   checkEquals(colnames(tbl.wt),
                c("motifName", "chrom", "motifStart", "motifEnd", "strand", "motifScore", "motifRelativeScore", "match",
-                 "regulatoryRegionStart", "regualtoryRegionEnd", "regulatorySequence", "variant", "tfs"))
-
-   checkTrue(length(x.wt$tfs) > 150)
+                 "regulatoryRegionStart", "regualtoryRegionEnd", "regulatorySequence", "variant"))
 
    cfSpec.variant <- create.vrk2.rs13384219.variant.candidateFilterSpec()
 
@@ -659,29 +653,16 @@ test_getCandidates.vrk2.rs13384219.neighborhood.with.withoutVariants <- function
                                               geneCenteredSpec=geneCenteredSpec,
                                               variants=variants,
                                               quiet=FALSE))
-   x.mut <- getCandidates(hdf)
-   checkEquals(sort(names(x.mut)), c("tbl", "tfs"))
-   checkEquals(dim(x.mut$tbl), c(55, 13))
-   checkEquals(colnames(x.mut$tbl),
+   tbl.mut <- getCandidates(hdf)
+   checkEquals(dim(tbl.mut), c(45, 12))
+   checkEquals(colnames(tbl.mut),
                c("motifName", "chrom", "motifStart", "motifEnd", "strand", "motifScore", "motifRelativeScore", "match",
-                 "regulatoryRegionStart", "regualtoryRegionEnd", "regulatorySequence", "variant", "tfs"))
-
-   checkTrue(length(x.mut$tfs) > 140)
+                 "regulatoryRegionStart", "regualtoryRegionEnd", "regulatorySequence", "variant"))
 
    # the top-scoring motifs in the wild type are missing from the mutant
 
-   tbl.wt <- x.wt$tbl
-   tbl.mut <- x.mut$tbl
-   tfs.wt <- x.wt$tfs
-   tfs.mut <- x.mut$tfs
-
-   tfs.lost <- setdiff(tfs.wt, tfs.mut)
-   tfs.gained <- setdiff(tfs.mut, tfs.wt)  # none
-   checkEquals(length(tfs.lost), 18)
-   checkEquals(length(tfs.gained), 0)
-
    missing.motifs <- setdiff(tbl.wt$motifName, tbl.mut$motifName)
-   checkEquals(length(missing.motifs), 11)
+   checkEquals(length(missing.motifs), 9)
      # high-scoring, long motifs for POU family tfs have been lost
    checkEqualsNumeric(mean(subset(tbl.wt,  motifName %in% missing.motifs)$motifScore), 7.66, tol=1e-1)
    checkEqualsNumeric(mean(subset(tbl.wt, !motifName %in% missing.motifs)$motifScore), 5.49, tol=1e-1)
@@ -701,15 +682,14 @@ test_getCandidates.vrk2.rs13384219.variant <- function()
                               geneCenteredSpec=geneCenteredSpec,
                               variants=variants,
                               quiet=TRUE))
-   x <- getCandidates(hdf)
-   checkEquals(sort(names(x)), c("tbl", "tfs"))
+   tbl <- getCandidates(hdf)
 
-   checkEquals(dim(x$tbl), c(55, 13))
-   checkEquals(colnames(x$tbl),
+   checkEquals(ncol(tbl), 12)
+   checkTrue(nrow(tbl) > 40)
+   checkEquals(colnames(tbl),
                c("motifName", "chrom", "motifStart", "motifEnd", "strand", "motifScore", "motifRelativeScore", "match",
-                 "regulatoryRegionStart", "regualtoryRegionEnd", "regulatorySequence", "variant", "tfs"))
+                 "regulatoryRegionStart", "regualtoryRegionEnd", "regulatorySequence", "variant"))
 
-   checkTrue(length(x$tfs) > 140)
 
 } # test_getCandidates.vrk2.rs13384219.variant
 #------------------------------------------------------------------------------------------------------------------------
@@ -722,12 +702,12 @@ test_getCandidates.twoAlternateAllelesInVariant <- function()
    genome <- "hg38"
    chromosome <- "chr18"
    loc <- 26864410
-   region <- sprintf("%s:%d-%d", chromosome, loc-5, loc+5)
+   region <- sprintf("%s:%d-%d", chromosome, loc-15, loc+15)
 
    recipe <- list(filterType="EncodeDNaseClusters",
                   genomeName="hg38",
                   encodeTableName="wgEncodeRegDnaseClustered",
-                  pwmMatchPercentageThreshold=80L,
+                  pwmMatchPercentageThreshold=70L,
                   geneInfoDB="postgres://whovian/gtf",
                   geneCenteredSpec=list(),
                   regionsSpec=region,
@@ -742,8 +722,10 @@ test_getCandidates.twoAlternateAllelesInVariant <- function()
                               variants=variants,
                               quiet=TRUE))
 
-   x <- getCandidates(hdf)
-
+   tbl <- getCandidates(hdf)
+      # TODO: this test is completely useless, written by me, long forgotten or ignored
+      # TODO: when time permits, rewrite this.
+   checkEquals(nrow(tbl), 0)
 
 
 } # test_getCandidates.twoAlternateAllelesInVariant
@@ -762,8 +744,8 @@ test_getCandidates.twoAlternateAllelesInVariant <- function()
 #   x <- getCandidates(hdcf, filter.args)
 #   checkEquals(sort(names(x)), c("tbl", "tfs"))
 #   checkTrue(all(c("chrom", "regionStart", "regionEnd", "regionScore", "sourceCount", "motif", "match",
-#                   "motif.start", "motif.end", "motif.width", "motif.score", "strand", "tf") %in% colnames(x$tbl)))
-#   checkTrue(nrow(x$tbl) > 15)     # 16 on (29 mar 2017)
+#                   "motif.start", "motif.end", "motif.width", "motif.score", "strand", "tf") %in% colnames(tbl)))
+#   checkTrue(nrow(tbl) > 15)     # 16 on (29 mar 2017)
 #   checkTrue(length(x$tfs) > 200)  # 217 on (29 mar 2017)
 #   checkEquals(length(which(duplicated(x$tfs))), 0)
 
@@ -857,11 +839,11 @@ test_rs34423320 <- function()
 
    x <- getCandidates(hdcf, args)
    checkEquals(sort(names(x)), c("tbl", "tfs"))
-   checkTrue(all(c("chrom", "regionStart", "regionEnd", "regionScore", "sourceCount", "motif", "match", "motif.start", "motif.end", "motif.width", "motif.score", "strand", "tf") %in% colnames(x$tbl)))
-   checkTrue(nrow(x$tbl) == 2)
+   checkTrue(all(c("chrom", "regionStart", "regionEnd", "regionScore", "sourceCount", "motif", "match", "motif.start", "motif.end", "motif.width", "motif.score", "strand", "tf") %in% colnames(tbl)))
+   checkTrue(nrow(tbl) == 2)
    checkTrue(length(x$tfs) == 25)
    checkEquals(length(which(duplicated(x$tfs))), 0)
-   checkEquals(x$tbl$motif, c("MA0081.1", "MA0056.1"))
+   checkEquals(tbl$motif, c("MA0081.1", "MA0056.1"))
 
    seq.wt <-  as.character(getSeq(reference.genome, "chr1", 167830170-10, 167830170+10))
    seq.mut <- sprintf("%s%s%s", substr(seq.wt, 1, 10), "T", substr(seq.wt, 12, 21))

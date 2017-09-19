@@ -586,8 +586,12 @@ setMethod("mapMotifsToTFsMergeIntoTable", "FootprintFinder",
       tbl.mtf <- DBI::dbGetQuery(obj@genome.db, query.string)
       tfsCollapsed <- unlist(lapply(tbl$name, function(name) paste(subset(tbl.mtf, motif==name)$tf, collapse=";")))
       tbl$tf <- tfsCollapsed
-      tbl <- tbl[, c("chrom", "start", "endpos", "name", "length", "strand", "score1", "score2", "score3", "tf")]
-      colnames(tbl) <- c("chrom", "start", "end", "motifName", "length", "strand", "score1", "score2", "score3", "tf")
+      tbl <- tbl[, c("chrom", "start", "endpos", "name",
+                     "length", "strand", "sample_id", "score1",
+                     "score2", "score3", "tf")]
+      colnames(tbl) <- c("chrom", "start", "end", "motifName",
+                         "length", "strand", "sample_id","score1",
+                         "score2", "score3", "tf")
       signature <- with(tbl, sprintf("%s:%d-%d-%s-%s-%d", chrom, start, end, motifName, strand, length))
       deleters <- which(duplicated(signature))
       if(length(deleters) > 0)

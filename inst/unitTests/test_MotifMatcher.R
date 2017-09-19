@@ -81,22 +81,25 @@ test_.matchPwmForwardAndReverse <- function()
 test_.getScoredMotifs <- function()
 {
    printf("--- test_.getScoredMotifs")
-   seqs <- test_getSequence(indirect=TRUE)
+   seqs.3 <- test_getSequence(indirect=TRUE)   # returns 3 dna sequences
 
    jaspar.human.pfms <- as.list(query (query(MotifDb, "sapiens"), "jaspar2016"))
 
-   motifs.3 <- trena:::.getScoredMotifs(seqs[3], jaspar.human.pfms, min.match.percentage=90)[[1]]
+      # multiple sequences can be passed in, with a list of tables returned.
+   motifs.90 <- trena:::.getScoredMotifs(seqs.3, jaspar.human.pfms, min.match.percentage=90)
+      # >= 90% match results only for the third sequence
+   checkEquals(unlist(lapply(motifs.90, nrow)), c(0, 0, 2))
 
+   motifs.75 <- trena:::.getScoredMotifs(seqs.3, jaspar.human.pfms, min.match.percentage=75)
+   checkEquals(unlist(lapply(motifs.75, nrow)), c(7, 0, 30))
 
-   motifs <- trena:::.getScoredMotifs(seqs, jaspar.human.pfms, min.match.percentage=75)  # relatexed threshold
-   checkEquals(unlist(lapply(motifs, nrow)), c(7, 0, 30))
-   checkEquals(colnames(motifs[[1]]),
+   checkEquals(colnames(motifs.75[[1]]),
                         c("start", "end", "width", "score", "maxScore", "relativeScore", "motif", "match", "strand"))
-   checkEquals(colnames(motifs[[3]]),
+   checkEquals(colnames(motifs.75[[3]]),
                         c("start", "end", "width", "score", "maxScore", "relativeScore", "motif", "match", "strand"))
 
-   motifs <- trena:::.getScoredMotifs(seqs, jaspar.human.pfms, min.match.percentage=100)  # nigh impossible threshold
-   checkEquals(unlist(lapply(motifs, nrow)), c(0, 0, 0))
+   motifs.perfect <- trena:::.getScoredMotifs(seqs.3, jaspar.human.pfms, min.match.percentage=100)  # nigh impossible threshold
+   checkEquals(unlist(lapply(motifs.perfect, nrow)), c(0, 0, 0))
 
 } # test_.getScoredMotifs
 #----------------------------------------------------------------------------------------------------
@@ -184,21 +187,24 @@ test_.parseVariantString <- function()
    checkEquals(tbl.v2$wt, "A")
    checkEquals(tbl.v2$mut, "G")
 
-   tbl.2vars <- trena:::.parseVariantString(mm, "rs3763040:A")  # snp with two variant alleles; one must be specified
+     # snp with two variant alleles; one must be specified
+   suppressWarnings(tbl.2vars <- trena:::.parseVariantString(mm, "rs3763040:A"))
    checkEquals(dim(tbl.2vars), c(1,4))
    checkEquals(tbl.2vars$chrom, "chr18")
    checkEquals(tbl.2vars$loc, 26864410)
    checkEquals(tbl.2vars$wt, "G")
    checkEquals(tbl.2vars$mut, "A")
 
-   tbl.2vars <- trena:::.parseVariantString(mm, "rs3763040:T")  # snp with two variant alleles; one must be specified
+     # snp with two variant alleles; one must be specified
+   suppressWarnings(tbl.2vars <- trena:::.parseVariantString(mm, "rs3763040:T"))
    checkEquals(dim(tbl.2vars), c(1,4))
    checkEquals(tbl.2vars$chrom, "chr18")
    checkEquals(tbl.2vars$loc, 26864410)
    checkEquals(tbl.2vars$wt, "G")
    checkEquals(tbl.2vars$mut, "T")
 
-   tbl.2vars <- trena:::.parseVariantString(mm, "rs3763040")  # snp with two variant alleles; first is chosen by default
+      # snp with two variant alleles; first is chosen by default
+   suppressWarnings(tbl.2vars <- trena:::.parseVariantString(mm, "rs3763040"))
    checkEquals(dim(tbl.2vars), c(1,4))
    checkEquals(tbl.2vars$chrom, "chr18")
    checkEquals(tbl.2vars$loc, 26864410)
@@ -318,7 +324,7 @@ test_getSequenceWithVariants <- function()
    checkEquals(tbl.wt$seq, "ACAGGGGGGTG")
    checkEquals(tbl.wt$status, "wt")
 
-   tbl.mut <- getSequence(mm, tbl.regions.noSeq, rsid)
+   suppressWarnings(tbl.mut <- getSequence(mm, tbl.regions.noSeq, rsid))
    checkEquals(dim(tbl.mut), c(1, 5))
    checkEquals(tbl.mut$seq, "ACAGGAGGGTG")
    checkEquals(tbl.mut$status, "mut")    # c("chr18:26864410(G->A)", "chr18:26864410(G->T)"))
@@ -349,7 +355,7 @@ test_getSequenceWithVariants <- function()
 test_findMatchesByChromosomalRegion <- function()
 {
    printf("--- test_findMatchesByChromosomalRegion")
-   jaspar.human.pfms <- as.list(query (query(MotifDb, "sapiens"), "jaspar"))
+   jaspar.human.pfms <- as.list(query (query(MotifDb, "sapiens"), "jaspar2016"))
 
    motifMatcher <- MotifMatcher(genomeName="hg38", pfms=jaspar.human.pfms, quiet=FALSE)
 
