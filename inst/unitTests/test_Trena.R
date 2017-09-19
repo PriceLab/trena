@@ -172,6 +172,7 @@ openPostgresConnections <- function()
 #------------------------------------------------------------------------------------------------------------------------
 test_createGeneModel <- function()
 {
+   targetGene <- "MEF2C"
    jaspar.human.pfms <- as.list(query(query(MotifDb, "jaspar2016"), "sapiens"))
    motifMatcher <- MotifMatcher(genomeName="hg38", pfms=jaspar.human.pfms)
 
@@ -185,13 +186,14 @@ test_createGeneModel <- function()
    tbl.motifs.tfs <- associateTranscriptionFactors(MotifDb, tbl.motifs, source="MotifDb", expand.rows=FALSE)
    solver.names <- c("lasso", "lassopv", "pearson", "randomForest", "ridge", "spearman")
    trena <- Trena("hg38")
-   tbl.geneModel <- createGeneModel(trena, "MEF2C", solver.names, tbl.motifs.tfs, mtx)
+   tbl.geneModel <- createGeneModel(trena, targetGene, solver.names, tbl.motifs.tfs, mtx)
 
    checkTrue(is.data.frame(tbl.geneModel))
 
    expected.colnames <- c("gene", "beta.lasso", "lasso.p.value", "pearson.coeff", "rf.score", "beta.ridge",
-                          "spearman.coeff", "concordance", "pcaMax")
+                          "spearman.coeff", "concordance", "pcaMax", "binding.sites")
    checkTrue(all(expected.colnames %in% colnames(tbl.geneModel)))
+   checkTrue(nrow(tbl.geneModel) > 8)
    checkTrue("FOXC1" %in% tbl.geneModel$gene)
 
    checkEquals(openPostgresConnections(), 0)
