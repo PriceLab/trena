@@ -162,32 +162,6 @@ test_getRegulatoryRegions_twoFootprintSources <- function()
 
 } # test_getRegulatoryRegions_twoFootprintSources
 #----------------------------------------------------------------------------------------------------
-test_createGeneModel <- function()
-{
-   printf("--- test_createGeneModel")
-
-   trena <- Trena("hg38")
-   targetGene <- "AQP4"
-   aqp4.tss <- 26865884
-   chromosome <- "chr18"
-   fp.source <- c("postgres://whovian/brain_hint_20")
-
-   x <- getRegulatoryChromosomalRegions(trena, chromosome, aqp4.tss-100, aqp4.tss+100, fp.source, "AQP4", aqp4.tss)
-
-   tbl.regulatoryRegions <- x[[fp.source]]
-
-   tbl.geneModel <- createGeneModel(trena, targetGene, c("lasso", "randomForest"), tbl.regulatoryRegions, mtx)
-   #checkTrue(all(getGeneModelTableColumnNames(trena) == colnames(tbl.geneModel)))
-   tbl.strong <- subset(tbl.geneModel, rf.score > 3)
-   checkTrue(all(c("TEAD1", "SP3", "KLF3", "NEUROD2") %in% tbl.strong$gene))
-
-   checkEquals(openPostgresConnections(), 0)
-
-   invisible(list(tbl.regulatoryRegions=tbl.regulatoryRegions,
-                  tbl.geneModel=tbl.geneModel))
-
-} # test_createGeneModel
-#------------------------------------------------------------------------------------------------------------------------
 # temporary hack.  the database-accessing classes should clean up after themselves
 openPostgresConnections <- function()
 {
