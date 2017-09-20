@@ -313,7 +313,7 @@ test_mapMotifsToTFsMergeIntoTable <- function()
    checkTrue(nrow(tbl) > 0)   # 11
 
    tbl.withTFs <- mapMotifsToTFsMergeIntoTable(fp, tbl)
-   checkEquals(ncol(tbl.withTFs), 10)
+   checkEquals(ncol(tbl.withTFs), 11)
    checkEquals(nrow(tbl.withTFs),nrow(tbl))
    closeDatabaseConnections(fp)
 

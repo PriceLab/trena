@@ -416,7 +416,7 @@ test_getRegulatoryRegions <- function()
 #
 # } # test_getRegulatoryRegions_hardCase
 #----------------------------------------------------------------------------------------------------
-test_getSequence <- function()
+notest_getSequence <- function()
 {
    printf("--- test_getSequence")
    candidateFilterSpec <- create.vrk2.candidateFilterSpec(geneCentered=FALSE)
@@ -444,7 +444,7 @@ test_getSequence <- function()
 
 } # test_getSequence
 #----------------------------------------------------------------------------------------------------
-test_.matchForwardAndReverse <- function()
+notest_.matchForwardAndReverse <- function()
 {
    printf("--- test_.matchForwardAndReverse")
 
@@ -522,7 +522,7 @@ test_.matchForwardAndReverse <- function()
 
 } # test_.matchForwardAndReverse
 #----------------------------------------------------------------------------------------------------
-test_.findMofits <- function()
+notest_.findMofits <- function()
 {
    printf("--- test_.findMotifs")
    x <- .findMotifs("ACTATTCCCCT", pfms, 90)
@@ -532,7 +532,7 @@ test_.findMofits <- function()
 
 } # test_.findMotifs
 #----------------------------------------------------------------------------------------------------
-test_.getScoredMotifs <- function()
+notest_.getScoredMotifs <- function()
 {
    printf("--- test_.getScoredMotifs")
    seqs <- test_getSequence()
@@ -541,7 +541,7 @@ test_.getScoredMotifs <- function()
 
 } # test_.getScoredMotifs
 #----------------------------------------------------------------------------------------------------
-test_vrk2Promoter.incrementally <- function()
+notest_vrk2Promoter.incrementally <- function()
 {
    printf("--- test_vrk2Promoter.incrementally")
 
@@ -815,7 +815,7 @@ notest_bin1 <- function()
 } # notest_bin1
 #----------------------------------------------------------------------------------------------------
 # one of the igap gwas alzheimer's snps, hand-verified to fall within a motif in a dhs region
-test_rs34423320 <- function()
+notest_rs34423320 <- function()
 {
    printf("--- test_rs34423320")
      # chr1 167830170 167830170  rs34423320-C-T
