@@ -19,6 +19,6 @@ Given a MotifMatcher object, return the motifs, which are stored in the pfms slo
 \examples{
 
 # Return the default matrix of JASPAR motifs
-motifMatcher <- MotifMatcher()
+motifMatcher <- MotifMatcher(genomeName="hg38", pfms = as.list(query(MotifDb, "sapiens")))
 motifs <- getPfms(motifMatcher)
 }

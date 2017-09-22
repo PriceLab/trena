@@ -38,11 +38,8 @@ search for. Ordinarily this class is primarily used by the HumanDHSFilter, but c
 be used to search for motifs in a given genome without any filtering functionality.
 }
 \examples{
-# Create an unamed MotifMatcher object using the default parameters
-mm <- MotifMatcher()
-
 # Specify the name, genome, and motif list to create a MotifMatcher for only human motifs
-mm <- MotifMatcher(name="motifDB.test", genomeName="hg38",
+mm <- MotifMatcher( genomeName="hg38",
 pfms=as.list(query(MotifDb, "sapiens")))
 }
 \seealso{

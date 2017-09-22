@@ -73,8 +73,7 @@ import(
     GenomicRanges,
     BSgenome,
     flare,
-    lassopv,
-    Biostrings
+    lassopv
 )
 
 importFrom(RSQLite, SQLite)
@@ -86,3 +85,7 @@ importFrom(org.Hs.eg.db, org.Hs.eg.db)
 importFrom(BSgenome.Hsapiens.UCSC.hg38,BSgenome.Hsapiens.UCSC.hg38)
 importFrom(BSgenome.Hsapiens.UCSC.hg19,BSgenome.Hsapiens.UCSC.hg19)
 importFrom(SNPlocs.Hsapiens.dbSNP144.GRCh38,SNPlocs.Hsapiens.dbSNP144.GRCh38)
+importFrom(Biostrings, IUPAC_CODE_MAP)
+importFrom(Biostrings, maxScore)
+importFrom(Biostrings, matchPWM)
+importFrom(Biostrings, reverseComplement)

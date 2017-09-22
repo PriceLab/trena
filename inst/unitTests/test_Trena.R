@@ -80,7 +80,6 @@ test_getRegulatoryRegions_oneFootprintSource <- function()
 
    checkEquals(openPostgresConnections(), 0)
 
-
 } # test_getRegulatoryRegions_oneFootprintSource
 #----------------------------------------------------------------------------------------------------
 test_getRegulatoryRegions_encodeDHS <- function()
@@ -180,7 +179,7 @@ test_createGeneModel <- function()
       # use MEF2C, and 100 bases downstream, and 500 bases upstream of one of its transcripts TSS chr5:88825894
 
    tss <- 88825894
-   tbl.region <- data.frame(chrom="chr5", start=tss-100, end=tss+400, stringsAsFactors=FALSE)
+   tbl.region <- data.frame(chrom="chr5", start=tss-100, end=tss+500, stringsAsFactors=FALSE)
    tbl.motifs <- findMatchesByChromosomalRegion(motifMatcher, tbl.region, pwmMatchMinimumAsPercentage=92)
    tbl.motifs.tfs <- associateTranscriptionFactors(MotifDb, tbl.motifs, source="MotifDb", expand.rows=FALSE)
    solver.names <- c("lasso", "lassopv", "pearson", "randomForest", "ridge", "spearman")
@@ -192,7 +191,7 @@ test_createGeneModel <- function()
    expected.colnames <- c("gene", "beta.lasso", "lasso.p.value", "pearson.coeff", "rf.score", "beta.ridge",
                           "spearman.coeff", "concordance", "pcaMax", "binding.sites")
    checkTrue(all(expected.colnames %in% colnames(tbl.geneModel)))
-   checkTrue(nrow(tbl.geneModel) > 8)
+   checkTrue(nrow(tbl.geneModel) == 3)
    checkTrue("FOXC1" %in% tbl.geneModel$gene)
 
    checkEquals(openPostgresConnections(), 0)

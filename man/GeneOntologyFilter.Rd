@@ -26,6 +26,7 @@ Create a CandidateFilter using Gene Ontology
 }
 \examples{
 # Make a filter for "transcription, DNA-templated"
+library(org.Hs.eg.db)
 goFilter <- GeneOntologyFilter(org.Hs.eg.db, GOTerm="GO:0006351")
 }
 \seealso{

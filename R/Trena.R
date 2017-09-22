@@ -1,25 +1,140 @@
+#----------------------------------------------------------------------------------------------------
+#' @name Trena-class
+#' @rdname Trena-class
+#' @aliases Trena
+#'
+#' @import methods
+
 .Trena <- setClass ("Trena",
                     representation = representation(
                         genomeName="character")
                         )
 #------------------------------------------------------------------------------------------------------------------------
+#' Get the regulatory chromosomal regions for a Trena object
+#'
+#' @rdname getRegulatoryChromosomalRegions
+#' @aliases getRegulatoryChromosomalRegions
+#'
+#' @param obj An object of class Trena
+#' @param chromosome A choromosome of interest
+#' @param chromStart The beginning of the desired region
+#' @param chromEnd The end of the desired region
+#' @param regulatoryRegionSources A vector containing the names of sources for chromosome information. These can be
+#' addresses of footprint databases or the names of DHS databases
+#' @param targetGene A target gene of interest
+#' @param targetGeneTSS An integer giving the location of the target gene's transcription start site
+#' @param combine A logical indicating whether or not to combine the output into one data frame (default = FALSE)
+#' @param quiet A logical indicating whether or not the method should print output (default = FALSE)
+#'
+#' @export
+#'
+#' @return A list of regulatory regions for the supplied target gene. If \code{combine} is set to \code{TRUE},
+#' the list is converted into a data frame. 
+#' 
+#' @examples
+#' # Get regulatory regions for MEF2C from a footprint database
+#' database.filename <- system.file(package="trena", "extdata", "project.sub.db")
+#' database.uri <- sprintf("sqlite://%s", database.filename)
+#' sources <- c(database.uri)
+#' 
+#' trena <- Trena("hg38")
+#' chromosome <- "chr5"
+#' mef2c.tss <- 88904257
+#' loc.start <- mef2c.tss - 1000
+#' loc.end   <- mef2c.tss + 1000
+#'
+#' regions <- getRegulatoryChromosomalRegions(trena, chromosome, mef2c.tss-1000, mef2c.tss+1000,
+#' sources, "MEF2C", mef2c.tss)
+#' 
+#' # Get regulatory regions for AQP4 from a Human DHS source
+#' trena <- Trena("hg38")
+#' aqp4.tss <- 26865884
+#' chromosome <- "chr18"
+#' sources <- c("encodeHumanDHS")
+#'
+#' regions <- getRegulatoryChromosomalRegions(trena, chromosome, aqp4.tss-1, aqp4.tss+3, sources, "AQP4", aqp4.tss)
+
 setGeneric('getRegulatoryChromosomalRegions',  signature='obj',
            function(obj, chromosome, chromStart, chromEnd, regulatoryRegionSources, targetGene, targetGeneTSS,
                     combine=FALSE, quiet=FALSE) standardGeneric("getRegulatoryChromosomalRegions"))
 
+#' Retrieve the column names in the regulatory table for a Trena object
+#'
+#' @rdname getRegulatoryTableColumnNames
+#' @aliases getRegulatoryTableColumnNames
+#'
+#' @param obj An object of class Trena
+#'
+#' @return A character vector listing the column names in the Trena object regulatory table
+#'
+#' @export
+#'
+#' @examples
+#' # Create a Trena object and retrieve the column names of the regulatory table
+#' trena <- Trena("mm10")
+#' tbl.cols <- getRegulatoryTableColumnNames(trena)
 
 setGeneric('getRegulatoryTableColumnNames',  signature='obj', function(obj) standardGeneric ('getRegulatoryTableColumnNames'))
+
+#' Retrieve the column names in the gene model table for a Trena object
+#'
+#' @rdname getGeneModelTableColumnNames
+#' @aliases getGeneModelTableColumnNames
+#'
+#' @param obj An object of class Trena
+#'
+#' @return A character vector listing the column names in the Trena object gene model table
+#'
+#' @export
+#'
+#' @examples
+#' # Create a Trena object and retrieve the column names of the gene model table
+#' trena <- Trena("mm10")
+#' tbl.cols <- getRegulatoryTableColumnNames(trena)
+
 setGeneric('getGeneModelTableColumnNames',  signature='obj', function(obj) standardGeneric ('getGeneModelTableColumnNames'))
+
+
 setGeneric('createGeneModel', signature='obj', function(obj, targetGene,  solverNames, tbl.regulatoryRegions, mtx)
-              standardGeneric('createGeneModel'))
+    standardGeneric('createGeneModel'))
+
+
 setGeneric('expandRegulatoryRegionsTableByTF', signature='obj', function(obj, tbl.reg) standardGeneric('expandRegulatoryRegionsTableByTF'))
+
+
 #setGeneric('addGeneModelLayout', signature='obj', function(obj, g, xPos.span=1500) standardGeneric('addGeneModelLayout'))
+
+
 setGeneric('assessSnp', signature='obj', function(obj, pfms, variant, shoulder, pwmMatchMinimumAsPercentage, genomeName="hg38")
               standardGeneric('assessSnp'))
 #------------------------------------------------------------------------------------------------------------------------
 # a temporary hack: some constants
 genome.db.uri <- "postgres://bddsrds.globusgenomics.org/hg38"   # has gtf and motifsgenes tables
 #------------------------------------------------------------------------------------------------------------------------
+#' Define an object of class Trena
+#'
+#' @description
+#' The Trena class provides a convenient wrapper for the most commonly used filters and solver in the \code{trena}
+#' package. Given a particular genome (one of \code{c("hg19","hg38","mm10")}, the Trena class provides methods to
+#' retrieve information about possible regulators for a target gene, assess the effects of SNPs, and create gene models
+#' using the flexible \code{\link{EnsembleSolver}} class.
+#'
+#' @param genomeName A string indicating the genome used by the Trena object. Currently, only human and mouse ("hg19",
+#' "hg38","mm10") are supported
+#' @param quiet A logical indicating whether or not the Trena object should print output
+#'
+#' @return An object of the Trena class
+#'
+#' @export
+#'
+#' @examples
+#' # Create a Trena object using the human hg38 genome
+#' trena <- Trena("hg38")
+#'
+#' @seealso \code{\link{getRegulatoryChromosomalRegions}}, \code{\link{getRegulatoryTableColumnNames}},
+#' \code{\link{getGeneModelTableColumnNames}}, \code{\link{createGeneModel}},
+#' \code{\link{expandRegulatoryRegionsTableByTF}}, \code{\link{assessSnp}}
+
 Trena = function(genomeName, quiet=TRUE)
 {
    stopifnot(genomeName %in% c("hg19", "hg38", "mm10"))
@@ -173,7 +288,7 @@ setMethod('createGeneModel', 'Trena',
       }) # createGeneModel
 
 #------------------------------------------------------------------------------------------------------------------------
-setMethod('assessSnp', 'TrenaUtils',
+setMethod('assessSnp', 'Trena',
 
      function(obj, pfms=list(), variant, shoulder, pwmMatchMinimumAsPercentage, genomeName="hg38"){
 

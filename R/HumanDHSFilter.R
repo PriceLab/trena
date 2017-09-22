@@ -150,15 +150,13 @@ setMethod("getEncodeRegulatoryTableNames", "HumanDHSFilter",
        })
 
 #----------------------------------------------------------------------------------------------------
-#' Get candidate genes using a human DHS filter
+#' Show the details of a human DHS filter
 #'
-#' @aliases getCandidates-FootprintFilter
+#' @aliases show-HumanDHSFilter
 #'
-#' @param obj An object of class FootprintFilter
+#' @param object An object of class HumanDHSFilter
 #'
-#' @seealso \code{\link{FootprintFilter}}
-#'
-#' @family getCandidate Methods
+#' @seealso \code{\link{HumanDHSFilter}}
 #'
 #' @return A list, where one element a character vector of transcription factors that match
 #' the GO term and the other is an empty data frame.
@@ -166,10 +164,7 @@ setMethod("getEncodeRegulatoryTableNames", "HumanDHSFilter",
 #' @export
 #'
 #' @examples
-#'
-#' # Make a filter for "transcription, DNA-templated" and use it to filter candidates
-#' goFilter <- GeneOntologyFilter(org.Hs.eg.db, GOTerm="GO:0006351")
-#' candidates <- getCandidates(goFilter)
+#' # Make a filter and show it
 
 setMethod("show", "HumanDHSFilter",
 

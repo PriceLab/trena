@@ -21,6 +21,7 @@ Get candidate genes using a gene ontology filter
 \examples{
 
 # Make a filter for "transcription, DNA-templated" and use it to filter candidates
+library(org.Hs.eg.db)
 goFilter <- GeneOntologyFilter(org.Hs.eg.db, GOTerm="GO:0006351")
 candidates <- getCandidates(goFilter)
 }
@@ -33,6 +34,5 @@ Other getCandidate Methods: \code{\link{geneSymbolToTSS,HumanDHSFilter-method}},
   \code{\link{getCandidates,VarianceFilter-method}},
   \code{\link{getCandidates}},
   \code{\link{getRegulatoryRegions,HumanDHSFilter-method}},
-  \code{\link{getSequence_tmp,HumanDHSFilter-method}},
-  \code{\link{show,HumanDHSFilter-method}}
+  \code{\link{getSequence_tmp,HumanDHSFilter-method}}
 }

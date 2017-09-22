@@ -3,36 +3,24 @@
 \docType{methods}
 \name{show,HumanDHSFilter-method}
 \alias{show,HumanDHSFilter-method}
-\alias{getCandidates-FootprintFilter}
-\title{Get candidate genes using a human DHS filter}
+\alias{show-HumanDHSFilter}
+\title{Show the details of a human DHS filter}
 \usage{
 \S4method{show}{HumanDHSFilter}(object)
 }
 \arguments{
-\item{obj}{An object of class FootprintFilter}
+\item{object}{An object of class HumanDHSFilter}
 }
 \value{
 A list, where one element a character vector of transcription factors that match
 the GO term and the other is an empty data frame.
 }
 \description{
-Get candidate genes using a human DHS filter
+Show the details of a human DHS filter
 }
 \examples{
-
-# Make a filter for "transcription, DNA-templated" and use it to filter candidates
-goFilter <- GeneOntologyFilter(org.Hs.eg.db, GOTerm="GO:0006351")
-candidates <- getCandidates(goFilter)
+# Make a filter and show it
 }
 \seealso{
-\code{\link{FootprintFilter}}
-
-Other getCandidate Methods: \code{\link{geneSymbolToTSS,HumanDHSFilter-method}},
-  \code{\link{getCandidates,FootprintFilter-method}},
-  \code{\link{getCandidates,GeneOntologyFilter-method}},
-  \code{\link{getCandidates,HumanDHSFilter-method}},
-  \code{\link{getCandidates,VarianceFilter-method}},
-  \code{\link{getCandidates}},
-  \code{\link{getRegulatoryRegions,HumanDHSFilter-method}},
-  \code{\link{getSequence_tmp,HumanDHSFilter-method}}
+\code{\link{HumanDHSFilter}}
 }

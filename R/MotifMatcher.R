@@ -61,11 +61,8 @@ setGeneric("findMatchesByChromosomalRegion", signature="obj",
 #' @seealso \code{\link{HumanDHSFilter}}
 #'
 #' @examples
-#' # Create an unamed MotifMatcher object using the default parameters
-#' mm <- MotifMatcher()
-#'
 #' # Specify the name, genome, and motif list to create a MotifMatcher for only human motifs
-#' mm <- MotifMatcher(name="motifDB.test", genomeName="hg38",
+#' mm <- MotifMatcher( genomeName="hg38",
 #' pfms=as.list(query(MotifDb, "sapiens")))
 
 MotifMatcher <- function(genomeName,
@@ -126,13 +123,13 @@ setMethod("show", "MotifMatcher",
 #'
 #' @examples
 #' # Perform a simple match in the rs13384219 neighborhood
-#' motifMatcher <- MotifMatcher(name="rs13384219.neighborhood", genomeName="hg38", quiet=FALSE)
+#' motifMatcher <- MotifMatcher(genomeName="hg38", pfms = as.list(query(MotifDb, "sapiens")), quiet=FALSE)
 #' tbl.regions <- data.frame(chrom="chr2", start=57907313, end=57907333, stringsAsFactors=FALSE)
 #' x <- findMatchesByChromosomalRegion(motifMatcher, tbl.regions, pwmMatchMinimumAsPercentage=92)
 #'
 #' # Perform the same match, but now include a variant
 #' x.mut <- findMatchesByChromosomalRegion(motifMatcher, tbl.regions,
-#' pwmMatchMinimumAsPercentage=92, "rs13384219")
+#' pwmMatchMinimumAsPercentage=92, variants = "rs13384219")
 
 setMethod("findMatchesByChromosomalRegion", "MotifMatcher",
 
@@ -209,7 +206,7 @@ setMethod("findMatchesByChromosomalRegion", "MotifMatcher",
 #' @examples
 #'
 #' # Return the default matrix of JASPAR motifs
-#' motifMatcher <- MotifMatcher()
+#' motifMatcher <- MotifMatcher(genomeName="hg38", pfms = as.list(query(MotifDb, "sapiens")))
 #' motifs <- getPfms(motifMatcher)
 
 setMethod("getPfms", "MotifMatcher",
@@ -463,7 +460,7 @@ setMethod("getPfms", "MotifMatcher",
 #'
 #' @examples
 #' # Retrieve the sequences for the rs13384219 neighborhood
-#' motifMatcher <- MotifMatcher(name="rs13384219.neighborhood", genomeName="hg38", quiet=FALSE)
+#' motifMatcher <- MotifMatcher(genomeName="hg38", pfms = as.list(query(MotifDb, "sapiens")))
 #' tbl.regions <- data.frame(chrom="chr2", start=57907313, end=57907333, stringsAsFactors=FALSE)
 #' x <- findMatchesByChromosomalRegion(motifMatcher, tbl.regions, pwmMatchMinimumAsPercentage=92)
 #'

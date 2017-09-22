@@ -46,6 +46,7 @@ printf <- function(...) print(noquote(sprintf(...)))
 #'
 #' @examples
 #' # Make a filter for "transcription, DNA-templated"
+#' library(org.Hs.eg.db)
 #' goFilter <- GeneOntologyFilter(org.Hs.eg.db, GOTerm="GO:0006351")
 
 GeneOntologyFilter <- function(organismDatabase=org.Hs.eg.db::org.Hs.eg.db,
@@ -75,6 +76,7 @@ GeneOntologyFilter <- function(organismDatabase=org.Hs.eg.db::org.Hs.eg.db,
 #' @examples
 #'
 #' # Make a filter for "transcription, DNA-templated" and use it to filter candidates
+#' library(org.Hs.eg.db)
 #' goFilter <- GeneOntologyFilter(org.Hs.eg.db, GOTerm="GO:0006351")
 #' candidates <- getCandidates(goFilter)
 

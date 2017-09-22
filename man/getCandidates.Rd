@@ -22,6 +22,5 @@ Other getCandidate Methods: \code{\link{geneSymbolToTSS,HumanDHSFilter-method}},
   \code{\link{getCandidates,HumanDHSFilter-method}},
   \code{\link{getCandidates,VarianceFilter-method}},
   \code{\link{getRegulatoryRegions,HumanDHSFilter-method}},
-  \code{\link{getSequence_tmp,HumanDHSFilter-method}},
-  \code{\link{show,HumanDHSFilter-method}}
+  \code{\link{getSequence_tmp,HumanDHSFilter-method}}
 }

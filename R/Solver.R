@@ -85,10 +85,9 @@ setGeneric("getRegulators", signature = "obj", function(obj) standardGeneric("ge
 #' Define an object of class Solver
 #'
 #' @description
-#' The Solver class is a generic class that governs the different solvers available in TReNA. A
-#' Solver class object is constructed during creation of a TReNA object and resides within the
-#' TReNA object. It is rarely called by itself; rather, interaction with a particular solver object
-#' is achieved using the \code{\link{solve}} method on a TReNA object.
+#' The Solver class is a base class that governs the different solvers available in \code{trena}.
+#' It is rarely called by itself; rather, interaction with a particular solver object
+#' is achieved using a specific solver type.
 #' 
 #' @rdname Solver-class
 #'
