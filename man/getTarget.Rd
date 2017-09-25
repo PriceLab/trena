@@ -18,6 +18,8 @@ Retrieve the target gene from a Solver object
 \examples{
 # Create a Solver object using the included Alzheimer's data and retrieve the target gene
 load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
-solver <- Solver(mtx.sub)
+targetGene <- "MEF2C"
+candidateRegulators <- setdiff(rownames(mtx.sub), targetGene)
+solver <- Solver(mtx.sub, targetGene, candidateRegulators)
 mtx <- getTarget(solver) 
 }

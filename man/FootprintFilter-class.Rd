@@ -56,7 +56,7 @@ footprint.filter <- FootprintFilter(genomeDB = genome.db.uri, footprintDB = proj
 geneCenteredSpec = geneCenteredSpec)
 }
 \seealso{
-\code{\link{getCandidates-FootprintFilter}}, \code{\link{getFilterAssayData}}
+\code{\link{getCandidates-FootprintFilter}}
 
 Other Filtering Objects: \code{\link{VarianceFilter-class}}
 }

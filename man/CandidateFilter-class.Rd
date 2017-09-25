@@ -32,5 +32,5 @@ a Solver object.
 candidate.filter <- CandidateFilter(quiet=TRUE)
 }
 \seealso{
-\code{\link{getCandidates}}, \code{\link{getFilterAssayData}}
+\code{\link{getCandidates}}
 }

@@ -40,12 +40,14 @@ create.vrk2.candidateFilterSpec <- function(geneCentered=TRUE, promoter.length=1
    chromosome <- "chr2"
    tss <- 57907651
    promoter.length <- 1000
+   db.address <- system.file(package="trena", "extdata")
+   genome.db.uri    <- paste("sqlite:/", db.address, "vrk2.genome.db",  sep = "/")
 
    candidateFilterSpec <- list(filterType="EncodeDNaseClusters",
                                genomeName=genome,
                                encodeTableName="wgEncodeRegDnaseClustered",
                                pwmMatchPercentageThreshold=85L,
-                               geneInfoDB="postgres://whovian/gtf",
+                               geneInfoDB=genome.db.uri,
                                geneCenteredSpec=list(targetGene=target.gene,
                                                      tssUpstream=promoter.length,
                                                      tssDownstream=promoter.length),
@@ -69,12 +71,14 @@ create.vrk2.candidateFilterSpec.twoRegions <- function()
    chromosome <- "chr2"
    tss <- 57907651
    promoter.length <- 1000
+   db.address <- system.file(package="trena", "extdata")
+   genome.db.uri    <- paste("sqlite:/", db.address, "vrk2.genome.db",  sep = "/")
 
    cfSpec <- list(filterType="EncodeDNaseClusters",
                   genomeName=genome,
                   encodeTableName="wgEncodeRegDnaseClustered",
                   pwmMatchPercentageThreshold=85L,
-                  geneInfoDB="postgres://whovian/gtf",
+                  geneInfoDB= genome.db.uri,
                         # 2 dhs regions found by inspection
                   regionsSpec=c("chr2:57906700-57906870",
                                 "chr2:57907740-57908150"),
@@ -94,8 +98,6 @@ test_create.vrk2.candidateFilterSpec <- function()
    checkEquals(spec.0$filterType, "EncodeDNaseClusters")
    checkEquals(spec.0$genomeName, "hg38")
    checkEquals(spec.0$encodeTableName, "wgEncodeRegDnaseClustered")
-   #checkEquals(spec.0$fimoDB, "postgres://whovian/fimo")
-   checkEquals(spec.0$geneInfoDB, "postgres://whovian/gtf")
    checkTrue(is.na(spec.0$regionsSpec))
    checkEquals(spec.0$geneCenteredSpec$targetGene, "VRK2")
    checkEquals(spec.0$geneCenteredSpec$tssUpstream, 1000)
@@ -105,8 +107,6 @@ test_create.vrk2.candidateFilterSpec <- function()
    checkEquals(spec.1$filterType, "EncodeDNaseClusters")
    checkEquals(spec.1$genomeName, "hg38")
    checkEquals(spec.1$encodeTableName, "wgEncodeRegDnaseClustered")
-   #checkEquals(spec.1$fimoDB, "postgres://whovian/fimo")
-   checkEquals(spec.1$geneInfoDB, "postgres://whovian/gtf")
    checkEquals(spec.1$geneCenteredSpec, list())
    checkEquals(spec.1$regionsSpec, "chr2:57906651-57908651")
    checkTrue(is.na(spec.1$variants))
@@ -571,11 +571,15 @@ notest_vrk2Promoter.incrementally <- function()
 #----------------------------------------------------------------------------------------------------
 test_getCandidates.emptyRegion <- function()
 {
-   printf("--- test_getCandidates.emptyRegion")
+    printf("--- test_getCandidates.emptyRegion")
+
+    db.address <- system.file(package="trena", "extdata")    
+    genome.db.uri    <- paste("sqlite:/", db.address, "vrk2.genome.db",  sep = "/")    
+
    hdf <-  HumanDHSFilter("hg38",
                           encodeTableName="wgEncodeRegDnaseClustered",
                           pwmMatchPercentageThreshold=80L,
-                          geneInfoDatabase.uri="postgres://whovian/gtf",
+                          geneInfoDatabase.uri=genome.db.uri,
                           regionsSpec=c("chr18:26850560-268505"),
                           quiet=FALSE)
    tbl <- getCandidates(hdf)
@@ -704,11 +708,14 @@ test_getCandidates.twoAlternateAllelesInVariant <- function()
    loc <- 26864410
    region <- sprintf("%s:%d-%d", chromosome, loc-15, loc+15)
 
+
+   db.address <- system.file(package="trena", "extdata")
+   genome.db.uri    <- paste("sqlite:/", db.address, "vrk2.genome.db",  sep = "/")
    recipe <- list(filterType="EncodeDNaseClusters",
                   genomeName="hg38",
                   encodeTableName="wgEncodeRegDnaseClustered",
                   pwmMatchPercentageThreshold=70L,
-                  geneInfoDB="postgres://whovian/gtf",
+                  geneInfoDB=genome.db.uri,
                   geneCenteredSpec=list(),
                   regionsSpec=region,
                   variants=rsid)
@@ -776,9 +783,9 @@ notest_bin1 <- function()
    dhsFilter <- HumanDHSFilter("hg38")
    dhs.out <- getCandidates(dhsFilter, dhs.args)
 
-   genome.db.uri    <- "postgres://whovian/hg38"             # has gtf and motifsgenes tables
-   footprint.db.uri <- "postgres://whovian/brain_hint"       # has hits and regions tables
-
+   db.address <- system.file(package="trena", "extdata")
+   genome.db.uri    <- paste("sqlite:/", db.address, "vrk2.genome.db",  sep = "/") # has gtf and motifsgenes tables
+   footprint.db.uri <- paste("sqlite:/", db.address, "vrk2.project.db", sep = "/") # has hits and regions tables     
 
    region <- sprintf("%s:%d-%d", chrom, start, end)
    recipe <- list(genomeDB=genome.db.uri,

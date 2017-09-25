@@ -36,7 +36,7 @@ load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RD
 variance.filter <- VarianceFilter(mtx.assay = mtx.sub)
 }
 \seealso{
-\code{\link{getCandidates-VarianceFilter}}, \code{\link{getFilterAssayData}}
+\code{\link{getCandidates-VarianceFilter}}
 
 Other Filtering Objects: \code{\link{FootprintFilter-class}}
 }

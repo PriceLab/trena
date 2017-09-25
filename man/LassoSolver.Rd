@@ -48,7 +48,6 @@ lasso.solver <- LassoSolver(mtx.sub, target.gene, tfs)
 
 Other Solver class objects: \code{\link{BayesSpikeSolver}},
   \code{\link{EnsembleSolver}},
-  \code{\link{GeneOntologyFilter}},
   \code{\link{HumanDHSFilter}},
   \code{\link{LassoPVSolver}}, \code{\link{PearsonSolver}},
   \code{\link{RandomForestSolver}},

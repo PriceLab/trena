@@ -28,7 +28,7 @@ accepted strings are "hg38" and "hg19", both of which are human genomes.}
 \item{quiet}{A logical denoting whether or not the solver should print output}
 }
 \value{
-A Solver class object with Random Forest as the solver
+A CandidateFilter class object that filters using Human DHS data
 }
 \description{
 Create a CandidateFilter using Human DNAse Hypersensitivity
@@ -36,15 +36,18 @@ Create a CandidateFilter using Human DNAse Hypersensitivity
 \examples{
 load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
 targetGene <- "MEF2C"
+promoter.length <- 1000
+genome <- "hg38"
+hd.filter <- HumanDHSFilter(genome, pwmMatchPercentageThreshold = 85,
+geneInfoDatabase.uri = 
 candidateRegulators <- setdiff(rownames(mtx.sub), targetGene)
 rf.solver <- RandomForestSolver(mtx.sub, targetGene, candidateRegulators)
 }
 \seealso{
-\code{\link{solve.RandomForest}}, \code{\link{getAssayData}}
+\code{\link{getCandidates-HumanDHSFilter}},
 
 Other Solver class objects: \code{\link{BayesSpikeSolver}},
   \code{\link{EnsembleSolver}},
-  \code{\link{GeneOntologyFilter}},
   \code{\link{LassoPVSolver}}, \code{\link{LassoSolver}},
   \code{\link{PearsonSolver}},
   \code{\link{RandomForestSolver}},

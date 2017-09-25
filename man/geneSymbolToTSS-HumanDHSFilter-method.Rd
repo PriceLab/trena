@@ -3,17 +3,17 @@
 \docType{methods}
 \name{geneSymbolToTSS,HumanDHSFilter-method}
 \alias{geneSymbolToTSS,HumanDHSFilter-method}
-\alias{getCandidates-FootprintFilter}
+\alias{getCandidates-HumanDHSFilter}
 \title{Get candidate genes using a human DHS filter}
 \usage{
 \S4method{geneSymbolToTSS}{HumanDHSFilter}(obj, geneSymbol)
 }
 \arguments{
-\item{obj}{An object of class FootprintFilter}
+\item{obj}{An object of class HumanDHSFilter}
 }
 \value{
-A list, where one element a character vector of transcription factors that match
-the GO term and the other is an empty data frame.
+A list, where one element is a character vector of chromosomes in which the geneSymbol
+is found and the other is a vector of the transcription start sites of the geneSymbol
 }
 \description{
 Get candidate genes using a human DHS filter
@@ -21,11 +21,10 @@ Get candidate genes using a human DHS filter
 \examples{
 
 # Make a filter for "transcription, DNA-templated" and use it to filter candidates
-goFilter <- GeneOntologyFilter(org.Hs.eg.db, GOTerm="GO:0006351")
-candidates <- getCandidates(goFilter)
+hd.filter <- HumanDHSFilter(
 }
 \seealso{
-\code{\link{FootprintFilter}}
+\code{\link{HumanDHSFilter}}
 
 Other getCandidate Methods: \code{\link{getCandidates,FootprintFilter-method}},
   \code{\link{getCandidates,GeneOntologyFilter-method}},

@@ -44,7 +44,7 @@ printf <- function(...) print(noquote(sprintf(...)))
 #' be formatted as follows: "chr##:start-end" (e.g. "chr1:10000-20000"). (default = list())
 #' @param quiet A logical denoting whether or not the filter should print output
 #'
-#' @seealso \code{\link{getCandidates-FootprintFilter}}, \code{\link{getFilterAssayData}}
+#' @seealso \code{\link{getCandidates-FootprintFilter}}
 #'
 #' @export
 #'

@@ -10,16 +10,13 @@ GeneOntologyFilter(organismDatabase = org.Hs.eg.db::org.Hs.eg.db,
 \arguments{
 \item{organismDatabase}{An organism-specific database of type 'OrgDb'}
 
-\item{quiet}{A logical denoting whether or not the solver should print output}
+\item{GOTerm}{A character matching an accepted gene ontology term. The default term corresponds
+to "transcription, DNA-templated". (default="GO:0006351")}
 
-\item{candidateRegulators}{The designated set of transcription factors that could be associated
-with the target gene}
-
-\item{regulatorWeights}{A set of weights on the transcription factors
-(default = rep(1, length(candidateRegulators)))}
+\item{quiet}{A logical denoting whether or not the filter should print output}
 }
 \value{
-A Solver class object with Random Forest as the solver
+A GeneOntologyFilter object
 }
 \description{
 Create a CandidateFilter using Gene Ontology
@@ -30,15 +27,5 @@ library(org.Hs.eg.db)
 goFilter <- GeneOntologyFilter(org.Hs.eg.db, GOTerm="GO:0006351")
 }
 \seealso{
-\code{\link{solve.RandomForest}}, \code{\link{getAssayData}}
-
-Other Solver class objects: \code{\link{BayesSpikeSolver}},
-  \code{\link{EnsembleSolver}},
-  \code{\link{HumanDHSFilter}},
-  \code{\link{LassoPVSolver}}, \code{\link{LassoSolver}},
-  \code{\link{PearsonSolver}},
-  \code{\link{RandomForestSolver}},
-  \code{\link{RidgeSolver}}, \code{\link{Solver-class}},
-  \code{\link{SpearmanSolver}},
-  \code{\link{SqrtLassoSolver}}
+\code{\link{CandidateFilter}}
 }

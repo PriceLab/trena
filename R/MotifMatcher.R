@@ -62,6 +62,7 @@ setGeneric("findMatchesByChromosomalRegion", signature="obj",
 #'
 #' @examples
 #' # Specify the name, genome, and motif list to create a MotifMatcher for only human motifs
+#' library(MotifDb)
 #' mm <- MotifMatcher( genomeName="hg38",
 #' pfms=as.list(query(MotifDb, "sapiens")))
 
@@ -123,6 +124,7 @@ setMethod("show", "MotifMatcher",
 #'
 #' @examples
 #' # Perform a simple match in the rs13384219 neighborhood
+#' library(MotifDb)
 #' motifMatcher <- MotifMatcher(genomeName="hg38", pfms = as.list(query(MotifDb, "sapiens")), quiet=FALSE)
 #' tbl.regions <- data.frame(chrom="chr2", start=57907313, end=57907333, stringsAsFactors=FALSE)
 #' x <- findMatchesByChromosomalRegion(motifMatcher, tbl.regions, pwmMatchMinimumAsPercentage=92)
@@ -206,6 +208,7 @@ setMethod("findMatchesByChromosomalRegion", "MotifMatcher",
 #' @examples
 #'
 #' # Return the default matrix of JASPAR motifs
+#' library(MotifDb)
 #' motifMatcher <- MotifMatcher(genomeName="hg38", pfms = as.list(query(MotifDb, "sapiens")))
 #' motifs <- getPfms(motifMatcher)
 
@@ -460,6 +463,7 @@ setMethod("getPfms", "MotifMatcher",
 #'
 #' @examples
 #' # Retrieve the sequences for the rs13384219 neighborhood
+#' library(MotifDb)
 #' motifMatcher <- MotifMatcher(genomeName="hg38", pfms = as.list(query(MotifDb, "sapiens")))
 #' tbl.regions <- data.frame(chrom="chr2", start=57907313, end=57907333, stringsAsFactors=FALSE)
 #' x <- findMatchesByChromosomalRegion(motifMatcher, tbl.regions, pwmMatchMinimumAsPercentage=92)

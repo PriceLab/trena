@@ -50,9 +50,9 @@ setGeneric("geneSymbolToTSS", signature="obj", function(obj, geneSymbol) standar
 #' @param variants Variants
 #' @param quiet A logical denoting whether or not the solver should print output
 #'
-#' @return A Solver class object with Random Forest as the solver
+#' @return A CandidateFilter class object that filters using Human DHS data
 #'
-#' @seealso  \code{\link{solve.RandomForest}}, \code{\link{getAssayData}}
+#' @seealso  \code{\link{getCandidates-HumanDHSFilter}},
 #'
 #' @family Solver class objects
 #'
@@ -61,6 +61,10 @@ setGeneric("geneSymbolToTSS", signature="obj", function(obj, geneSymbol) standar
 #' @examples
 #' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
 #' targetGene <- "MEF2C"
+#' promoter.length <- 1000
+#' genome <- "hg38"
+#' hd.filter <- HumanDHSFilter(genome, pwmMatchPercentageThreshold = 85,
+#' geneInfoDatabase.uri = 
 #' candidateRegulators <- setdiff(rownames(mtx.sub), targetGene)
 #' rf.solver <- RandomForestSolver(mtx.sub, targetGene, candidateRegulators)
 
@@ -176,24 +180,23 @@ setMethod("show", "HumanDHSFilter",
 #----------------------------------------------------------------------------------------------------
 #' Get candidate genes using a human DHS filter
 #'
-#' @aliases getCandidates-FootprintFilter
+#' @aliases getCandidates-HumanDHSFilter
 #'
-#' @param obj An object of class FootprintFilter
+#' @param obj An object of class HumanDHSFilter
 #'
-#' @seealso \code{\link{FootprintFilter}}
+#' @seealso \code{\link{HumanDHSFilter}}
 #'
 #' @family getCandidate Methods
 #'
-#' @return A list, where one element a character vector of transcription factors that match
-#' the GO term and the other is an empty data frame.
+#' @return A list, where one element is a character vector of chromosomes in which the geneSymbol
+#' is found and the other is a vector of the transcription start sites of the geneSymbol
 #'
 #' @export
 #'
 #' @examples
 #'
 #' # Make a filter for "transcription, DNA-templated" and use it to filter candidates
-#' goFilter <- GeneOntologyFilter(org.Hs.eg.db, GOTerm="GO:0006351")
-#' candidates <- getCandidates(goFilter)
+#' hd.filter <- HumanDHSFilter(
 
 setMethod("geneSymbolToTSS", "HumanDHSFilter",
 
@@ -201,11 +204,18 @@ setMethod("geneSymbolToTSS", "HumanDHSFilter",
         geneInfo.db.info <- .parseDatabaseUri(obj@geneInfoDatabase.uri)
         host <- geneInfo.db.info$host
         dbname <- geneInfo.db.info$name
-        driver <- RPostgreSQL::PostgreSQL()
-        db.geneInfo <- DBI::dbConnect(driver, user= "trena", password="trena", dbname=dbname, host=host)
+        if(geneInfo.db.info$brand == "postgres"){
+            db.geneInfo <- DBI::dbConnect(RPostgreSQL::PostgreSQL(),
+                                          user= "trena",
+                                          password="trena",
+                                          dbname=dbname,
+                                          host=host)}
+        if(geneInfo.db.info$brand == "sqlite"){
+            db.geneInfo <- DBI::dbConnect(RSQLite::SQLite(),
+                                          dbname = paste(host, dbname, sep = "/"))}
         #print(dbListTables(db.geneInfo))
         #db.gtf <- dbConnect(PostgreSQL(), user= "trena", password="trena", dbname="gtf", host="whovian")
-        query <- sprintf("select * from hg38human where moleculetype='gene' and gene_biotype='protein_coding' and gene_name='%s'",
+        query <- sprintf("select * from gtf where moleculetype='gene' and gene_biotype='protein_coding' and gene_name='%s'",
                          obj@geneCenteredSpec$targetGene)
         tbl <- dbGetQuery(db.geneInfo, query);
         tss <- tbl$start[1];
@@ -217,7 +227,7 @@ setMethod("geneSymbolToTSS", "HumanDHSFilter",
 #----------------------------------------------------------------------------------------------------
 #' Get candidate genes using a human DHS filter
 #'
-#' @aliases getCandidates-FootprintFilter
+#' @aliases getCandidates-HumanDHSFilter
 #'
 #' @param obj An object of class FootprintFilter
 #'

@@ -28,6 +28,7 @@ return the sequences as a new column of the table.
 }
 \examples{
 # Retrieve the sequences for the rs13384219 neighborhood
+library(MotifDb)
 motifMatcher <- MotifMatcher(genomeName="hg38", pfms = as.list(query(MotifDb, "sapiens")))
 tbl.regions <- data.frame(chrom="chr2", start=57907313, end=57907333, stringsAsFactors=FALSE)
 x <- findMatchesByChromosomalRegion(motifMatcher, tbl.regions, pwmMatchMinimumAsPercentage=92)

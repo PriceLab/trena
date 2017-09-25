@@ -161,11 +161,11 @@ setGeneric('expandRegulatoryRegionsTableByTF', signature='obj', function(obj, tb
 #' @aliases assessSnp
 #'
 #' @param obj An object of class Trena
-#' @param pfms
-#' @param variant
-#' @param shoulder
-#' @param pwmMatchMinimumAsPercentage
-#' @param genomeName
+#' @param pfms A set of motif matrices, generally retrieved using MotifDb
+#' @param variant A variant of interest
+#' @param shoulder A distance from the TSS to use as a window
+#' @param pwmMatchMinimumAsPercentage A minimum match percentage for the  motifs
+#' @param genomeName A genome name (one of "hg38", "hg19", "mm10")
 #'
 #' @return A data frame containing the gene model
 #'

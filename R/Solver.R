@@ -32,7 +32,7 @@ printf <- function(...) print(noquote(sprintf(...)))
 #' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
 #' targetGene <- "MEF2C"
 #' candidateRegulators <- setdiff(rownames(mtx.sub), targetGene)
-#' solver <- Solver(mtx.sub,targetGene,candidateRegulators)
+#' solver <- Solver(mtx.sub, targetGene, candidateRegulators)
 #' mtx <- getAssayData(solver)
 #' 
 setGeneric("getAssayData",    signature="obj", function(obj) standardGeneric ("getAssayData"))
@@ -56,7 +56,9 @@ setGeneric("rescalePredictorWeights",
 #' @examples
 #' # Create a Solver object using the included Alzheimer's data and retrieve the target gene
 #' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
-#' solver <- Solver(mtx.sub)
+#' targetGene <- "MEF2C"
+#' candidateRegulators <- setdiff(rownames(mtx.sub), targetGene)
+#' solver <- Solver(mtx.sub, targetGene, candidateRegulators)
 #' mtx <- getTarget(solver) 
 
 #' @export
@@ -74,7 +76,9 @@ setGeneric("getTarget", signature = "obj", function(obj) standardGeneric("getTar
 #' @examples
 #' # Create a Solver object using the included Alzheimer's data and retrieve the regulators
 #' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
-#' solver <- Solver(mtx.sub)
+#' targetGene <- "MEF2C"
+#' candidateRegulators <- setdiff(rownames(mtx.sub), targetGene)
+#' solver <- Solver(mtx.sub, targetGene, candidateRegulators)
 #' mtx <- getRegulators(solver) 
 
 #' @export
@@ -101,7 +105,11 @@ setGeneric("getRegulators", signature = "obj", function(obj) standardGeneric("ge
 #' @return An object of the Solver class
 #'
 #' @examples
-#' # Create a simple Solver object with default options
+#'#' # Create a Solver object using the included Alzheimer's data
+#' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+#' targetGene <- "MEF2C"
+#' candidateRegulators <- setdiff(rownames(mtx.sub), targetGene)
+#' solver <- Solver(mtx.sub, targetGene, candidateRegulators) # Create a simple Solver object with default options
 #' mtx <- matrix(rnorm(10000), nrow = 100)
 #' solver <- Solver(mtx)
 #'
@@ -168,7 +176,9 @@ setMethod("getRegulators", "Solver",
 #' @examples
 #' # Create a LassoSolver object using the included Alzheimer's data and rescale the predictors
 #' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
-#' ls <- LassoSolver(mtx.sub)
+#' targetGene <- "MEF2C"
+#' candidateRegulators <- setdiff(rownames(mtx.sub), targetGene)
+#' ls <- LassoSolver(mtx.sub, targetGene, candidateRegulators)
 #' raw.values <- c(241, 4739, 9854, 22215, 658334)
 #' cooked.values <- rescalePredictorWeights(ls, rawValue.min = 1, rawValue.max = 1000000, raw.values)
 

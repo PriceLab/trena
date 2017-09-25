@@ -28,7 +28,11 @@ It is rarely called by itself; rather, interaction with a particular solver obje
 is achieved using a specific solver type.
 }
 \examples{
-# Create a simple Solver object with default options
+#' # Create a Solver object using the included Alzheimer's data
+load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+targetGene <- "MEF2C"
+candidateRegulators <- setdiff(rownames(mtx.sub), targetGene)
+solver <- Solver(mtx.sub, targetGene, candidateRegulators) # Create a simple Solver object with default options
 mtx <- matrix(rnorm(10000), nrow = 100)
 solver <- Solver(mtx)
 
@@ -38,7 +42,6 @@ solver <- Solver(mtx)
 
 Other Solver class objects: \code{\link{BayesSpikeSolver}},
   \code{\link{EnsembleSolver}},
-  \code{\link{GeneOntologyFilter}},
   \code{\link{HumanDHSFilter}},
   \code{\link{LassoPVSolver}}, \code{\link{LassoSolver}},
   \code{\link{PearsonSolver}},

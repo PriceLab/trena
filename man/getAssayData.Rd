@@ -20,7 +20,7 @@ Retrieve the assay matrix of gene expression data from a Solver object
 load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
 targetGene <- "MEF2C"
 candidateRegulators <- setdiff(rownames(mtx.sub), targetGene)
-solver <- Solver(mtx.sub,targetGene,candidateRegulators)
+solver <- Solver(mtx.sub, targetGene, candidateRegulators)
 mtx <- getAssayData(solver)
 
 }

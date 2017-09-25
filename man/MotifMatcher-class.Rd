@@ -39,6 +39,7 @@ be used to search for motifs in a given genome without any filtering functionali
 }
 \examples{
 # Specify the name, genome, and motif list to create a MotifMatcher for only human motifs
+library(MotifDb)
 mm <- MotifMatcher( genomeName="hg38",
 pfms=as.list(query(MotifDb, "sapiens")))
 }

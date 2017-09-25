@@ -42,7 +42,7 @@ setGeneric("getCandidates", signature="obj", function(obj, ...) standardGeneric(
 #'
 #' @return An object of the Candidate filter class
 #'
-#' @seealso \code{\link{getCandidates}}, \code{\link{getFilterAssayData}}
+#' @seealso \code{\link{getCandidates}}
 #'
 #' @export
 #'

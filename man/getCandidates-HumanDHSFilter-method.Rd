@@ -3,7 +3,7 @@
 \docType{methods}
 \name{getCandidates,HumanDHSFilter-method}
 \alias{getCandidates,HumanDHSFilter-method}
-\alias{getCandidates-FootprintFilter}
+\alias{getCandidates-HumanDHSFilter}
 \title{Get candidate genes using a human DHS filter}
 \usage{
 \S4method{getCandidates}{HumanDHSFilter}(obj)

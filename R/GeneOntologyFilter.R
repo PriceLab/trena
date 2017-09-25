@@ -30,17 +30,15 @@ printf <- function(...) print(noquote(sprintf(...)))
 #' Create a CandidateFilter using Gene Ontology 
 #'
 #' @param organismDatabase An organism-specific database of type 'OrgDb'
-#' @param candidateRegulators The designated set of transcription factors that could be associated
-#' with the target gene
-#' @param regulatorWeights A set of weights on the transcription factors
-#' (default = rep(1, length(candidateRegulators)))
-#' @param quiet A logical denoting whether or not the solver should print output
+#' @param GOTerm A character matching an accepted gene ontology term. The default term corresponds
+#' to "transcription, DNA-templated". (default="GO:0006351")
+#' @param quiet A logical denoting whether or not the filter should print output
 #' 
-#' @return A Solver class object with Random Forest as the solver
+#' @return A GeneOntologyFilter object
 #'
-#' @seealso  \code{\link{solve.RandomForest}}, \code{\link{getAssayData}}
+#' @seealso  \code{\link{CandidateFilter}}
 #'
-#' @family Solver class objects
+#' @family CandidateFilter class objects
 #'
 #' @export
 #'
