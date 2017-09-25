@@ -33,16 +33,6 @@ A CandidateFilter class object that filters using Human DHS data
 \description{
 Create a CandidateFilter using Human DNAse Hypersensitivity
 }
-\examples{
-load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
-targetGene <- "MEF2C"
-promoter.length <- 1000
-genome <- "hg38"
-hd.filter <- HumanDHSFilter(genome, pwmMatchPercentageThreshold = 85,
-geneInfoDatabase.uri = 
-candidateRegulators <- setdiff(rownames(mtx.sub), targetGene)
-rf.solver <- RandomForestSolver(mtx.sub, targetGene, candidateRegulators)
-}
 \seealso{
 \code{\link{getCandidates-HumanDHSFilter}},
 

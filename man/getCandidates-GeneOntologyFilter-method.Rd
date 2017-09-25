@@ -28,8 +28,7 @@ candidates <- getCandidates(goFilter)
 \seealso{
 \code{\link{GeneOntologyFilter}}
 
-Other getCandidate Methods: \code{\link{geneSymbolToTSS,HumanDHSFilter-method}},
-  \code{\link{getCandidates,FootprintFilter-method}},
+Other getCandidate Methods: \code{\link{getCandidates,FootprintFilter-method}},
   \code{\link{getCandidates,HumanDHSFilter-method}},
   \code{\link{getCandidates,VarianceFilter-method}},
   \code{\link{getCandidates}},

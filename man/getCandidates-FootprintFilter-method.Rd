@@ -46,8 +46,7 @@ tfs <- getCandidates(footprint.filter)
 \seealso{
 \code{\link{FootprintFilter}}
 
-Other getCandidate Methods: \code{\link{geneSymbolToTSS,HumanDHSFilter-method}},
-  \code{\link{getCandidates,GeneOntologyFilter-method}},
+Other getCandidate Methods: \code{\link{getCandidates,GeneOntologyFilter-method}},
   \code{\link{getCandidates,HumanDHSFilter-method}},
   \code{\link{getCandidates,VarianceFilter-method}},
   \code{\link{getCandidates}},

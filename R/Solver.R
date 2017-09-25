@@ -59,7 +59,7 @@ setGeneric("rescalePredictorWeights",
 #' targetGene <- "MEF2C"
 #' candidateRegulators <- setdiff(rownames(mtx.sub), targetGene)
 #' solver <- Solver(mtx.sub, targetGene, candidateRegulators)
-#' mtx <- getTarget(solver) 
+#' target <- getTarget(solver) 
 
 #' @export
 setGeneric("getTarget", signature = "obj", function(obj) standardGeneric("getTarget"))
@@ -79,7 +79,7 @@ setGeneric("getTarget", signature = "obj", function(obj) standardGeneric("getTar
 #' targetGene <- "MEF2C"
 #' candidateRegulators <- setdiff(rownames(mtx.sub), targetGene)
 #' solver <- Solver(mtx.sub, targetGene, candidateRegulators)
-#' mtx <- getRegulators(solver) 
+#' regs <- getRegulators(solver) 
 
 #' @export
 setGeneric("getRegulators", signature = "obj", function(obj) standardGeneric("getRegulators"))
@@ -110,8 +110,6 @@ setGeneric("getRegulators", signature = "obj", function(obj) standardGeneric("ge
 #' targetGene <- "MEF2C"
 #' candidateRegulators <- setdiff(rownames(mtx.sub), targetGene)
 #' solver <- Solver(mtx.sub, targetGene, candidateRegulators) # Create a simple Solver object with default options
-#' mtx <- matrix(rnorm(10000), nrow = 100)
-#' solver <- Solver(mtx)
 #'
 #' @seealso \code{\link{getAssayData}}, \code{\link{getTarget}}, \code{\link{getRegulators}}
 #'

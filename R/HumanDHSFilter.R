@@ -60,13 +60,16 @@ setGeneric("geneSymbolToTSS", signature="obj", function(obj, geneSymbol) standar
 #'
 #' @examples
 #' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
-#' targetGene <- "MEF2C"
+#' targetGene <- VRK2"
 #' promoter.length <- 1000
 #' genome <- "hg38"
+#' db.address <- system.file(package="trena", "extdata")
+#' genome.db.uri    <- paste("sqlite:/", db.address, "vrk2.genome.db",  sep = "/")
+#' gene.spec=list(targetGene=target.gene,
+#' tssUpstream=promoter.length,tssDownstream=promoter.length)
+#' 
 #' hd.filter <- HumanDHSFilter(genome, pwmMatchPercentageThreshold = 85,
-#' geneInfoDatabase.uri = 
-#' candidateRegulators <- setdiff(rownames(mtx.sub), targetGene)
-#' rf.solver <- RandomForestSolver(mtx.sub, targetGene, candidateRegulators)
+#' geneInfoDatabase.uri = genome.db.uri, geneCenteredSpec = gene.spec)
 
 HumanDHSFilter <- function(genomeName,
                            encodeTableName="wgEncodeRegDnaseClustered",
@@ -129,7 +132,19 @@ HumanDHSFilter <- function(genomeName,
 #'
 #' @examples
 #'
-#' #
+#' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+#' targetGene <- VRK2"
+#' promoter.length <- 1000
+#' genome <- "hg38"
+#' db.address <- system.file(package="trena", "extdata")
+#' genome.db.uri    <- paste("sqlite:/", db.address, "vrk2.genome.db",  sep = "/")
+#' gene.spec=list(targetGene=target.gene,
+#' tssUpstream=promoter.length,tssDownstream=promoter.length)
+#' 
+#' hd.filter <- HumanDHSFilter(genome, pwmMatchPercentageThreshold = 85,
+#' geneInfoDatabase.uri = genome.db.uri, geneCenteredSpec = gene.spec)
+#'
+#' getEncodeRegulatoryTableNames(hd.filter)
 
 setMethod("getEncodeRegulatoryTableNames", "HumanDHSFilter",
 
@@ -169,6 +184,19 @@ setMethod("getEncodeRegulatoryTableNames", "HumanDHSFilter",
 #'
 #' @examples
 #' # Make a filter and show it
+#' #' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+#' targetGene <- VRK2"
+#' promoter.length <- 1000
+#' genome <- "hg38"
+#' db.address <- system.file(package="trena", "extdata")
+#' genome.db.uri    <- paste("sqlite:/", db.address, "vrk2.genome.db",  sep = "/")
+#' gene.spec=list(targetGene=target.gene,
+#' tssUpstream=promoter.length,tssDownstream=promoter.length)
+#' 
+#' hd.filter <- HumanDHSFilter(genome, pwmMatchPercentageThreshold = 85,
+#' geneInfoDatabase.uri = genome.db.uri, geneCenteredSpec = gene.spec)
+#'
+#' show(hd.filter)
 
 setMethod("show", "HumanDHSFilter",
 
@@ -180,13 +208,12 @@ setMethod("show", "HumanDHSFilter",
 #----------------------------------------------------------------------------------------------------
 #' Get candidate genes using a human DHS filter
 #'
-#' @aliases getCandidates-HumanDHSFilter
+#' @aliases geneSymbolToTSS
 #'
 #' @param obj An object of class HumanDHSFilter
+#' @param geneSymbol A gene of interest
 #'
 #' @seealso \code{\link{HumanDHSFilter}}
-#'
-#' @family getCandidate Methods
 #'
 #' @return A list, where one element is a character vector of chromosomes in which the geneSymbol
 #' is found and the other is a vector of the transcription start sites of the geneSymbol
@@ -196,7 +223,19 @@ setMethod("show", "HumanDHSFilter",
 #' @examples
 #'
 #' # Make a filter for "transcription, DNA-templated" and use it to filter candidates
-#' hd.filter <- HumanDHSFilter(
+#' #' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+#' targetGene <- VRK2"
+#' promoter.length <- 1000
+#' genome <- "hg38"
+#' db.address <- system.file(package="trena", "extdata")
+#' genome.db.uri    <- paste("sqlite:/", db.address, "vrk2.genome.db",  sep = "/")
+#' gene.spec=list(targetGene=target.gene,
+#' tssUpstream=promoter.length,tssDownstream=promoter.length)
+#' 
+#' hd.filter <- HumanDHSFilter(genome, pwmMatchPercentageThreshold = 85,
+#' geneInfoDatabase.uri = genome.db.uri, geneCenteredSpec = gene.spec)
+#'
+#' geneSymbolToTSS(hd.filter, "VRK2")
 
 setMethod("geneSymbolToTSS", "HumanDHSFilter",
 
@@ -243,8 +282,19 @@ setMethod("geneSymbolToTSS", "HumanDHSFilter",
 #' @examples
 #'
 #' # Make a filter for "transcription, DNA-templated" and use it to filter candidates
-#' goFilter <- GeneOntologyFilter(org.Hs.eg.db, GOTerm="GO:0006351")
-#' candidates <- getCandidates(goFilter)
+#' #' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+#' targetGene <- VRK2"
+#' promoter.length <- 1000
+#' genome <- "hg38"
+#' db.address <- system.file(package="trena", "extdata")
+#' genome.db.uri    <- paste("sqlite:/", db.address, "vrk2.genome.db",  sep = "/")
+#' gene.spec=list(targetGene=target.gene,
+#' tssUpstream=promoter.length,tssDownstream=promoter.length)
+#' 
+#' hd.filter <- HumanDHSFilter(genome, pwmMatchPercentageThreshold = 85,
+#' geneInfoDatabase.uri = genome.db.uri, geneCenteredSpec = gene.spec)
+#'
+#' getCandidates(hd.filter)
 
 setMethod("getCandidates", "HumanDHSFilter",
 
@@ -323,8 +373,26 @@ setMethod("getCandidates", "HumanDHSFilter",
 #' @examples
 #'
 #' # Make a filter for "transcription, DNA-templated" and use it to filter candidates
-#' goFilter <- GeneOntologyFilter(org.Hs.eg.db, GOTerm="GO:0006351")
-#' candidates <- getCandidates(goFilter)
+#' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+#' targetGene <- VRK2"
+#' promoter.length <- 1000
+#' genome <- "hg38"
+#' db.address <- system.file(package="trena", "extdata")
+#' genome.db.uri    <- paste("sqlite:/", db.address, "vrk2.genome.db",  sep = "/")
+#' gene.spec=list(targetGene=target.gene,
+#' tssUpstream=promoter.length,tssDownstream=promoter.length)
+#' 
+#' hd.filter <- HumanDHSFilter(genome, pwmMatchPercentageThreshold = 85,
+#' geneInfoDatabase.uri = genome.db.uri, geneCenteredSpec = gene.spec)
+#'
+#' chrom <- "chr2"
+#' rs13384219.loc <- 57907323
+#' start <- rs13384219.loc - 10
+#' end <- rs13384219.loc + 10
+#'
+#' tableNames <- getEncodeRegulatoryTableNames(hdf)
+#' 
+#' getRegulatoryRegions(hd.filter, tableNames[1], chrom, start, end)
 
 setMethod("getRegulatoryRegions", "HumanDHSFilter",
 
@@ -434,10 +502,6 @@ setMethod("getRegulatoryRegions", "HumanDHSFilter",
 #' @export
 #'
 #' @examples
-#'
-#' # Make a filter for "transcription, DNA-templated" and use it to filter candidates
-#' goFilter <- GeneOntologyFilter(org.Hs.eg.db, GOTerm="GO:0006351")
-#' candidates <- getCandidates(goFilter)
 
 setMethod("getSequence_tmp", "HumanDHSFilter",
 

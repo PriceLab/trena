@@ -18,17 +18,10 @@ the GO term and the other is an empty data frame.
 \description{
 Get candidate genes using a human DHS filter
 }
-\examples{
-
-# Make a filter for "transcription, DNA-templated" and use it to filter candidates
-goFilter <- GeneOntologyFilter(org.Hs.eg.db, GOTerm="GO:0006351")
-candidates <- getCandidates(goFilter)
-}
 \seealso{
 \code{\link{FootprintFilter}}
 
-Other getCandidate Methods: \code{\link{geneSymbolToTSS,HumanDHSFilter-method}},
-  \code{\link{getCandidates,FootprintFilter-method}},
+Other getCandidate Methods: \code{\link{getCandidates,FootprintFilter-method}},
   \code{\link{getCandidates,GeneOntologyFilter-method}},
   \code{\link{getCandidates,VarianceFilter-method}},
   \code{\link{getCandidates}},

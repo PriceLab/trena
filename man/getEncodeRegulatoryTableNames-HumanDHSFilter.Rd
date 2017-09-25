@@ -18,10 +18,6 @@ contained in the HumanDHSFilter object
 \description{
 Get Encode regulatory tables using a human DHS filter
 }
-\examples{
-
-#
-}
 \seealso{
 \code{\link{HumanDHSFilter}}
 }

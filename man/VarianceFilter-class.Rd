@@ -33,7 +33,7 @@ range of the variance of a supplied target gene.
 }
 \examples{
 load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
-variance.filter <- VarianceFilter(mtx.assay = mtx.sub)
+variance.filter <- VarianceFilter(mtx.assay = mtx.sub, targetGene = "MEF2C")
 }
 \seealso{
 \code{\link{getCandidates-VarianceFilter}}

@@ -18,9 +18,6 @@ the GO term and the other is an empty data frame.
 \description{
 Show the details of a human DHS filter
 }
-\examples{
-# Make a filter and show it
-}
 \seealso{
 \code{\link{HumanDHSFilter}}
 }

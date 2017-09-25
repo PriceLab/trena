@@ -43,7 +43,7 @@ printf <- function(...) print(noquote(sprintf(...)))
 #'
 #' @examples
 #' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
-#' variance.filter <- VarianceFilter(mtx.assay = mtx.sub)
+#' variance.filter <- VarianceFilter(mtx.assay = mtx.sub, targetGene = "MEF2C")
 
 VarianceFilter <- function(mtx.assay=matrix(), targetGene, varSize = 0.5, quiet=TRUE)
 {

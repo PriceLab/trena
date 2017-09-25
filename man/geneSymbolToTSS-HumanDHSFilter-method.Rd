@@ -3,13 +3,15 @@
 \docType{methods}
 \name{geneSymbolToTSS,HumanDHSFilter-method}
 \alias{geneSymbolToTSS,HumanDHSFilter-method}
-\alias{getCandidates-HumanDHSFilter}
+\alias{geneSymbolToTSS}
 \title{Get candidate genes using a human DHS filter}
 \usage{
 \S4method{geneSymbolToTSS}{HumanDHSFilter}(obj, geneSymbol)
 }
 \arguments{
 \item{obj}{An object of class HumanDHSFilter}
+
+\item{geneSymbol}{A gene of interest}
 }
 \value{
 A list, where one element is a character vector of chromosomes in which the geneSymbol
@@ -18,19 +20,6 @@ is found and the other is a vector of the transcription start sites of the geneS
 \description{
 Get candidate genes using a human DHS filter
 }
-\examples{
-
-# Make a filter for "transcription, DNA-templated" and use it to filter candidates
-hd.filter <- HumanDHSFilter(
-}
 \seealso{
 \code{\link{HumanDHSFilter}}
-
-Other getCandidate Methods: \code{\link{getCandidates,FootprintFilter-method}},
-  \code{\link{getCandidates,GeneOntologyFilter-method}},
-  \code{\link{getCandidates,HumanDHSFilter-method}},
-  \code{\link{getCandidates,VarianceFilter-method}},
-  \code{\link{getCandidates}},
-  \code{\link{getRegulatoryRegions,HumanDHSFilter-method}},
-  \code{\link{getSequence_tmp,HumanDHSFilter-method}}
 }

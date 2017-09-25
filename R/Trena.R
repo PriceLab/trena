@@ -180,9 +180,9 @@ setGeneric('expandRegulatoryRegionsTableByTF', signature='obj', function(obj, tb
 #' loc.start <- mef2c.tss - 1000
 #' loc.end   <- mef2c.tss + 1000
 #'
-#' regions <- getRegulatoryChromosomalRegions(trena, chromosome, mef2c.tss-1000, mef2c.tss+1000,
-#' sources, "MEF2C", mef2c.tss)
-#' regions.tf <- expandRegulatoryRegionsTableByTF(trena, regions)
+#' 
+#'
+#' 
 
 setGeneric('assessSnp', signature='obj', function(obj, pfms, variant, shoulder, pwmMatchMinimumAsPercentage, genomeName="hg38")
               standardGeneric('assessSnp'))

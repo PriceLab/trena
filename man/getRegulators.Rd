@@ -21,5 +21,5 @@ load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RD
 targetGene <- "MEF2C"
 candidateRegulators <- setdiff(rownames(mtx.sub), targetGene)
 solver <- Solver(mtx.sub, targetGene, candidateRegulators)
-mtx <- getRegulators(solver) 
+regs <- getRegulators(solver) 
 }
