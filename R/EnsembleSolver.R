@@ -81,11 +81,11 @@ EnsembleSolver <- function(mtx.assay=matrix(), targetGene, candidateRegulators,
                            nOrderings.bayes = 10,
                            quiet=TRUE)
 {
-    if(any(grepl(targetGene, candidateRegulators)))        
-        candidateRegulators <- candidateRegulators[-grep(targetGene, candidateRegulators)]    
+    if(any(grepl(targetGene, candidateRegulators)))
+        candidateRegulators <- candidateRegulators[-grep(targetGene, candidateRegulators)]
 
-    candidateRegulators <- intersect(candidateRegulators, rownames(mtx.assay))    
-    stopifnot(length(candidateRegulators) > 0)    
+    candidateRegulators <- intersect(candidateRegulators, rownames(mtx.assay))
+    stopifnot(length(candidateRegulators) > 0)
 
     # Send a warning if there's a row of zeros
     if(!is.na(max(mtx.assay)) & any(rowSums(mtx.assay) == 0))
@@ -109,7 +109,7 @@ EnsembleSolver <- function(mtx.assay=matrix(), targetGene, candidateRegulators,
 } # EnsembleSolver, the constructor
 #----------------------------------------------------------------------------------------------------
 #' Show the Ensemble Solver
-#' 
+#'
 #' @rdname show.EnsembleSolver
 #' @aliases show.EnsembleSolver
 #'
@@ -166,7 +166,7 @@ setMethod('show', 'EnsembleSolver',
 #' }
 #'
 #' @seealso \code{\link{EnsembleSolver}}
-#' 
+#'
 #' @family solver methods
 #'
 #' @examples
@@ -202,7 +202,7 @@ setMethod("run", "EnsembleSolver",
                }
 
               # Create a list of solvers and a list for solutions
-              out.list <- list()              
+              out.list <- list()
               solver.list <- obj@solverNames
 
               for(i in 1:length(solver.list)){
@@ -212,18 +212,18 @@ setMethod("run", "EnsembleSolver",
                                                          alpha = obj@alpha.lasso, lambda = obj@lambda.lasso),
                                    "randomforest" = RandomForestSolver(mtx, target.gene, tfs),
                                    "bayesspike" = BayesSpikeSolver(mtx, target.gene, tfs,
-                                                                   nOrderings = obj@nOrderings.bayes),           
-                                   "pearson" = PearsonSolver(mtx, target.gene, tfs),                                   
-                                   "spearman" = SpearmanSolver(mtx, target.gene, tfs),                                   
+                                                                   nOrderings = obj@nOrderings.bayes),
+                                   "pearson" = PearsonSolver(mtx, target.gene, tfs),
+                                   "spearman" = SpearmanSolver(mtx, target.gene, tfs),
                                    "sqrtlasso" = SqrtLassoSolver(mtx, target.gene, tfs,
-                                                                 lambda = obj@lambda.sqrt, nCores = obj@nCores.sqrt),             
-                                   "lassopv" = LassoPVSolver(mtx, target.gene, tfs),                           
+                                                                 lambda = obj@lambda.sqrt, nCores = obj@nCores.sqrt),
+                                   "lassopv" = LassoPVSolver(mtx, target.gene, tfs),
                                    "ridge" = RidgeSolver(mtx, target.gene, tfs,
                                                          alpha = obj@alpha.ridge, lambda = obj@lambda.ridge))
-                  
-                  # Solve each Solver object and save it to the output list                  
+
+                  # Solve each Solver object and save it to the output list
                   out.list[[i]] <- run(solver)
-                  names(out.list)[i] <- paste("out",tolower(solver.list[[i]]),sep=".")                  
+                  names(out.list)[i] <- paste("out",tolower(solver.list[[i]]),sep=".")
               }
 
                # Output lasso with beta
@@ -394,7 +394,7 @@ setMethod("run", "EnsembleSolver",
                # Compute the scaled "concordance score"
                pca <- stats::prcomp(tbl.scale, center=FALSE, scale.=FALSE)
                pca$x <- pca$x / sqrt(length(which(pca$sdev > 0.1)))
-               concordance <- apply(pca$x[, pca$sdev > 0.1], 1,
+               concordance <- apply(pca$x[, pca$sdev > 0.1, drop=FALSE], 1,
                              function(x) {sqrt(mean((2*atan(x)/pi)^2))})
                concordance <- as.data.frame(concordance)
                concordance$gene <- rownames(concordance)
@@ -402,7 +402,7 @@ setMethod("run", "EnsembleSolver",
                tbl.all <- merge(tbl.all, concordance, by = "gene", all = TRUE)
 
                # Transform via PCA and compute the pcaMax score
-               pcaMax <- apply(pca$x[,pca$sdev > 0.1],1, function(x) {sqrt(mean(x*x))})
+               pcaMax <- apply(pca$x[, pca$sdev > 0.1, drop=FALSE],1, function(x) {sqrt(mean(x*x))})
                pcaMax <- as.data.frame(pcaMax)
                pcaMax$gene <- rownames(pcaMax)
                rownames(pcaMax) <- NULL
