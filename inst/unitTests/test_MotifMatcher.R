@@ -18,6 +18,8 @@ runTests <- function()
    test_getSequenceWithVariants()
    test_.getScoredMotifs()
 
+   test_noMatch()
+
    test_findMatchesByChromosomalRegion()
    test_findMatchesByChromosomalRegion_contrastReferenceWithVariant()
    test_findMatchesByChromosomalRegion.twoAlternateAlleles()
@@ -351,6 +353,18 @@ test_getSequenceWithVariants <- function()
    checkEquals(as.list(tbl.mut[, c("seq", "status")]), list(seq="AAACCACCCC", status="mut"))
 
 } # test_getSequenceWithVariants
+#----------------------------------------------------------------------------------------------------
+test_noMatch <- function()
+{
+   printf("--- test_noMatch")
+   jaspar.human.pfms <- as.list(query (query(MotifDb, "sapiens"), "jaspar2016"))
+   motifMatcher <- MotifMatcher(genomeName="hg38", pfms=jaspar.human.pfms, quiet=TRUE)
+
+   tbl.regions <- data.frame(chrom="chr2", start=57907313, end=57907314, stringsAsFactors=FALSE)
+   tbl.hits <- findMatchesByChromosomalRegion(motifMatcher, tbl.regions, pwmMatchMinimumAsPercentage=92)
+   checkEquals(dim(tbl.hits), c(0,0))
+
+} # test_noMatch
 #----------------------------------------------------------------------------------------------------
 test_findMatchesByChromosomalRegion <- function()
 {

@@ -7,7 +7,8 @@
 
 .Trena <- setClass ("Trena",
                     representation = representation(
-                        genomeName="character")
+                       genomeName="character",
+                       quiet="logical")
                         )
 #------------------------------------------------------------------------------------------------------------------------
 #' Get the regulatory chromosomal regions for a Trena object
@@ -29,14 +30,14 @@
 #' @export
 #'
 #' @return A list of regulatory regions for the supplied target gene. If \code{combine} is set to \code{TRUE},
-#' the list is converted into a data frame. 
-#' 
+#' the list is converted into a data frame.
+#'
 #' @examples
 #' # Get regulatory regions for MEF2C from a footprint database
 #' database.filename <- system.file(package="trena", "extdata", "project.sub.db")
 #' database.uri <- sprintf("sqlite://%s", database.filename)
 #' sources <- c(database.uri)
-#' 
+#'
 #' trena <- Trena("hg38")
 #' chromosome <- "chr5"
 #' mef2c.tss <- 88904257
@@ -45,7 +46,7 @@
 #'
 #' regions <- getRegulatoryChromosomalRegions(trena, chromosome, mef2c.tss-1000, mef2c.tss+1000,
 #' sources, "MEF2C", mef2c.tss)
-#' 
+#'
 #' # Get regulatory regions for AQP4 from a Human DHS source
 #' trena <- Trena("hg38")
 #' aqp4.tss <- 26865884
@@ -121,7 +122,7 @@ setGeneric('getGeneModelTableColumnNames',  signature='obj', function(obj) stand
 #' regions <- getRegulatoryChromosomalRegions(trena, chromosome, mef2c.tss-1000, mef2c.tss+1000,
 #' sources, "MEF2C", mef2c.tss)
 #' regions.tf <- expandRegulatoryRegionsTableByTF(trena, regions)
-#' model.mef2c <- createGeneModel(trena, "MEF2C", c("lasso","ridge","randomforest"), regions.tf, mtx.sub) 
+#' model.mef2c <- createGeneModel(trena, "MEF2C", c("lasso","ridge","randomforest"), regions.tf, mtx.sub)
 
 setGeneric('createGeneModel', signature='obj', function(obj, targetGene,  solverNames, tbl.regulatoryRegions, mtx)
     standardGeneric('createGeneModel'))
@@ -180,11 +181,11 @@ setGeneric('expandRegulatoryRegionsTableByTF', signature='obj', function(obj, tb
 #' loc.start <- mef2c.tss - 1000
 #' loc.end   <- mef2c.tss + 1000
 #'
-#' 
 #'
-#' 
+#'
+#'
 
-setGeneric('assessSnp', signature='obj', function(obj, pfms, variant, shoulder, pwmMatchMinimumAsPercentage, genomeName="hg38")
+setGeneric('assessSnp', signature='obj', function(obj, pfms, variant, shoulder, pwmMatchMinimumAsPercentage, relaxedMatchDelta=25)
               standardGeneric('assessSnp'))
 #------------------------------------------------------------------------------------------------------------------------
 # a temporary hack: some constants
@@ -218,7 +219,7 @@ Trena = function(genomeName, quiet=TRUE)
 {
    stopifnot(genomeName %in% c("hg19", "hg38", "mm10"))
 
-   obj <- .Trena(genomeName=genomeName)
+   obj <- .Trena(genomeName=genomeName, quiet=quiet)
 
    obj
 
@@ -264,7 +265,7 @@ setMethod('getGeneModelTableColumnNames', 'Trena',
 #------------------------------------------------------------------------------------------------------------------------
 .callHumanDHSFilter <- function(obj, chromosome, chromStart, chromEnd, targetGene, targetGeneTSS)
 {
-    printf("--- in .callHumanDHS")
+    if(!obj@quiet) printf("--- in .callHumanDHS")
     chromLocString <- sprintf("%s:%d-%d", chromosome, chromStart, chromEnd)
     dhsFilter <- HumanDHSFilter(genome="hg38",
                                 encodeTableName="wgEncodeRegDnaseClustered",
@@ -354,8 +355,9 @@ setMethod('createGeneModel', 'Trena',
          stopifnot("geneSymbol" %in% colnames(tbl.regulatoryRegions))
          unique.tfs.from.regulatory.regions <- unique(tbl.regulatoryRegions$geneSymbol)
          tfs <- intersect(unique.tfs.from.regulatory.regions, rownames(mtx))
-         printf("tf candidate count, in mtx, in tbl.regulatory.regions: %d/%d", length(tfs),
-                length(unique.tfs.from.regulatory.regions))
+         if(!obj@quiet)
+            printf("tf candidate count, in mtx, in tbl.regulatory.regions: %d/%d", length(tfs),
+                   length(unique.tfs.from.regulatory.regions))
 
          solver <- EnsembleSolver(mtx, targetGene=targetGene, candidateRegulators=tfs, solverNames)
          tbl.model <- run(solver)
@@ -369,43 +371,48 @@ setMethod('createGeneModel', 'Trena',
 #------------------------------------------------------------------------------------------------------------------------
 setMethod('assessSnp', 'Trena',
 
-     function(obj, pfms=list(), variant, shoulder, pwmMatchMinimumAsPercentage, genomeName="hg38"){
+     function(obj, pfms, variant, shoulder, pwmMatchMinimumAsPercentage, relaxedMatchDelta=25){
 
-        motifMatcher <- MotifMatcher(genomeName=genomeName, pfms=pfms, quiet=TRUE)
+        motifMatcher <- MotifMatcher(genomeName=obj@genomeName, pfms=pfms, quiet=obj@quiet)
         tbl.variant <- trena:::.parseVariantString(motifMatcher, variant)
         tbl.regions <- data.frame(chrom=tbl.variant$chrom,
                                   start=tbl.variant$loc-shoulder,
                                   end=tbl.variant$loc+shoulder,
                                   stringsAsFactors=FALSE)
-        x.wt  <- findMatchesByChromosomalRegion(motifMatcher, tbl.regions,
-                                                pwmMatchMinimumAsPercentage=pwmMatchMinimumAsPercentage)
-        if(nrow(x.wt$tbl) == 0){
+
+        tbl.wt  <- findMatchesByChromosomalRegion(motifMatcher, tbl.regions,
+                                                  pwmMatchMinimumAsPercentage=pwmMatchMinimumAsPercentage)
+        if(nrow(tbl.wt) == 0){
            warning(sprintf("no motifs found in reference sequence in neighborhood of %s with shoulder %d",
                            variant, shoulder))
            return(data.frame())
            }
 
+       tbl.mut <- findMatchesByChromosomalRegion(motifMatcher, tbl.regions,
+                                                 pwmMatchMinimumAsPercentage=pwmMatchMinimumAsPercentage,
+                                                 variant=variant)
+       if(nrow(tbl.mut) == 0){
+          warning(sprintf("no motifs altered by %s with shoulder %d", variant, shoulder))
+          return(data.frame())
+          }
 
-        x.mut <- findMatchesByChromosomalRegion(motifMatcher, tbl.regions,
-                                                pwmMatchMinimumAsPercentage=pwmMatchMinimumAsPercentage,
-                                                variant=variant)
+        tbl.wt$signature <- sprintf("%s;%s;%s", tbl.wt$motifName, tbl.wt$motifStart, tbl.wt$strand)
+        tbl.mut$signature <- sprintf("%s;%s;%s", tbl.mut$motifName, tbl.mut$motifStart, tbl.mut$strand)
 
-
-
-        if(nrow(x.mut$tbl) == 0){
-           warning(sprintf("no motifs altered by %s with shoulder %d", variant, shoulder))
-           return(data.frame())
-           }
-
-        tbl.wt.50 <- findMatchesByChromosomalRegion(motifMatcher, tbl.regions, 50)$tbl
-        tbl.wt.50$signature <- sprintf("%s;%s;%s", tbl.wt.50$motifName, tbl.wt.50$motifStart, tbl.wt.50$strand)
-        tbl.mut.50 <- findMatchesByChromosomalRegion(motifMatcher, tbl.regions, 50, variant=variant)$tbl
-        tbl.mut.50$signature <- sprintf("%s;%s;%s", tbl.mut.50$motifName, tbl.mut.50$motifStart, tbl.mut.50$strand)
-
-        tbl <- rbind(x.wt$tbl[, c(1,12, 2,3,4,5,7,8,13)], x.mut$tbl[, c(1,12, 2,3,4,5,7,8,13)])
+            # comine wt and mut tables, reorder columns and rows for easier comprehension
+        tbl <- rbind(tbl.wt[, c(1,12,2,3,4,5,6,7,8,13)], tbl.mut[, c(1,12,2,3,4,5,6,7,8,13)])
         tbl <- tbl[order(tbl$motifName, tbl$motifRelativeScore, decreasing=TRUE),]
-        tbl$signature <- sprintf("%s;%s;%s", tbl$motifName, tbl$motifStart, tbl$strand)
-        tbl <- tbl [, c(1,2,10,3:9)]
+        #tbl$signature <- sprintf("%s;%s;%s", tbl$motifName, tbl$motifStart, tbl$strand)
+        tbl <- tbl[,c(1,2,3:10)]
+
+            # now look for less stringent matches.  these will be matched up with the
+            # wt and mut motifs which do not yet have partners, thus enabling us to
+            # provide a wt->mut motifScore.delta for each
+        relaxedMatchPercentage <- pwmMatchMinimumAsPercentage-relaxedMatchDelta
+        tbl.wt.relaxed <- findMatchesByChromosomalRegion(motifMatcher, tbl.regions, relaxedMatchPercentage)
+        tbl.wt.relaxed$signature <- sprintf("%s;%s;%s", tbl.wt.relaxed$motifName, tbl.wt.relaxed$motifStart, tbl.wt.relaxed$strand)
+        tbl.mut.relaxed <- findMatchesByChromosomalRegion(motifMatcher, tbl.regions, relaxedMatchPercentage, variant=variant)
+        tbl.mut.relaxed$signature <- sprintf("%s;%s;%s", tbl.mut.relaxed$motifName, tbl.mut.relaxed$motifStart, tbl.mut.relaxed$strand)
 
         signatures.in.both <- intersect(subset(tbl, status=="mut")$signature, subset(tbl, status=="wt")$signature)
         signatures.only.in.wt <- setdiff(subset(tbl, status=="wt")$signature, subset(tbl, status=="mut")$signature)
@@ -434,7 +441,7 @@ setMethod('assessSnp', 'Trena',
         tbl.wt.only  <- subset(tbl, assessed=="wt.only", select=c(signature, motifRelativeScore))
         if(nrow(tbl.wt.only) > 0){
            sigs <- tbl.wt.only$signature
-           tbl.mut.scores <- subset(tbl.mut.50, signature %in% sigs, select=c(signature, motifRelativeScore))
+           tbl.mut.scores <- subset(tbl.mut.relaxed, signature %in% sigs, select=c(signature, motifRelativeScore))
            deltas <- unlist(lapply(sigs, function(sig){wt.score  <- subset(tbl.wt.only, signature==sig)$motifRelativeScore;
                                                 mut.score <- subset(tbl.mut.scores, signature==sig)$motifRelativeScore;
                                                 delta <- wt.score - mut.score
@@ -443,18 +450,23 @@ setMethod('assessSnp', 'Trena',
            } # if some wt.only entries
 
            # find the wt scores for each of the "mut.only" entries, subtract from the mut score
-        tbl.mut.only  <- subset(tbl, assessed=="mut.only", select=c(signature, motifRelativeScore))
-        sigs <- tbl.mut.only$signature
-        tbl.wt.scores <- subset(tbl.wt.50, signature %in% sigs, select=c(signature, motifRelativeScore))
-        deltas <- unlist(lapply(sigs, function(sig){mut.score  <- subset(tbl.mut.only, signature==sig)$motifRelativeScore;
-                                                    wt.score <- subset(tbl.wt.scores, signature==sig)$motifRelativeScore;
-                                                    delta <- wt.score - mut.score
-                                                 }))
-        tbl$delta[match(sigs, tbl$signature)] <- deltas
-        coi <-  c("motifName", "status", "assessed", "motifRelativeScore", "delta",
-                  "signature", "chrom", "motifStart", "motifEnd", "strand",
-                  "match", "tf")
 
+        tbl.mut.only  <- subset(tbl, assessed=="mut.only", select=c(signature, motifRelativeScore))
+        if(nrow(tbl.mut.only) > 0){
+           sigs <- tbl.mut.only$signature
+              # find the wt scores for these muts, looking in the relaxedMatchPercentage match table
+           tbl.wt.scores <- subset(tbl.wt.relaxed, signature %in% sigs, select=c(signature, motifRelativeScore))
+           deltas <- unlist(lapply(sigs, function(sig){mut.score  <- subset(tbl.mut.only, signature==sig)$motifRelativeScore;
+                                                       wt.score <- subset(tbl.wt.scores, signature==sig)$motifRelativeScore;
+                                                       delta <- wt.score - mut.score
+                                                       }))
+           tbl$delta[match(sigs, tbl$signature)] <- deltas
+           } # tbl.mut.only > 0
+
+        coi <-  c("motifName", "status", "assessed", "motifRelativeScore", "delta",
+                  "signature", "chrom", "motifStart", "motifEnd", "strand", "match")
+
+        stopifnot(all(coi %in% colnames(tbl)))
         tbl <- tbl[, coi]
         tbl$variant <- variant
         tbl

@@ -140,8 +140,10 @@ setMethod("findMatchesByChromosomalRegion", "MotifMatcher",
               x <- lapply(1:nrow(tbl.regions),
                           function(r) getSequence(obj, tbl.regions[r,], variants))
               tbl.regions <- do.call(rbind, x)
-              printf("---- MotifMatcher::findMatchesByChromosomalRegion")
-              print(tbl.regions)
+             if(!obj@quiet){
+                printf("---- MotifMatcher::findMatchesByChromosomalRegion")
+                print(tbl.regions)
+                }
               tbl.motifs.list <- .getScoredMotifs(tbl.regions$seq, obj@pfms,
                                                   pwmMatchMinimumAsPercentage, obj@quiet)
 
@@ -162,7 +164,7 @@ setMethod("findMatchesByChromosomalRegion", "MotifMatcher",
               } # for i
 
               if(nrow(tbl.out) == 0)
-                  return(list(tbl=data.frame(), tfs=c()))
+                  return(tbl=data.frame())
 
               tbl.out$motifStart <- tbl.out$motifStart + tbl.out$chromStart - 1;
               tbl.out$motifEnd <- tbl.out$motifEnd  + tbl.out$chromStart - 1;
@@ -288,27 +290,7 @@ setMethod("getPfms", "MotifMatcher",
 {
    min.match.as.string <- sprintf("%02d%%", min.match.percentage)
 
-   # search <- function(motifName, mtx, seq){
-   #    hits.fwd <- matchPWM(mtx, seq, with.score=TRUE, min.score=min.match.as.string)
-   #    seq.revcomp <- as.character(reverseComplement(DNAString(seq)))
-   #    hits.rev <- matchPWM(mtx, seq.revcomp, with.score=TRUE, min.score=min.match.as.string)
-   #    tbl <- data.frame()
-   #    if(length(hits.fwd) > 0){
-   #        if(!quiet) printf("%d +", length(hits.fwd))
-   #        match <- substring(as.character(subject(hits.fwd)), start(ranges(hits.fwd)), end(ranges(hits.fwd)))
-   #        tbl <- data.frame(ranges(hits.fwd), score=mcols(hits.fwd)$score, motif=motifName, match=match, strand="+")
-   #        }
-   #    if(length(hits.rev) > 0){
-   #        if(!quiet) printf("%d -", length(hits.rev))
-   #        match <- substring(as.character(subject(hits.rev)), start(ranges(hits.rev)), end(ranges(hits.rev)))
-   #        tbl.rev <- data.frame(ranges(hits.rev), score=mcols(hits.rev)$score, motif=motifName, match=match, strand="-")
-   #        tbl <- rbind(tbl, tbl.rev)
-   #        }
-   #     return(tbl)
-   #     }
-
     count <- length(pfms)
-    #browser()
     xx <- lapply(1:count, function(i) {
        .matchPwmForwardAndReverse(sequence, pfms[[i]], names(pfms)[i], min.match.percentage, quiet)
        })
@@ -319,7 +301,6 @@ setMethod("getPfms", "MotifMatcher",
       }
     else{
       tbl.result$motif <- as.character(tbl.result$motif)
-      #tbl.result$seq <- as.character(tbl.result$seq)
       tbl.result$match <- as.character(tbl.result$match)
       tbl.result$strand <- as.character(tbl.result$strand)
       return(tbl.result[order(tbl.result$score,decreasing=TRUE),])
@@ -477,13 +458,11 @@ setMethod("getSequence", "MotifMatcher",
    function(obj, tbl.regions, variants=NA_character_){
         # either no variants are supplied, or a variant string is offered for each row
      stopifnot(nrow(tbl.regions) == 1)
-     # stopifnot(is.na(variants) || nrow(tbl.regions) == length(variants))
      gr.regions <- with(tbl.regions, GRanges(seqnames=chrom, IRanges(start=start, end=end)))
      seqs <- as.character(BSgenome::getSeq(obj@genome, gr.regions))
      tbl.regions$seq <- seqs
      if(!all(is.na(variants))){  # successively inject each variant
         tbl.variants <- do.call(rbind, lapply(variants, function(variant) .parseVariantString(obj, variant)))
-        #browser()
         for(rr in 1:nrow(tbl.variants))
            tbl.regions <- .injectSnp(tbl.regions, tbl.variants[rr,])
         } # !all(is.na(variants))
