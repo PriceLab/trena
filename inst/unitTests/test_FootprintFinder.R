@@ -257,8 +257,8 @@ test_getFootprintsInRegionWithVariants <- function()
 
        # a region of size 1.  no footprints here
    tbl.fp <- getFootprintsInRegion(fp, chromosome, region.start, region.end)
-   checkEquals(dim(tbl.fp), c(2, 17))
-   checkTrue("MA0152.1" %in% tbl.fp$name)
+   checkEquals(dim(tbl.fp), c(7, 19))
+   checkTrue("Rnorvegicus-jaspar2016-NFATC2-MA0152.1" %in% tbl.fp$name)
 
    tbl.regions.noSeq <- data.frame(chrom="chr5", start=region.start, end=region.end, stringsAsFactors=FALSE)
    mini.motifs <- MotifDb::query(MotifDb::query(MotifDb::MotifDb, "jaspar2016"), "hsapiens")
@@ -310,7 +310,7 @@ test_mapMotifsToTFsMergeIntoTable <- function()
 
          # 3k up and downstream.  we expect more footprints upstream,  some downstream
    tbl <- getFootprintsInRegion(fp, chromosome, tss-1000, tss + 1000)
-   checkTrue(nrow(tbl) > 0)   # 11
+   checkTrue(nrow(tbl) > 0)   # 142
 
    tbl.withTFs <- mapMotifsToTFsMergeIntoTable(fp, tbl)
    checkEquals(ncol(tbl.withTFs), 11)

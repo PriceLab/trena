@@ -19,6 +19,30 @@ the GO term and the other is an empty data frame.
 \description{
 Get candidate genes using a human DHS filter
 }
+\examples{
+
+# Make a filter for "transcription, DNA-templated" and use it to filter candidates
+load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+targetGene <- "VRK2"
+promoter.length <- 1000
+genome <- "hg38"
+db.address <- system.file(package="trena", "extdata")
+genome.db.uri    <- paste("sqlite:/", db.address, "vrk2.genome.db",  sep = "/")
+gene.spec=list(targetGene=target.gene,
+tssUpstream=promoter.length,tssDownstream=promoter.length)
+
+hd.filter <- HumanDHSFilter(genome, pwmMatchPercentageThreshold = 85,
+geneInfoDatabase.uri = genome.db.uri, geneCenteredSpec = gene.spec)
+
+chrom <- "chr2"
+rs13384219.loc <- 57907323
+start <- rs13384219.loc - 10
+end <- rs13384219.loc + 10
+
+tableNames <- getEncodeRegulatoryTableNames(hdf)
+
+getRegulatoryRegions(hd.filter, tableNames[1], chrom, start, end)
+}
 \seealso{
 \code{\link{FootprintFilter}}
 
@@ -26,6 +50,5 @@ Other getCandidate Methods: \code{\link{getCandidates,FootprintFilter-method}},
   \code{\link{getCandidates,GeneOntologyFilter-method}},
   \code{\link{getCandidates,HumanDHSFilter-method}},
   \code{\link{getCandidates,VarianceFilter-method}},
-  \code{\link{getCandidates}},
-  \code{\link{getSequence_tmp,HumanDHSFilter-method}}
+  \code{\link{getCandidates}}
 }

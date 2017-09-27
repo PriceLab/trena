@@ -30,10 +30,16 @@ chromosome <- "chr5"
 mef2c.tss <- 88904257
 loc.start <- mef2c.tss - 1000
 loc.end   <- mef2c.tss + 1000
+
+database.filename <- system.file(package="trena", "extdata", "project.sub.db")
+database.uri <- sprintf("sqlite://\%s", database.filename)
+sources <- c(database.uri)
 load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
 
-regions <- getRegulatoryChromosomalRegions(trena, chromosome, mef2c.tss-1000, mef2c.tss+1000,
+motifs.list <- getRegulatoryChromosomalRegions(trena, chromosome, mef2c.tss-1000, mef2c.tss+1000,
 sources, "MEF2C", mef2c.tss)
-regions.tf <- expandRegulatoryRegionsTableByTF(trena, regions)
-model.mef2c <- createGeneModel(trena, "MEF2C", c("lasso","ridge","randomforest"), regions.tf, mtx.sub) 
+
+library(MotifDb)
+tbl.motifs.tfs <- associateTranscriptionFactors(MotifDb, motifs.list[[1]], source="MotifDb", expand.rows=TRUE)
+model.mef2c <- createGeneModel(trena, "MEF2C", c("lasso","ridge","randomforest"), tbl.motifs.tfs, mtx.sub)
 }

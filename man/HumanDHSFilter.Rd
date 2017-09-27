@@ -33,6 +33,19 @@ A CandidateFilter class object that filters using Human DHS data
 \description{
 Create a CandidateFilter using Human DNAse Hypersensitivity
 }
+\examples{
+load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+targetGene <- "VRK2"
+promoter.length <- 1000
+genome <- "hg38"
+db.address <- system.file(package="trena", "extdata")
+genome.db.uri    <- paste("sqlite:/", db.address, "vrk2.genome.db",  sep = "/")
+gene.spec=list(targetGene=target.gene,
+tssUpstream=promoter.length,tssDownstream=promoter.length)
+
+hd.filter <- HumanDHSFilter(genome, pwmMatchPercentageThreshold = 85,
+geneInfoDatabase.uri = genome.db.uri, geneCenteredSpec = gene.spec)
+}
 \seealso{
 \code{\link{getCandidates-HumanDHSFilter}},
 

@@ -59,7 +59,6 @@ exportMethods(
     getRegulatoryTableColumnNames,
     getGeneModelTableColumnNames,
     createGeneModel,
-    expandRegulatoryRegionsTableByTF,
     assessSnp
 )
 
