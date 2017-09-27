@@ -17,7 +17,7 @@ parseChromLocString <- function(chromLocString)
 
    return(list(chrom=chrom, start=start, end=end))
 
-} # .parseChromLocString
+} # parseChromLocString
 #------------------------------------------------------------------------------------------------------------------------
 # "postgres://whovian/gtf" >- list(brand="postgres", host="whovian", name="gtf"
 parseDatabaseUri <- function(database.uri)
@@ -30,5 +30,5 @@ parseDatabaseUri <- function(database.uri)
 
    list(brand=database.brand, host=host, name=database.name)
 
-} # .parseDatabaseUri
+} # parseDatabaseUri
 #----------------------------------------------------------------------------------------------------

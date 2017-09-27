@@ -72,21 +72,21 @@ FootprintFilter <- function(genomeDB, footprintDB, geneCenteredSpec=list(),
 
     if(length(geneCenteredSpec) == 3){
         fpFinder <- FootprintFinder(genomeDB, footprintDB, quiet=quiet)
-        
-        new.region <- with(geneCenteredSpec,                            
-                           getGenePromoterRegion(fpFinder,                                                 
-                                                 targetGene,                                                 
-                                                 tssUpstream,                                                 
-                                                 tssDownstream))        
-        if(class(new.region) == "list"){            
-            new.region.chromLocString <- with(new.region, sprintf("%s:%d-%d", chr, start, end))            
-            regions <- c(regions, new.region.chromLocString)            
-        } else {            
-            warning("No regions found for supplied gene-centered spec")                        
+
+        new.region <- with(geneCenteredSpec,
+                           getGenePromoterRegion(fpFinder,
+                                                 targetGene,
+                                                 tssUpstream,
+                                                 tssDownstream))
+        if(class(new.region) == "list"){
+            new.region.chromLocString <- with(new.region, sprintf("%s:%d-%d", chr, start, end))
+            regions <- c(regions, new.region.chromLocString)
+        } else {
+            warning("No regions found for supplied gene-centered spec")
             regions <- c()
         }
-        closeDatabaseConnections(fpFinder)        
-    }    
+        closeDatabaseConnections(fpFinder)
+    }
 
    if(length(regionsSpec) > 0)
       regions <- c(regions, regionsSpec)
@@ -112,7 +112,7 @@ FootprintFilter <- function(genomeDB, footprintDB, geneCenteredSpec=list(),
 #' other is a data frame containing all the meta data for the footprints
 #'
 #' @export
-#' 
+#'
 #' @examples
 #'
 #' # Use footprint filter with the included SQLite database for MEF2C to filter candidates
@@ -148,7 +148,7 @@ setMethod("getCandidates", "FootprintFilter",
          tbl.out <- data.frame()
 
         for(region in obj@regions){
-           chromLoc <- .parseChromLocString(region)
+           chromLoc <- parseChromLocString(region)
            if(!obj@quiet) printf(" FootprintFilter::getCandidates, getFootprintsInRegion %s", region)
            tbl.fp <- try(with(chromLoc, getFootprintsInRegion(fp, chrom, start, end)))
            if(!(class(tbl.fp) == "try-error")){
@@ -170,20 +170,20 @@ setMethod("getCandidates", "FootprintFilter",
         }) # getCandidates
 
 #----------------------------------------------------------------------------------------------------
-.parseChromLocString <- function(chromLocString)
-{
-   tokens.0 <- strsplit(chromLocString, ":", fixed=TRUE)[[1]]
-   stopifnot(length(tokens.0) == 2)
-   chrom <- tokens.0[1]
-   if(!grepl("chr", chrom))
-      chrom <- sprintf("chr%s", chrom)
-
-   tokens.1 <- strsplit(tokens.0[2], "-")[[1]]
-   stopifnot(length(tokens.1) == 2)
-   start <- as.integer(tokens.1[1])
-   end <- as.integer(tokens.1[2])
-
-   return(list(chrom=chrom, start=start, end=end))
-
-} # parseChromLocString
+# .parseChromLocString <- function(chromLocString)
+# {
+#    tokens.0 <- strsplit(chromLocString, ":", fixed=TRUE)[[1]]
+#    stopifnot(length(tokens.0) == 2)
+#    chrom <- tokens.0[1]
+#    if(!grepl("chr", chrom))
+#       chrom <- sprintf("chr%s", chrom)
+#
+#    tokens.1 <- strsplit(tokens.0[2], "-")[[1]]
+#    stopifnot(length(tokens.1) == 2)
+#    start <- as.integer(tokens.1[1])
+#    end <- as.integer(tokens.1[2])
+#
+#    return(list(chrom=chrom, start=start, end=end))
+#
+# } # parseChromLocString
 #------------------------------------------------------------------------------------------------------------------------
