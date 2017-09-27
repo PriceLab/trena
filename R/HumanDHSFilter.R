@@ -41,7 +41,7 @@ setGeneric("geneSymbolToTSS", signature="obj", function(obj, geneSymbol) standar
 #' Create a CandidateFilter using Human DNAse Hypersensitivity
 #'
 #' @param genomeName A character string indicating the reference genome; currently, the only
-#' accepted strings are "hg38" and "hg19", both of which are human genomes. 
+#' accepted strings are "hg38" and "hg19", both of which are human genomes.
 #' @param encodeTableName (default = "wgEncodeRegDnaseClustered")
 #' @param pwmMatchPercentageThreshold A numeric from 0-100 to serve as a threshold for a match
 #' @param geneInfoDatabase.uri An address for a gene database
@@ -67,7 +67,7 @@ setGeneric("geneSymbolToTSS", signature="obj", function(obj, geneSymbol) standar
 #' genome.db.uri    <- paste("sqlite:/", db.address, "vrk2.genome.db",  sep = "/")
 #' gene.spec=list(targetGene=target.gene,
 #' tssUpstream=promoter.length,tssDownstream=promoter.length)
-#' 
+#'
 #' hd.filter <- HumanDHSFilter(genome, pwmMatchPercentageThreshold = 85,
 #' geneInfoDatabase.uri = genome.db.uri, geneCenteredSpec = gene.spec)
 
@@ -140,7 +140,7 @@ HumanDHSFilter <- function(genomeName,
 #' genome.db.uri    <- paste("sqlite:/", db.address, "vrk2.genome.db",  sep = "/")
 #' gene.spec=list(targetGene=target.gene,
 #' tssUpstream=promoter.length,tssDownstream=promoter.length)
-#' 
+#'
 #' hd.filter <- HumanDHSFilter(genome, pwmMatchPercentageThreshold = 85,
 #' geneInfoDatabase.uri = genome.db.uri, geneCenteredSpec = gene.spec)
 #'
@@ -192,7 +192,7 @@ setMethod("getEncodeRegulatoryTableNames", "HumanDHSFilter",
 #' genome.db.uri    <- paste("sqlite:/", db.address, "vrk2.genome.db",  sep = "/")
 #' gene.spec=list(targetGene=target.gene,
 #' tssUpstream=promoter.length,tssDownstream=promoter.length)
-#' 
+#'
 #' hd.filter <- HumanDHSFilter(genome, pwmMatchPercentageThreshold = 85,
 #' geneInfoDatabase.uri = genome.db.uri, geneCenteredSpec = gene.spec)
 #'
@@ -231,7 +231,7 @@ setMethod("show", "HumanDHSFilter",
 #' genome.db.uri    <- paste("sqlite:/", db.address, "vrk2.genome.db",  sep = "/")
 #' gene.spec=list(targetGene=target.gene,
 #' tssUpstream=promoter.length,tssDownstream=promoter.length)
-#' 
+#'
 #' hd.filter <- HumanDHSFilter(genome, pwmMatchPercentageThreshold = 85,
 #' geneInfoDatabase.uri = genome.db.uri, geneCenteredSpec = gene.spec)
 #'
@@ -240,7 +240,7 @@ setMethod("show", "HumanDHSFilter",
 setMethod("geneSymbolToTSS", "HumanDHSFilter",
 
      function(obj, geneSymbol){
-        geneInfo.db.info <- .parseDatabaseUri(obj@geneInfoDatabase.uri)
+        geneInfo.db.info <- parseDatabaseUri(obj@geneInfoDatabase.uri)
         host <- geneInfo.db.info$host
         dbname <- geneInfo.db.info$name
         if(geneInfo.db.info$brand == "postgres"){
@@ -290,7 +290,7 @@ setMethod("geneSymbolToTSS", "HumanDHSFilter",
 #' genome.db.uri    <- paste("sqlite:/", db.address, "vrk2.genome.db",  sep = "/")
 #' gene.spec=list(targetGene=target.gene,
 #' tssUpstream=promoter.length,tssDownstream=promoter.length)
-#' 
+#'
 #' hd.filter <- HumanDHSFilter(genome, pwmMatchPercentageThreshold = 85,
 #' geneInfoDatabase.uri = genome.db.uri, geneCenteredSpec = gene.spec)
 #'
@@ -318,12 +318,22 @@ setMethod("getCandidates", "HumanDHSFilter",
           regions <- c(regions, obj@regionsSpec)
           }
 
-       printf("HumanDHSFilter::getCandidates");
-       tbl.regions <- as.data.frame(do.call("rbind", lapply(regions, function(region) .parseChromLocString(region))))
+       if(!obj@quiet){
+          printf("HumanDHSFilter::getCandidates, from these regions:");
+          print(regions)
+          }
+
+       tbl.regions <- as.data.frame(do.call("rbind", lapply(regions, function(region) parseChromLocString(region))))
        tbl.regions$chrom <- as.character(tbl.regions$chrom)
        tbl.regions$start <- as.integer(tbl.regions$start)
        tbl.regions$end <- as.integer(tbl.regions$end)
        tbl.dhs <- data.frame()
+
+       if(!obj@quiet){
+          printf("HumanDHSFilter::getCandidates, getRegulatoryRegions for %d regions", nrow(tbl.regions))
+          print(tbl.regions)
+          }
+
        for(r in 1:nrow(tbl.regions)){
           tbl.new <- getRegulatoryRegions(obj, obj@encodeTableName, tbl.regions$chrom[r], tbl.regions$start[r], tbl.regions$end[r])
           tbl.dhs <- rbind(tbl.dhs, tbl.new)
@@ -337,7 +347,7 @@ setMethod("getCandidates", "HumanDHSFilter",
 
        colnames(tbl.dhs) <- c("chrom", "start", "end", "count", "score")
        jaspar.human.pfms <- as.list(query(query(MotifDb, "hsapiens"), "jaspar2016"))
-       mm <- MotifMatcher(genomeName=obj@genomeName, pfms=jaspar.human.pfms)
+       mm <- MotifMatcher(genomeName=obj@genomeName, pfms=jaspar.human.pfms, obj@quiet)
        tbl <- findMatchesByChromosomalRegion(mm, tbl.dhs[, 1:3],
                                              pwmMatchMinimumAsPercentage=obj@pwmMatchPercentageThreshold,
                                              variants=obj@variants)
@@ -381,7 +391,7 @@ setMethod("getCandidates", "HumanDHSFilter",
 #' genome.db.uri    <- paste("sqlite:/", db.address, "vrk2.genome.db",  sep = "/")
 #' gene.spec=list(targetGene=target.gene,
 #' tssUpstream=promoter.length,tssDownstream=promoter.length)
-#' 
+#'
 #' hd.filter <- HumanDHSFilter(genome, pwmMatchPercentageThreshold = 85,
 #' geneInfoDatabase.uri = genome.db.uri, geneCenteredSpec = gene.spec)
 #'
@@ -391,7 +401,7 @@ setMethod("getCandidates", "HumanDHSFilter",
 #' end <- rs13384219.loc + 10
 #'
 #' tableNames <- getEncodeRegulatoryTableNames(hdf)
-#' 
+#'
 #' getRegulatoryRegions(hd.filter, tableNames[1], chrom, start, end)
 
 setMethod("getRegulatoryRegions", "HumanDHSFilter",
@@ -403,16 +413,10 @@ setMethod("getRegulatoryRegions", "HumanDHSFilter",
        user <- "genome"
        dbname <- obj@genomeName
 
+       if(!obj@quiet)
+          printf("connecting to %s/%s/%s as %s", host, dbname, encode.table.name,  user);
+
        db <- dbConnect(driver, user = user, host = host, dbname = dbname)
-
-       #schema <- colnames(dbGetQuery(db, sprintf("select * from %s limit 1", tableName)))
-       #suppressWarnings(dbGetQuery(db, sprintf("select * from %s limit 3", tableName)))
-
-       #if(!all(c("chrom", "chromStart", "chromEnd") %in% schema)){
-       #   printf("%s lacks chrom, start, end", tableName)
-       #   lapply(dbListConnections(driver), dbDisconnect)
-       #   return(data.frame())
-       #   }
 
        main.clause <- sprintf("select * from %s where", encode.table.name);
 
