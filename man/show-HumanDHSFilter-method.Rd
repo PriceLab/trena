@@ -18,6 +18,22 @@ the GO term and the other is an empty data frame.
 \description{
 Show the details of a human DHS filter
 }
+\examples{
+# Make a filter and show it
+#' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+targetGene <- "VRK2"
+promoter.length <- 1000
+genome <- "hg38"
+db.address <- system.file(package="trena", "extdata")
+genome.db.uri    <- paste("sqlite:/", db.address, "vrk2.genome.db",  sep = "/")
+gene.spec=list(targetGene=target.gene,
+tssUpstream=promoter.length,tssDownstream=promoter.length)
+
+hd.filter <- HumanDHSFilter(genome, pwmMatchPercentageThreshold = 85,
+geneInfoDatabase.uri = genome.db.uri, geneCenteredSpec = gene.spec)
+
+show(hd.filter)
+}
 \seealso{
 \code{\link{HumanDHSFilter}}
 }

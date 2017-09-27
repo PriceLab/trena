@@ -5,7 +5,7 @@
 \title{Assess the effect of a SNP using a Trena object}
 \usage{
 assessSnp(obj, pfms, variant, shoulder, pwmMatchMinimumAsPercentage,
-  genomeName = "hg38")
+  relaxedMatchDelta = 25)
 }
 \arguments{
 \item{obj}{An object of class Trena}
@@ -35,7 +35,7 @@ mef2c.tss <- 88904257
 loc.start <- mef2c.tss - 1000
 loc.end   <- mef2c.tss + 1000
 
-regions <- getRegulatoryChromosomalRegions(trena, chromosome, mef2c.tss-1000, mef2c.tss+1000,
-sources, "MEF2C", mef2c.tss)
-regions.tf <- expandRegulatoryRegionsTableByTF(trena, regions)
+
+
+
 }

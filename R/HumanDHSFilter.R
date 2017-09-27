@@ -60,7 +60,7 @@ setGeneric("geneSymbolToTSS", signature="obj", function(obj, geneSymbol) standar
 #'
 #' @examples
 #' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
-#' targetGene <- VRK2"
+#' targetGene <- "VRK2"
 #' promoter.length <- 1000
 #' genome <- "hg38"
 #' db.address <- system.file(package="trena", "extdata")
@@ -133,7 +133,7 @@ HumanDHSFilter <- function(genomeName,
 #' @examples
 #'
 #' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
-#' targetGene <- VRK2"
+#' targetGene <- "VRK2"
 #' promoter.length <- 1000
 #' genome <- "hg38"
 #' db.address <- system.file(package="trena", "extdata")
@@ -185,7 +185,7 @@ setMethod("getEncodeRegulatoryTableNames", "HumanDHSFilter",
 #' @examples
 #' # Make a filter and show it
 #' #' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
-#' targetGene <- VRK2"
+#' targetGene <- "VRK2"
 #' promoter.length <- 1000
 #' genome <- "hg38"
 #' db.address <- system.file(package="trena", "extdata")
@@ -224,7 +224,7 @@ setMethod("show", "HumanDHSFilter",
 #'
 #' # Make a filter for "transcription, DNA-templated" and use it to filter candidates
 #' #' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
-#' targetGene <- VRK2"
+#' targetGene <- "VRK2"
 #' promoter.length <- 1000
 #' genome <- "hg38"
 #' db.address <- system.file(package="trena", "extdata")
@@ -283,7 +283,7 @@ setMethod("geneSymbolToTSS", "HumanDHSFilter",
 #'
 #' # Make a filter for "transcription, DNA-templated" and use it to filter candidates
 #' #' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
-#' targetGene <- VRK2"
+#' targetGene <- "VRK2"
 #' promoter.length <- 1000
 #' genome <- "hg38"
 #' db.address <- system.file(package="trena", "extdata")
@@ -384,7 +384,7 @@ setMethod("getCandidates", "HumanDHSFilter",
 #'
 #' # Make a filter for "transcription, DNA-templated" and use it to filter candidates
 #' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
-#' targetGene <- VRK2"
+#' targetGene <- "VRK2"
 #' promoter.length <- 1000
 #' genome <- "hg38"
 #' db.address <- system.file(package="trena", "extdata")
@@ -488,31 +488,5 @@ setMethod("getRegulatoryRegions", "HumanDHSFilter",
    invisible(tbl.regions[, c("chrom", "chromStart", "chromEnd",  "count", "score")])
 
    }) # getRegulatoryRegions
-
-#----------------------------------------------------------------------------------------------------
-#' Get candidate genes using a human DHS filter
-#'
-#' @aliases getCandidates-FootprintFilter
-#'
-#' @param obj An object of class FootprintFilter
-#'
-#' @seealso \code{\link{FootprintFilter}}
-#'
-#' @family getCandidate Methods
-#'
-#' @return A list, where one element a character vector of transcription factors that match
-#' the GO term and the other is an empty data frame.
-#'
-#' @export
-#'
-#' @examples
-
-setMethod("getSequence_tmp", "HumanDHSFilter",
-
-   function(obj, tbl.regions){
-     gr.regions <- with(tbl.regions, GRanges(seqnames=chrom, IRanges(start=chromStart, end=chromEnd)))
-     seqs <- BSgenome::getSeq(obj@genome, gr.regions)
-     as.character(seqs)
-     })  # getSequence_tmp
 
 #----------------------------------------------------------------------------------------------------

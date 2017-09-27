@@ -8,8 +8,8 @@ createForMEF2C <- function(){
 # Specify the database connection parameters and connect
 driver <- PostgreSQL()
 genome.dbname <- "hg38"
-project.dbname <- "brain_wellington"
-host <- "whovian"
+project.dbname <- "brain_wellington_20"
+host <- "khaleesi"
 genome.db <- dbConnect(driver, user = "trena", password = "trena", dbname = genome.dbname, host = host)
 project.db <- dbConnect(driver, user = "trena", password = "trena", dbname = project.dbname, host = host)
 
@@ -36,24 +36,24 @@ shoulder.size <- 10000 # Look at 10Kb upstream and downstream
     
 project.regions.query <- sprintf("select * from regions where chrom = '%s' and start > %d and start < %d",
                                  chrom, tss - shoulder.size, tss + shoulder.size)
-tbl.project.regions <- dbGetQuery(project.db, project.regions.query) # 60 rows
+tbl.project.regions <- dbGetQuery(project.db, project.regions.query) # 580 rows
 
 loc.set <- sprintf("('%s')", paste(tbl.project.regions$loc, collapse="','"))
 project.hits.query <- sprintf("select * from hits where loc in %s", loc.set)
-tbl.project.hits <- dbGetQuery(project.db, project.hits.query) # 90 rows
+tbl.project.hits <- dbGetQuery(project.db, project.hits.query) # 956 rows
 
 motifs <- unique(c(tbl.project.regions$name, tbl.project.hits$name))
 collected.motifs <- sprintf("('%s')", paste(motifs, collapse="','"))
 genome.motifsgenes.query <- sprintf("select * from motifsgenes where motif in %s", collected.motifs)
-tbl.genome.motifsgenes <- dbGetQuery(genome.db, genome.motifsgenes.query)
+tbl.genome.motifsgenes <- dbGetQuery(genome.db, genome.motifsgenes.query) # 3084 rows
 
 # Close the PostgreSQL connections
 dbDisconnect(genome.db)
 dbDisconnect(project.db)
 
 # Create the SQLite connections and write the tables
-genome.con <- dbConnect(SQLite(), dbname = "vrk2.genome.db")
-project.con <- dbConnect(SQLite(), dbname = "vrk2.project.db")
+genome.con <- dbConnect(SQLite(), dbname = "genome.sub.db")
+project.con <- dbConnect(SQLite(), dbname = "project.sub.db")
 
 dbWriteTable(genome.con, "motifsgenes", tbl.genome.motifsgenes, overwrite = TRUE)
 dbWriteTable(genome.con, "gtf", tbl.genome.gtf, overwrite = TRUE)
@@ -71,8 +71,8 @@ createForVRK2 <- function(){
 # Specify the database connection parameters and connect
 driver <- PostgreSQL()
 genome.dbname <- "hg38"
-project.dbname <- "brain_wellington"
-host <- "whovian"
+project.dbname <- "brain_wellington_20"
+host <- "khaleesi"
 genome.db <- dbConnect(driver, user = "trena", password = "trena", dbname = genome.dbname, host = host)
 project.db <- dbConnect(driver, user = "trena", password = "trena", dbname = project.dbname, host = host)
 

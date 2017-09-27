@@ -20,6 +20,23 @@ is found and the other is a vector of the transcription start sites of the geneS
 \description{
 Get candidate genes using a human DHS filter
 }
+\examples{
+
+# Make a filter for "transcription, DNA-templated" and use it to filter candidates
+#' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+targetGene <- "VRK2"
+promoter.length <- 1000
+genome <- "hg38"
+db.address <- system.file(package="trena", "extdata")
+genome.db.uri    <- paste("sqlite:/", db.address, "vrk2.genome.db",  sep = "/")
+gene.spec=list(targetGene=target.gene,
+tssUpstream=promoter.length,tssDownstream=promoter.length)
+
+hd.filter <- HumanDHSFilter(genome, pwmMatchPercentageThreshold = 85,
+geneInfoDatabase.uri = genome.db.uri, geneCenteredSpec = gene.spec)
+
+geneSymbolToTSS(hd.filter, "VRK2")
+}
 \seealso{
 \code{\link{HumanDHSFilter}}
 }

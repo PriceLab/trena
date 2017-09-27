@@ -44,7 +44,7 @@ test_FootprintFilter.geneCentered <- function()
    checkTrue(span > 100)
    checkTrue(span <= 20001)
 
-   checkEquals(length(list.out$tfs), 185)
+   checkEquals(length(list.out$tfs), 294)
 
 } # test_FootprintFilter.geneCentered
 #----------------------------------------------------------------------------------------------------
@@ -84,7 +84,7 @@ test_FootprintFilter.byRegion <- function()
    checkTrue(span > 100)
    checkTrue(span <= 20001)
 
-   checkEquals(length(list.out$tfs), 185)
+   checkEquals(length(list.out$tfs), 294)
 
 } # test_FootprintFilter.byRegion
 #----------------------------------------------------------------------------------------------------
@@ -127,9 +127,9 @@ test_FootprintFilter.byTwoRegions <- function()
    checkTrue(span > 100)
    checkTrue(span <= 20001)
 
-   checkEquals(length(list.out$tfs), 185)
-   checkTrue(nrow(list.out$tbl) > 20)
-   checkTrue(nrow(list.out$tbl) < 25)
+   checkEquals(length(list.out$tfs), 294)
+   checkTrue(nrow(list.out$tbl) > 130)
+   checkTrue(nrow(list.out$tbl) < 140)
 
 } # test_FootprintFilter.byTwoRegions
 #----------------------------------------------------------------------------------------------------
@@ -167,7 +167,7 @@ test_FootprintFilter.geneCenteredPlusRegion <- function()
    checkTrue(span > 2000)
    checkTrue(span <= 3000)
 
-   checkTrue(nrow(list.out$tbl) > 25)   # we see 22 rows without the extra 1k bp
+   checkTrue(nrow(list.out$tbl) > 180)   # we see 22 rows without the extra 1k bp
 
 } # test_FootprintFilter.geneCenteredPlusRegion
 
