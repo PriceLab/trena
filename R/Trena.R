@@ -57,7 +57,7 @@
 
 setGeneric('getRegulatoryChromosomalRegions',  signature='obj',
            function(obj, chromosome, chromStart, chromEnd, regulatoryRegionSources, targetGene, targetGeneTSS,
-                    combine=FALSE, quiet=FALSE) standardGeneric("getRegulatoryChromosomalRegions"))
+                    combine=FALSE) standardGeneric("getRegulatoryChromosomalRegions"))
 
 #' Retrieve the column names in the regulatory table for a Trena object
 #'
@@ -117,7 +117,7 @@ setGeneric('getGeneModelTableColumnNames',  signature='obj', function(obj) stand
 #' mef2c.tss <- 88904257
 #' loc.start <- mef2c.tss - 1000
 #' loc.end   <- mef2c.tss + 1000
-#' 
+#'
 #' database.filename <- system.file(package="trena", "extdata", "project.sub.db")
 #' database.uri <- sprintf("sqlite://%s", database.filename)
 #' sources <- c(database.uri)
@@ -222,20 +222,24 @@ setMethod('getGeneModelTableColumnNames', 'Trena',
 {
     chromLocString <- sprintf("%s:%d-%d", chromosome, chromStart, chromEnd)
     fpFilter <- FootprintFilter(genome.db.uri, source,  geneCenteredSpec=list(), regionsSpec=chromLocString)
-    x.fp <- getCandidates(fpFilter)
-    tbl.fp <- x.fp$tbl
+    tbl.fp <- getCandidates(fpFilter)
+
     if(nrow(tbl.fp) == 0){
-       warn("no footprints found in %s:%d-%d, targetGene is %s", chromosome, chromeStart, chromEnd, targetGene);
+       warning("no footprints found in %s:%d-%d, targetGene is %s", chromosome, chromeStart, chromEnd, targetGene);
        return(tbl.fp)
        }
 
-    colnames(tbl.fp) <- c("chrom", "motifStart", "motifEnd", "motifName", "length", "strand", "score1", "score", "score3", "tf")
+    colnames.raw <- c("loc", "chrom", "start", "endpos", "fp_start", "fp_end", "type", "name", "length", "strand",
+                      "sample_id", "method", "provenance", "score1", "score2", "score3", "score4", "score5", "score6")
+    tbl.fp <- tbl.fp[, c("chrom", "start", "endpos", "name", "length", "strand", "score1", "score2", "score3")]
+    colnames(tbl.fp) <- c("chrom", "motifStart", "motifEnd", "motifName", "length", "strand", "score1", "score", "score3")
 
     distance <- tbl.fp$motifStart - targetGeneTSS
     direction <- rep("upstream", length(distance))
     direction[which(distance < 0)] <- "downstream"
     tbl.fp$distance.from.tss <- distance
     tbl.fp$id <- sprintf("%s.fp.%s.%06d.%s", targetGene, direction, abs(distance), tbl.fp$motifName)
+      # a final rearrangement of columns, to match our standard
     tbl.fp <- tbl.fp[, getRegulatoryTableColumnNames(obj)]
 
     tbl.fp
@@ -276,7 +280,7 @@ setMethod('getGeneModelTableColumnNames', 'Trena',
 setMethod('getRegulatoryChromosomalRegions', 'Trena',
 
     function(obj, chromosome, chromStart, chromEnd, regulatoryRegionSources, targetGene, targetGeneTSS,
-             combine=FALSE, quiet=FALSE){
+             combine=FALSE){
 
          tbl.combined <- data.frame()
          result <- list()
@@ -289,7 +293,7 @@ setMethod('getRegulatoryChromosomalRegions', 'Trena',
          if(length(encodeDHS.source.index)){
             source.count <- source.count + 1
             regulatoryRegionSources <- regulatoryRegionSources[-encodeDHS.source.index]
-            if(!quiet) printf("about to callHumanDHSFilter");
+            if(!obj@quiet) printf("about to callHumanDHSFilter");
             tbl.dhs <- .callHumanDHSFilter(obj, chromosome, chromStart, chromEnd, targetGene, targetGeneTSS)
             result[[source.count]] <- tbl.dhs
             if(combine)
@@ -299,7 +303,7 @@ setMethod('getRegulatoryChromosomalRegions', 'Trena',
 
          for(source in regulatoryRegionSources){
             source.count <- source.count + 1
-            if(!quiet) printf("about to call footprintFilter with source = '%s'", source);
+            if(!obj@quiet) printf("about to call footprintFilter with source = '%s'", source);
             tbl.fp <- .callFootprintFilter(obj, source, chromosome, chromStart, chromEnd, targetGene, targetGeneTSS)
             if(combine)
                tbl.combined <- rbind(tbl.combined, tbl.fp)

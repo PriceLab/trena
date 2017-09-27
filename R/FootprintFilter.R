@@ -151,39 +151,30 @@ setMethod("getCandidates", "FootprintFilter",
            chromLoc <- parseChromLocString(region)
            if(!obj@quiet) printf(" FootprintFilter::getCandidates, getFootprintsInRegion %s", region)
            tbl.fp <- try(with(chromLoc, getFootprintsInRegion(fp, chrom, start, end)))
-           if(!(class(tbl.fp) == "try-error")){
-              tbl.out <- rbind(tbl.out, mapMotifsToTFsMergeIntoTable(fp, tbl.fp))
+           if(class(tbl.fp) == "try-error"){
+              warning("FootprintFinder error with region %s", region)
+              closeDatabaseConnections(fp)
+              return(NULL)
               }
-           else{
-             warning("FootprintFinder error with region %s", region)
-             closeDatabaseConnections(fp)
-             return(NULL)
-              }
+           tbl.out <- rbind(tbl.out, tbl.fp)
            } # for region
+           #if(!(class(tbl.fp) == "try-error")){
+           #   tbl.out <- rbind(tbl.out, mapMotifsToTFsMergeIntoTable(fp, tbl.fp))
+           #   }
+           #else{
+           #  warning("FootprintFinder error with region %s", region)
+           #  closeDatabaseConnections(fp)
+           #  return(NULL)
+           #   }
+           #} # for region
 
         closeDatabaseConnections(fp)
                 # Intersect the footprints with the rows in the matrix
-        candidate.tfs <- NA_character_
-        if(nrow(tbl.out) > 0)
-           candidate.tfs <- sort(unique(unlist(strsplit(tbl.out$tf, ";"))))
-        return(list("tfs" = candidate.tfs, "tbl" = tbl.out))
+        #candidate.tfs <- NA_character_
+        #if(nrow(tbl.out) > 0)
+        #   candidate.tfs <- sort(unique(unlist(strsplit(tbl.fp$tf, ";"))))
+        #return(list("tfs" = candidate.tfs, "tbl" = tbl.out))
+        tbl.out
         }) # getCandidates
 
 #----------------------------------------------------------------------------------------------------
-# .parseChromLocString <- function(chromLocString)
-# {
-#    tokens.0 <- strsplit(chromLocString, ":", fixed=TRUE)[[1]]
-#    stopifnot(length(tokens.0) == 2)
-#    chrom <- tokens.0[1]
-#    if(!grepl("chr", chrom))
-#       chrom <- sprintf("chr%s", chrom)
-#
-#    tokens.1 <- strsplit(tokens.0[2], "-")[[1]]
-#    stopifnot(length(tokens.1) == 2)
-#    start <- as.integer(tokens.1[1])
-#    end <- as.integer(tokens.1[2])
-#
-#    return(list(chrom=chrom, start=start, end=end))
-#
-# } # parseChromLocString
-#------------------------------------------------------------------------------------------------------------------------

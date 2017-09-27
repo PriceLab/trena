@@ -198,13 +198,13 @@ FootprintFinder <- function(genome.database.uri, project.database.uri, quiet=TRU
 setMethod("closeDatabaseConnections", "FootprintFinder",
 
      function(obj){
-        printf("-- FootprintFinder::closeDataConnections")
+        if(!obj@quiet) printf("-- FootprintFinder::closeDataConnections")
         if("DBIConnection" %in% is(obj@genome.db)){
-           printf("closing genome.db")
+           if(!obj@quiet) printf("closing genome.db")
            DBI::dbDisconnect(obj@genome.db)
            }
         if("DBIConnection" %in% is(obj@project.db)){
-           printf("closing project.db")
+           if(!obj@quiet) printf("closing project.db")
            DBI::dbDisconnect(obj@project.db)
            }
           })
