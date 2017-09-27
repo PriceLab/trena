@@ -15,7 +15,6 @@ runTests <- function()
    test_getFootprintsInRegion()
    test_getFootprintsInRegionWithVariants()
    test_getFootprintsForGene()
-   test_mapMotifsToTFsMergeIntoTable()
 
 } # runTests
 #----------------------------------------------------------------------------------------------------
@@ -250,8 +249,8 @@ test_getFootprintsInRegionWithVariants <- function()
 
    fp <- FootprintFinder(genome.db.uri, project.db.uri, quiet=TRUE)
 
-   # use MEF2C and the hg38 assembly   
-   chromosome <- "chr5"   
+   # use MEF2C and the hg38 assembly
+   chromosome <- "chr5"
    region.start <-  88894577 - 10
    region.end   <-  88894583 + 10
 
@@ -294,31 +293,6 @@ test_getFootprintsInRegionWithVariants <- function()
 
 } # test_getFootprintsInRegionWithVariants
 #----------------------------------------------------------------------------------------------------
-test_mapMotifsToTFsMergeIntoTable <- function()
-{
-    printf("--- test_mapMotifsToTFsMergeIntoTable")
-
-   db.address <- system.file(package="trena", "extdata")
-   genome.db.uri <- paste("sqlite:/",db.address,"genome.sub.db", sep = "/")
-   project.db.uri <- paste("sqlite:/",db.address,"project.sub.db", sep = "/")
-
-   fp <- FootprintFinder(genome.db.uri, project.db.uri, quiet=TRUE)
-
-      # use MEF2C and the hg38 assembly
-   chromosome <- "chr5"
-   tss <- 88904257
-
-         # 3k up and downstream.  we expect more footprints upstream,  some downstream
-   tbl <- getFootprintsInRegion(fp, chromosome, tss-1000, tss + 1000)
-   checkTrue(nrow(tbl) > 0)   # 142
-
-   tbl.withTFs <- mapMotifsToTFsMergeIntoTable(fp, tbl)
-   checkEquals(ncol(tbl.withTFs), 11)
-   checkEquals(nrow(tbl.withTFs),nrow(tbl))
-   closeDatabaseConnections(fp)
-
-} # test_getFootprintsInRegion
-#----------------------------------------------------------------------------------------------------
 explore_variantsInFootprints <- function()
 {
 
@@ -354,7 +328,6 @@ explore_variantsInFootprints <- function()
    tbl <- getFootprintsInRegion(fp, chromosome, tss-400, tss - 300)
    checkTrue(nrow(tbl) > 0)   # 11
 
-   tbl.withTFs <- mapMotifsToTFsMergeIntoTable(fp, tbl)
 
 } # explore_variantsInFootprints
 #----------------------------------------------------------------------------------------------------

@@ -46,7 +46,6 @@ exportMethods(
     getGtfGeneBioTypes,
     getGtfMoleculeTypes,
     getPromoterRegionsAllGenes,
-    mapMotifsToTFsMergeIntoTable,
     rescalePredictorWeights,
     getSequence,
     getEncodeRegulatoryTableNames,

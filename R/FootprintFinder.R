@@ -57,9 +57,6 @@ setGeneric("closeDatabaseConnections", signature="obj",
 setGeneric("getPromoterRegionsAllGenes",signature="obj",
            function(obj ,size.upstream=10000 , size.downstream=10000 , use_gene_ids = TRUE )
                standardGeneric("getPromoterRegionsAllGenes"))
-#' @export
-setGeneric("mapMotifsToTFsMergeIntoTable",signature="obj",
-           function(obj, tbl) standardGeneric("mapMotifsToTFsMergeIntoTable"))
 #----------------------------------------------------------------------------------------------------
 .parseDatabaseUri <- function(database.uri)
 {
@@ -546,56 +543,4 @@ setMethod("getPromoterRegionsAllGenes","FootprintFinder",
    return( gr )
 
 }) # getPromoterRegionsAllGenes
-#----------------------------------------------------------------------------------------------------
-#' Map Motifs to Transcription Factors and Merge into a Table
-#'
-#' Using the motifsgenes table inside the genome database specified by the FootprintFinder object,
-#' return a table mapping each motif to transcription factors
-#'
-#' @rdname mapMotifsToTFsMergeIntoTable
-#' @aliases mapMotifsToTFsMergeIntoTable
-#'
-#' @param obj An object of class FootprintFinder
-#' @param tbl A dataframe of footprints, generally obtained using \code{\link{getFootprintsInRegion}}
-#' or \code{\link{getFootprintsForGene}}
-#'
-#' @return A data frame containing the motifs from the supplied footprints table and the transcription
-#' factors they map to
-#'
-#' @export
-#'
-#' @family FootprintFinder methods
-#'
-#' @examples
-#' db.address <- system.file(package="trena", "extdata")
-#' genome.db.uri <- paste("sqlite:/",db.address,"genome.sub.db", sep = "/")
-#' project.db.uri <- paste("sqlite:/",db.address,"project.sub.db", sep = "/")
-#' fp <- FootprintFinder(genome.db.uri, project.db.uri)
-#'
-#' footprints <- getFootprintsForGene(fp, gene = "MEF2C")
-#' tfs <- mapMotifsToTFsMergeIntoTable(fp, footprints)
-
-setMethod("mapMotifsToTFsMergeIntoTable", "FootprintFinder",
-
-   function(obj, tbl){
-      motifs <- unique(tbl$name)
-      if(length(motifs) == 0)
-         return(tbl)
-      collected.motifs <- sprintf("('%s')", paste(motifs, collapse="','"))
-      query.string <- sprintf("select * from motifsgenes where motif in %s", collected.motifs)
-      tbl.mtf <- DBI::dbGetQuery(obj@genome.db, query.string)
-      tfsCollapsed <- unlist(lapply(tbl$name, function(name) paste(subset(tbl.mtf, motif==name)$tf, collapse=";")))
-      tbl$tf <- tfsCollapsed
-      tbl <- tbl[, c("chrom", "start", "endpos", "name",
-                     "length", "strand", "sample_id", "score1",
-                     "score2", "score3", "tf")]
-      colnames(tbl) <- c("chrom", "start", "end", "motifName",
-                         "length", "strand", "sample_id","score1",
-                         "score2", "score3", "tf")
-      signature <- with(tbl, sprintf("%s:%d-%d-%s-%s-%d", chrom, start, end, motifName, strand, length))
-      deleters <- which(duplicated(signature))
-      if(length(deleters) > 0)
-         tbl <- tbl[-deleters,]
-      invisible(tbl)
-      })
 #----------------------------------------------------------------------------------------------------
