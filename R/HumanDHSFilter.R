@@ -22,8 +22,7 @@
                                        encodeTableName="character",
                                        pwmMatchPercentageThreshold="numeric",
                                        geneInfoDatabase.uri="character",   # access to gtf database
-                                       geneCenteredSpec="list",
-                                       regionsSpec="character",
+                                       regions="data.frame",
                                        variants="character",
                                        pfms="list",
                                        quiet="logical"))
@@ -35,8 +34,6 @@ setGeneric("getEncodeRegulatoryTableNames", signature="obj", function(obj) stand
 setGeneric("getRegulatoryRegions", signature="obj",
            function(obj, encode.table.name, chromosome, start, end, score.threshold=200, quiet=TRUE)
                standardGeneric ("getRegulatoryRegions"))
-setGeneric("getSequence_tmp", signature="obj", function(obj, tbl.regions) standardGeneric ("getSequence_tmp"))
-setGeneric("geneSymbolToTSS", signature="obj", function(obj, geneSymbol) standardGeneric("geneSymbolToTSS"))
 #----------------------------------------------------------------------------------------------------
 #' Create a CandidateFilter using Human DNAse Hypersensitivity
 #'
@@ -45,7 +42,6 @@ setGeneric("geneSymbolToTSS", signature="obj", function(obj, geneSymbol) standar
 #' @param encodeTableName (default = "wgEncodeRegDnaseClustered")
 #' @param pwmMatchPercentageThreshold A numeric from 0-100 to serve as a threshold for a match
 #' @param geneInfoDatabase.uri An address for a gene database
-#' @param geneCenteredSpec A gene-centered spec
 #' @param regionsSpec A regions spec
 #' @param variants Variants
 #' @param quiet A logical denoting whether or not the solver should print output
@@ -69,20 +65,16 @@ setGeneric("geneSymbolToTSS", signature="obj", function(obj, geneSymbol) standar
 #' tssUpstream=promoter.length,tssDownstream=promoter.length)
 #'
 #' hd.filter <- HumanDHSFilter(genome, pwmMatchPercentageThreshold = 85,
-#' geneInfoDatabase.uri = genome.db.uri, geneCenteredSpec = gene.spec)
+#' geneInfoDatabase.uri = genome.db.uri, regions = tbl.regions)
 
 HumanDHSFilter <- function(genomeName,
                            encodeTableName="wgEncodeRegDnaseClustered",
-                           #fimoDatabase.uri,
                            pwmMatchPercentageThreshold,
                            geneInfoDatabase.uri,
-                           geneCenteredSpec=list(),
-                           regionsSpec=list(),
+                           regions,
                            variants=NA_character_,
                            quiet=TRUE)
 {
-    regions <- c();   # one or more chromLoc strings: "chr5:88903257-88905257"
-
     uri <- "http://jaspar.genereg.net/html/DOWNLOAD/JASPAR_CORE/pfm/nonredundant/pfm_vertebrates.txt"
     x <- .readRawJasparMatrices(uri)
          # normalize, so that a frequency sum of 1.0 is true across the 4 possible bases at each position
@@ -103,13 +95,11 @@ HumanDHSFilter <- function(genomeName,
 
    .HumanDHSFilter(CandidateFilter(quiet = quiet),
                    genomeName=genomeName,
-                   #fimoDB=fimo.db,
                    pwmMatchPercentageThreshold=pwmMatchPercentageThreshold,
                    encodeTableName=encodeTableName,
                    geneInfoDatabase.uri=geneInfoDatabase.uri,
                    genome=reference.genome,
-                   geneCenteredSpec=geneCenteredSpec,
-                   regionsSpec=regionsSpec,
+                   regions=regions,
                    variants=variants,
                    pfms=pfms,
                    quiet=quiet)
@@ -142,7 +132,7 @@ HumanDHSFilter <- function(genomeName,
 #' tssUpstream=promoter.length,tssDownstream=promoter.length)
 #'
 #' hd.filter <- HumanDHSFilter(genome, pwmMatchPercentageThreshold = 85,
-#' geneInfoDatabase.uri = genome.db.uri, geneCenteredSpec = gene.spec)
+#' geneInfoDatabase.uri = genome.db.uri, regions = tbl.regions)
 #'
 #' getEncodeRegulatoryTableNames(hd.filter)
 
@@ -194,7 +184,7 @@ setMethod("getEncodeRegulatoryTableNames", "HumanDHSFilter",
 #' tssUpstream=promoter.length,tssDownstream=promoter.length)
 #'
 #' hd.filter <- HumanDHSFilter(genome, pwmMatchPercentageThreshold = 85,
-#' geneInfoDatabase.uri = genome.db.uri, geneCenteredSpec = gene.spec)
+#' geneInfoDatabase.uri = genome.db.uri, regions = tbl.regions)
 #'
 #' show(hd.filter)
 
@@ -233,36 +223,36 @@ setMethod("show", "HumanDHSFilter",
 #' tssUpstream=promoter.length,tssDownstream=promoter.length)
 #'
 #' hd.filter <- HumanDHSFilter(genome, pwmMatchPercentageThreshold = 85,
-#' geneInfoDatabase.uri = genome.db.uri, geneCenteredSpec = gene.spec)
+#' geneInfoDatabase.uri = genome.db.uri, regions = tbl.regions)
 #'
 #' geneSymbolToTSS(hd.filter, "VRK2")
 
-setMethod("geneSymbolToTSS", "HumanDHSFilter",
-
-     function(obj, geneSymbol){
-        geneInfo.db.info <- parseDatabaseUri(obj@geneInfoDatabase.uri)
-        host <- geneInfo.db.info$host
-        dbname <- geneInfo.db.info$name
-        if(geneInfo.db.info$brand == "postgres"){
-            db.geneInfo <- DBI::dbConnect(RPostgreSQL::PostgreSQL(),
-                                          user= "trena",
-                                          password="trena",
-                                          dbname=dbname,
-                                          host=host)}
-        if(geneInfo.db.info$brand == "sqlite"){
-            db.geneInfo <- DBI::dbConnect(RSQLite::SQLite(),
-                                          dbname = paste(host, dbname, sep = "/"))}
-        #print(dbListTables(db.geneInfo))
-        #db.gtf <- dbConnect(PostgreSQL(), user= "trena", password="trena", dbname="gtf", host="whovian")
-        query <- sprintf("select * from gtf where moleculetype='gene' and gene_biotype='protein_coding' and gene_name='%s'",
-                         obj@geneCenteredSpec$targetGene)
-        tbl <- dbGetQuery(db.geneInfo, query);
-        tss <- tbl$start[1];
-        chrom <- tbl$chr
-        DBI::dbDisconnect(db.geneInfo)
-        list(chrom=chrom, tss=tss)
-        })
-
+# setMethod("geneSymbolToTSS", "HumanDHSFilter",
+#
+#      function(obj, geneSymbol){
+#         geneInfo.db.info <- parseDatabaseUri(obj@geneInfoDatabase.uri)
+#         host <- geneInfo.db.info$host
+#         dbname <- geneInfo.db.info$name
+#         if(geneInfo.db.info$brand == "postgres"){
+#             db.geneInfo <- DBI::dbConnect(RPostgreSQL::PostgreSQL(),
+#                                           user= "trena",
+#                                           password="trena",
+#                                           dbname=dbname,
+#                                           host=host)}
+#         if(geneInfo.db.info$brand == "sqlite"){
+#             db.geneInfo <- DBI::dbConnect(RSQLite::SQLite(),
+#                                           dbname = paste(host, dbname, sep = "/"))}
+#         #print(dbListTables(db.geneInfo))
+#         #db.gtf <- dbConnect(PostgreSQL(), user= "trena", password="trena", dbname="gtf", host="whovian")
+#         query <- sprintf("select * from gtf where moleculetype='gene' and gene_biotype='protein_coding' and gene_name='%s'",
+#                          obj@geneCenteredSpec$targetGene)
+#         tbl <- dbGetQuery(db.geneInfo, query);
+#         tss <- tbl$start[1];
+#         chrom <- tbl$chr
+#         DBI::dbDisconnect(db.geneInfo)
+#         list(chrom=chrom, tss=tss)
+#         })
+#
 #----------------------------------------------------------------------------------------------------
 #' Get candidate genes using a human DHS filter
 #'
@@ -300,33 +290,13 @@ setMethod("getCandidates", "HumanDHSFilter",
 
     function(obj){
 
-       regions <- c();   # one or more chromLoc strings: "chr5:88903257-88905257"
-
-         # if present, extract a region from the geneCenteredSpec
-       if(length(obj@geneCenteredSpec) == 3){
-          expected.fields <- c("targetGene", "tssUpstream", "tssDownstream")
-          stopifnot(all(expected.fields %in% names(obj@geneCenteredSpec)))
-          x <- geneSymbolToTSS(obj)
-          start <- x$tss - obj@geneCenteredSpec$tssUpstream
-          end <- x$tss + obj@geneCenteredSpec$tssDownstream
-          new.region.chromLocString <- sprintf("%s:%d-%d", x$chrom, start, end)
-          regions <- c(regions, new.region.chromLocString)
-          }
-
-          # are there any explicit regions to include?
-       if(!(all(is.na(obj@regionsSpec)))){
-          regions <- c(regions, obj@regionsSpec)
-          }
+       tbl.regions <- obj@regions
 
        if(!obj@quiet){
           printf("HumanDHSFilter::getCandidates, from these regions:");
-          print(regions)
+          print(tbl.regions)
           }
 
-       tbl.regions <- as.data.frame(do.call("rbind", lapply(regions, function(region) parseChromLocString(region))))
-       tbl.regions$chrom <- as.character(tbl.regions$chrom)
-       tbl.regions$start <- as.integer(tbl.regions$start)
-       tbl.regions$end <- as.integer(tbl.regions$end)
        tbl.dhs <- data.frame()
 
        if(!obj@quiet){
@@ -393,7 +363,7 @@ setMethod("getCandidates", "HumanDHSFilter",
 #' tssUpstream=promoter.length,tssDownstream=promoter.length)
 #'
 #' hd.filter <- HumanDHSFilter(genome, pwmMatchPercentageThreshold = 85,
-#' geneInfoDatabase.uri = genome.db.uri, geneCenteredSpec = gene.spec)
+#' geneInfoDatabase.uri = genome.db.uri, regions = tbl.regions)
 #'
 #' chrom <- "chr2"
 #' rs13384219.loc <- 57907323
@@ -483,8 +453,6 @@ setMethod("getRegulatoryRegions", "HumanDHSFilter",
       colnames(tbl.regions)[match("name", colnames(tbl.regions))] <- "count"
       }
 
-   #tbl.regions$motif.start <- -1 + tbl.regions$regionStart + motif.start
-   #tbl.regions$motif.end <- -1 + tbl.regions$regionEnd + motif.end
    invisible(tbl.regions[, c("chrom", "chromStart", "chromEnd",  "count", "score")])
 
    }) # getRegulatoryRegions

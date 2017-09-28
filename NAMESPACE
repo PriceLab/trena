@@ -50,7 +50,6 @@ exportMethods(
     getSequence,
     getEncodeRegulatoryTableNames,
     getRegulatoryRegions,
-    geneSymbolToTSS,
     getPfms,
     findMatchesByChromosomalRegion,
 
