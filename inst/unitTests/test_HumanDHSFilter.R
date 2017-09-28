@@ -139,7 +139,7 @@ test_getEncodeRegulatoryTableNames <- function()
 
 } # test_getEncodeRegulatoryTableNames
 #----------------------------------------------------------------------------------------------------
-test_checkSampleOfEncodeTables <- function(quiet=FALSE)
+test_checkSampleOfEncodeTables <- function(quiet=TRUE)
 {
    printf("--- test_checkSampleOfEncodeTables")
 
@@ -171,7 +171,7 @@ test_checkSampleOfEncodeTables <- function(quiet=FALSE)
    for(tableName in selectedTableNames){
       #printf("tableName: %s", tableName)
       tbl <-getRegulatoryRegions(hdf, tableName, chrom, start, end)
-      if(!quiet) printf("    --- %s: %d rows", tableName, nrow(tbl))
+      if(!quiet) printf("--- %s: %d rows", tableName, nrow(tbl))
       checkTrue(nrow(tbl) >= 0)
       checkEquals(colnames(tbl), c("chrom", "chromStart", "chromEnd",  "count",  "score"))
       }

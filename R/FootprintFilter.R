@@ -18,7 +18,7 @@
 .FootprintFilter <- setClass("FootprintFilter", contains = "CandidateFilter",
                              slots=list(genomeDB="character",
                                         footprintDB="character",
-                                        regions="character",
+                                        regions="data.frame",
                                         footprintFinder="FootprintFinder")
                              )
 
@@ -65,31 +65,8 @@ printf <- function(...) print(noquote(sprintf(...)))
 #' footprint.filter <- FootprintFilter(genomeDB = genome.db.uri, footprintDB = project.db.uri,
 #' geneCenteredSpec = geneCenteredSpec)
 
-FootprintFilter <- function(genomeDB, footprintDB, geneCenteredSpec=list(),
-                            regionsSpec=list(), quiet=TRUE)
+FootprintFilter <- function(genomeDB, footprintDB, regions=data.frame(), quiet=TRUE)
 {
-   regions <- c();   # one or more chromLoc strings: "chr5:88903257-88905257"
-
-    if(length(geneCenteredSpec) == 3){
-        fpFinder <- FootprintFinder(genomeDB, footprintDB, quiet=quiet)
-
-        new.region <- with(geneCenteredSpec,
-                           getGenePromoterRegion(fpFinder,
-                                                 targetGene,
-                                                 tssUpstream,
-                                                 tssDownstream))
-        if(class(new.region) == "list"){
-            new.region.chromLocString <- with(new.region, sprintf("%s:%d-%d", chr, start, end))
-            regions <- c(regions, new.region.chromLocString)
-        } else {
-            warning("No regions found for supplied gene-centered spec")
-            regions <- c()
-        }
-        closeDatabaseConnections(fpFinder)
-    }
-
-   if(length(regionsSpec) > 0)
-      regions <- c(regions, regionsSpec)
 
    .FootprintFilter(CandidateFilter(quiet = quiet),
                     genomeDB=genomeDB,
@@ -147,8 +124,10 @@ setMethod("getCandidates", "FootprintFilter",
          fp <- FootprintFinder(obj@genomeDB, obj@footprintDB)
          tbl.out <- data.frame()
 
-        for(region in obj@regions){
-           chromLoc <- parseChromLocString(region)
+        #for(region in obj@regions){
+           #chromLoc <- parseChromLocString(region)
+        for(r in 1:nrow(obj@regions)){
+           chromLoc <- as.list(obj@regions[r,])
            if(!obj@quiet) printf(" FootprintFilter::getCandidates, getFootprintsInRegion %s", region)
            tbl.fp <- try(with(chromLoc, getFootprintsInRegion(fp, chrom, start, end)))
            if(class(tbl.fp) == "try-error"){
@@ -158,22 +137,8 @@ setMethod("getCandidates", "FootprintFilter",
               }
            tbl.out <- rbind(tbl.out, tbl.fp)
            } # for region
-           #if(!(class(tbl.fp) == "try-error")){
-           #   tbl.out <- rbind(tbl.out, mapMotifsToTFsMergeIntoTable(fp, tbl.fp))
-           #   }
-           #else{
-           #  warning("FootprintFinder error with region %s", region)
-           #  closeDatabaseConnections(fp)
-           #  return(NULL)
-           #   }
-           #} # for region
 
         closeDatabaseConnections(fp)
-                # Intersect the footprints with the rows in the matrix
-        #candidate.tfs <- NA_character_
-        #if(nrow(tbl.out) > 0)
-        #   candidate.tfs <- sort(unique(unlist(strsplit(tbl.fp$tf, ";"))))
-        #return(list("tfs" = candidate.tfs, "tbl" = tbl.out))
         tbl.out
         }) # getCandidates
 

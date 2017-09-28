@@ -58,18 +58,18 @@ setGeneric("getPromoterRegionsAllGenes",signature="obj",
            function(obj ,size.upstream=10000 , size.downstream=10000 , use_gene_ids = TRUE )
                standardGeneric("getPromoterRegionsAllGenes"))
 #----------------------------------------------------------------------------------------------------
-.parseDatabaseUri <- function(database.uri)
-{
-   topLevel.tokens <- strsplit(database.uri, "://")[[1]]
-   database.brand <- topLevel.tokens[1]
-   #secondLevel.tokens <- strsplit(topLevel.tokens[2], "/")[[1]]
-   secondLevel.tokens <- strsplit(topLevel.tokens[2], "/(?=[^/]+$)", perl = TRUE)[[1]]
-   host <- secondLevel.tokens[1]
-   database.name <- secondLevel.tokens[2]
-
-   list(brand=database.brand, host=host, name=database.name)
-
-} # .parseDatabaseUri
+# .parseDatabaseUri <- function(database.uri)
+# {
+#    topLevel.tokens <- strsplit(database.uri, "://")[[1]]
+#    database.brand <- topLevel.tokens[1]
+#    #secondLevel.tokens <- strsplit(topLevel.tokens[2], "/")[[1]]
+#    secondLevel.tokens <- strsplit(topLevel.tokens[2], "/(?=[^/]+$)", perl = TRUE)[[1]]
+#    host <- secondLevel.tokens[1]
+#    database.name <- secondLevel.tokens[2]
+#
+#    list(brand=database.brand, host=host, name=database.name)
+#
+# } # .parseDatabaseUri
 #----------------------------------------------------------------------------------------------------
 #' @title Class FootprintFinder
 #' @name FootprintFinder-class
@@ -99,8 +99,8 @@ setGeneric("getPromoterRegionsAllGenes",signature="obj",
 
 FootprintFinder <- function(genome.database.uri, project.database.uri, quiet=TRUE)
 {
-   genome.db.info <- .parseDatabaseUri(genome.database.uri)
-   project.db.info <- .parseDatabaseUri(project.database.uri)
+   genome.db.info <- parseDatabaseUri(genome.database.uri)
+   project.db.info <- parseDatabaseUri(project.database.uri)
    stopifnot(genome.db.info$brand %in% c("postgres","sqlite"))
 
 

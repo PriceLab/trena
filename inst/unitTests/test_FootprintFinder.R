@@ -6,7 +6,7 @@ printf <- function(...) print(noquote(sprintf(...)))
 #----------------------------------------------------------------------------------------------------
 runTests <- function()
 {
-   test_.parseDatabaseUri()
+   test_parseDatabaseUri()
    test_constructor()
    test_getGtfGeneBioTypes()
    test_getGtfMoleculeTypes()
@@ -18,24 +18,24 @@ runTests <- function()
 
 } # runTests
 #----------------------------------------------------------------------------------------------------
-test_.parseDatabaseUri <- function()
+test_parseDatabaseUri <- function()
 {
-   printf("--- test_.parseDatabaseUri")
+   printf("--- test_parseDatabaseUri")
    db.address <- system.file(package="trena", "extdata")
    genome.db.uri <- paste("sqlite:/",db.address,"genome.sub.db", sep = "/")
    project.db.uri <- paste("sqlite:/",db.address,"project.sub.db", sep = "/")
 
-   x <- trena:::.parseDatabaseUri(genome.db.uri)
+   x <- trena:::parseDatabaseUri(genome.db.uri)
    checkEquals(x$brand, "sqlite")
    checkEquals(x$host,  db.address)
    checkEquals(x$name,  "genome.sub.db")
 
-   x <- trena:::.parseDatabaseUri(project.db.uri)
+   x <- trena:::parseDatabaseUri(project.db.uri)
    checkEquals(x$brand, "sqlite")
    checkEquals(x$host,  db.address)
    checkEquals(x$name,  "project.sub.db")
 
-} # test_.parseDatabaseUri
+} # test_parseDatabaseUri
 #----------------------------------------------------------------------------------------------------
 test_constructor <- function()
 {
