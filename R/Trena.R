@@ -221,7 +221,8 @@ setMethod('getGeneModelTableColumnNames', 'Trena',
 .callFootprintFilter <- function(obj, source, chromosome, chromStart, chromEnd, targetGene, targetGeneTSS)
 {
     chromLocString <- sprintf("%s:%d-%d", chromosome, chromStart, chromEnd)
-    fpFilter <- FootprintFilter(genome.db.uri, source,  geneCenteredSpec=list(), regionsSpec=chromLocString)
+    fpFilter <- FootprintFilter(genome.db.uri, source,
+                                regions=data.frame(chrom=chromosome, start=chromStart, end=chromEnd, stringsAsFactors=FALSE))
     tbl.fp <- getCandidates(fpFilter)
 
     if(nrow(tbl.fp) == 0){
@@ -254,8 +255,10 @@ setMethod('getGeneModelTableColumnNames', 'Trena',
                                 encodeTableName="wgEncodeRegDnaseClustered",
                                 pwmMatchPercentageThreshold=85L,
                                 geneInfoDatabase.uri=genome.db.uri,
-                                geneCenteredSpec=list(),
-                                regionsSpec=chromLocString)
+                                regions=data.frame(chrom=chromosome,
+                                                   start=chromStart,
+                                                   end=chromEnd,
+                                                   stringsAsFactors=FALSE))
 
     tbl.dhs <- getCandidates(dhsFilter)
     if(nrow(tbl.dhs) == 0)
