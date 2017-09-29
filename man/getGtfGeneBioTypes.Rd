@@ -35,6 +35,5 @@ Other FootprintFinder methods: \code{\link{FootprintFinder-class}},
   \code{\link{getFootprintsInRegion,FootprintFinder-method}},
   \code{\link{getGenePromoterRegion,FootprintFinder-method}},
   \code{\link{getGtfMoleculeTypes,FootprintFinder-method}},
-  \code{\link{getPromoterRegionsAllGenes,FootprintFinder-method}},
-  \code{\link{mapMotifsToTFsMergeIntoTable,FootprintFinder-method}}
+  \code{\link{getPromoterRegionsAllGenes,FootprintFinder-method}}
 }

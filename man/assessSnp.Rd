@@ -18,7 +18,7 @@ assessSnp(obj, pfms, variant, shoulder, pwmMatchMinimumAsPercentage,
 
 \item{pwmMatchMinimumAsPercentage}{A minimum match percentage for the  motifs}
 
-\item{genomeName}{A genome name (one of "hg38", "hg19", "mm10")}
+\item{relaxedMatchDelta}{A numeric indicating the degree of the match (default = 25)}
 }
 \value{
 A data frame containing the gene model

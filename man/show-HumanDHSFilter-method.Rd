@@ -30,7 +30,7 @@ gene.spec=list(targetGene=target.gene,
 tssUpstream=promoter.length,tssDownstream=promoter.length)
 
 hd.filter <- HumanDHSFilter(genome, pwmMatchPercentageThreshold = 85,
-geneInfoDatabase.uri = genome.db.uri, geneCenteredSpec = gene.spec)
+geneInfoDatabase.uri = genome.db.uri, regions = tbl.regions)
 
 show(hd.filter)
 }

@@ -10,7 +10,7 @@
                        genomeName="character",
                        quiet="logical")
                         )
-#------------------------------------------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------------
 #' Get the regulatory chromosomal regions for a Trena object
 #'
 #' @rdname getRegulatoryChromosomalRegions
@@ -25,7 +25,6 @@
 #' @param targetGene A target gene of interest
 #' @param targetGeneTSS An integer giving the location of the target gene's transcription start site
 #' @param combine A logical indicating whether or not to combine the output into one data frame (default = FALSE)
-#' @param quiet A logical indicating whether or not the method should print output (default = FALSE)
 #'
 #' @export
 #'
@@ -133,8 +132,6 @@ setGeneric('getGeneModelTableColumnNames',  signature='obj', function(obj) stand
 setGeneric('createGeneModel', signature='obj', function(obj, targetGene,  solverNames, tbl.regulatoryRegions, mtx)
     standardGeneric('createGeneModel'))
 
-#setGeneric('addGeneModelLayout', signature='obj', function(obj, g, xPos.span=1500) standardGeneric('addGeneModelLayout'))
-
 #' Assess the effect of a SNP using a Trena object
 #'
 #' @rdname assessSnp
@@ -145,7 +142,7 @@ setGeneric('createGeneModel', signature='obj', function(obj, targetGene,  solver
 #' @param variant A variant of interest
 #' @param shoulder A distance from the TSS to use as a window
 #' @param pwmMatchMinimumAsPercentage A minimum match percentage for the  motifs
-#' @param genomeName A genome name (one of "hg38", "hg19", "mm10")
+#' @param relaxedMatchDelta A numeric indicating the degree of the match (default = 25)
 #'
 #' @return A data frame containing the gene model
 #'
@@ -166,10 +163,10 @@ setGeneric('createGeneModel', signature='obj', function(obj, targetGene,  solver
 
 setGeneric('assessSnp', signature='obj', function(obj, pfms, variant, shoulder, pwmMatchMinimumAsPercentage, relaxedMatchDelta=25)
               standardGeneric('assessSnp'))
-#------------------------------------------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------------
 # a temporary hack: some constants
 genome.db.uri <- "postgres://bddsrds.globusgenomics.org/hg38"   # has gtf and motifsgenes tables
-#------------------------------------------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------------
 #' Define an object of class Trena
 #'
 #' @description
@@ -177,6 +174,8 @@ genome.db.uri <- "postgres://bddsrds.globusgenomics.org/hg38"   # has gtf and mo
 #' package. Given a particular genome (one of \code{c("hg19","hg38","mm10")}, the Trena class provides methods to
 #' retrieve information about possible regulators for a target gene, assess the effects of SNPs, and create gene models
 #' using the flexible \code{\link{EnsembleSolver}} class.
+#'
+#' @rdname Trena-class
 #'
 #' @param genomeName A string indicating the genome used by the Trena object. Currently, only human and mouse ("hg19",
 #' "hg38","mm10") are supported
@@ -203,21 +202,21 @@ Trena = function(genomeName, quiet=TRUE)
    obj
 
 } # constructor
-#------------------------------------------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------------
 setMethod('getRegulatoryTableColumnNames', 'Trena',
 
       function(obj){
          c("chrom", "motifStart", "motifEnd", "motifName", "strand", "score", "length", "distance.from.tss", "id")
          })
 
-#------------------------------------------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------------
 setMethod('getGeneModelTableColumnNames', 'Trena',
 
       function(obj){
          c("tf", "randomForest", "pearson", "spearman", "betaLasso", "pcaMax", "concordance")
          })
 
-#------------------------------------------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------------
 .callFootprintFilter <- function(obj, source, chromosome, chromStart, chromEnd, targetGene, targetGeneTSS)
 {
     chromLocString <- sprintf("%s:%d-%d", chromosome, chromStart, chromEnd)
@@ -246,7 +245,7 @@ setMethod('getGeneModelTableColumnNames', 'Trena',
     tbl.fp
 
 } # .callFootprintFilter
-#------------------------------------------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------------
 .callHumanDHSFilter <- function(obj, chromosome, chromStart, chromEnd, targetGene, targetGeneTSS)
 {
     if(!obj@quiet) printf("--- in .callHumanDHS")
@@ -279,7 +278,7 @@ setMethod('getGeneModelTableColumnNames', 'Trena',
     tbl.dhs
 
 } # .callHumanDHSFilter
-#------------------------------------------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------------
 setMethod('getRegulatoryChromosomalRegions', 'Trena',
 
     function(obj, chromosome, chromStart, chromEnd, regulatoryRegionSources, targetGene, targetGeneTSS,
@@ -318,7 +317,7 @@ setMethod('getRegulatoryChromosomalRegions', 'Trena',
          result
          }) # getRegulatoryChromosomalRegions
 
-#------------------------------------------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------------
 setMethod('createGeneModel', 'Trena',
 
       function(obj, targetGene, solverNames, tbl.regulatoryRegions, mtx){
@@ -339,7 +338,7 @@ setMethod('createGeneModel', 'Trena',
          tbl.model
       }) # createGeneModel
 
-#------------------------------------------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------------
 setMethod('assessSnp', 'Trena',
 
      function(obj, pfms, variant, shoulder, pwmMatchMinimumAsPercentage, relaxedMatchDelta=25){
@@ -443,4 +442,4 @@ setMethod('assessSnp', 'Trena',
         tbl
         }) # assessSnp
 
-#------------------------------------------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------------

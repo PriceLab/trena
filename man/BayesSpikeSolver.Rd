@@ -36,7 +36,7 @@ bayes.solver <- BayesSpikeSolver(mtx.sub, target.gene, tfs)
 \code{\link{solve.BayesSpike}}, \code{\link{getAssayData}}
 
 Other Solver class objects: \code{\link{EnsembleSolver}},
-  \code{\link{HumanDHSFilter}},
+  \code{\link{HumanDHSFilter-class}},
   \code{\link{LassoPVSolver}}, \code{\link{LassoSolver}},
   \code{\link{PearsonSolver}},
   \code{\link{RandomForestSolver}},

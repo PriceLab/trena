@@ -22,8 +22,6 @@ example below). If unspecified, the motifs will default to all vertebrates in th
 database (default = list())}
 
 \item{quiet}{A logical denoting whether or not the MotifMatcher object should print output}
-
-\item{name}{A character string used to name a given MotifMatcher object (default = NA_character_)}
 }
 \value{
 An object of the MotifMatcher class
@@ -38,10 +36,10 @@ search for. Ordinarily this class is primarily used by the HumanDHSFilter, but c
 be used to search for motifs in a given genome without any filtering functionality.
 }
 \examples{
-# Specify the name, genome, and motif list to create a MotifMatcher for only human motifs
+# Specify the genome, and motif list to create a MotifMatcher for only human motifs
 library(MotifDb)
 mm <- MotifMatcher( genomeName="hg38",
-pfms=as.list(query(MotifDb, "sapiens")))
+pfms = as.list(query(MotifDb, "sapiens")))
 }
 \seealso{
 \code{\link{HumanDHSFilter}}

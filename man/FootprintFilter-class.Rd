@@ -8,28 +8,15 @@
 \alias{FootprintFilter}
 \title{Create a FootprintFilter object}
 \usage{
-FootprintFilter(genomeDB, footprintDB, geneCenteredSpec = list(),
-  regionsSpec = list(), quiet = TRUE)
+FootprintFilter(genomeDB, footprintDB, regions = data.frame(), quiet = TRUE)
 }
 \arguments{
 \item{genomeDB}{A connection to a database that contains genome information}
 
 \item{footprintDB}{A connection to a database that contains footprint information}
 
-\item{geneCenteredSpec}{A named list that specifies the regions of interest using a target gene
-and upstream/downstream sizes. If specified,it t should contain the following fields
-(default = list()):
-\itemize{
-\item{"targetGene" A designated target gene that should be part of the mtx.assay data}
-\item{"tssUpstream" An integer denoting the distance upstream of the target gene
-to look for footprints}
-\item{"tssDownstream" An integer denoting the distance downstream of the target gene
-to look for footprints}
-}}
-
-\item{regionsSpec}{A character vector that specifies the regions of interest directly, using a
-string containing chromosome number, starting position, and ending position. The string should
-be formatted as follows: "chr##:start-end" (e.g. "chr1:10000-20000"). (default = list())}
+\item{regions}{A data frame that specifies the regions of interest
+(default = data.frame())}
 
 \item{quiet}{A logical denoting whether or not the filter should print output}
 }
@@ -53,7 +40,7 @@ size.downstream <- 1000
 geneCenteredSpec <- list(targetGene = target.gene, tssUpstream = size.upstream,
 tssDownstream = size.downstream)
 footprint.filter <- FootprintFilter(genomeDB = genome.db.uri, footprintDB = project.db.uri,
-geneCenteredSpec = geneCenteredSpec)
+regions = regions)
 }
 \seealso{
 \code{\link{getCandidates-FootprintFilter}}

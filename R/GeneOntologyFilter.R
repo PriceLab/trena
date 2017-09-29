@@ -9,7 +9,6 @@
 #' @import methods
 #' @import org.Hs.eg.db
 #'
-#' @name GeneOntologyFilter-class
 #' @rdname GeneOntologyFilter-class
 #' @aliases GeneOntologyFilter
 #----------------------------------------------------------------------------------------------------
@@ -42,6 +41,8 @@ printf <- function(...) print(noquote(sprintf(...)))
 #'
 #' @export
 #'
+#' @rdname GeneOntologyFilter-class
+#' 
 #' @examples
 #' # Make a filter for "transcription, DNA-templated"
 #' library(org.Hs.eg.db)

@@ -30,7 +30,7 @@ size.upstream <- 1000
 size.downstream <- 1000
 geneCenteredSpec <- list(targetGene = target.gene, tssUpstream = size.upstream, tssDownstream = size.downstream)
 footprint.filter <- FootprintFilter(genomeDB = genome.db.uri, footprintDB = project.db.uri,
-geneCenteredSpec = geneCenteredSpec)
+regions = regions)
 tfs <- getCandidates(footprint.filter)
 
 # Perform the same operation, but use a region spec
@@ -49,6 +49,5 @@ tfs <- getCandidates(footprint.filter)
 Other getCandidate Methods: \code{\link{getCandidates,GeneOntologyFilter-method}},
   \code{\link{getCandidates,HumanDHSFilter-method}},
   \code{\link{getCandidates,VarianceFilter-method}},
-  \code{\link{getCandidates}},
-  \code{\link{getRegulatoryRegions,HumanDHSFilter-method}}
+  \code{\link{getCandidates}}
 }

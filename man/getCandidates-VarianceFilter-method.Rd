@@ -31,6 +31,5 @@ tfs <- getCandidates(variance.filter)
 Other getCandidate Methods: \code{\link{getCandidates,FootprintFilter-method}},
   \code{\link{getCandidates,GeneOntologyFilter-method}},
   \code{\link{getCandidates,HumanDHSFilter-method}},
-  \code{\link{getCandidates}},
-  \code{\link{getRegulatoryRegions,HumanDHSFilter-method}}
+  \code{\link{getCandidates}}
 }

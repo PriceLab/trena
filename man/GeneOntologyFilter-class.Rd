@@ -5,9 +5,35 @@
 \alias{GeneOntologyFilter-class}
 \alias{.GeneOntologyFilter}
 \alias{GeneOntologyFilter}
+\alias{GeneOntologyFilter}
 \title{Create a GeneOntologyFilter object}
+\usage{
+GeneOntologyFilter(organismDatabase = org.Hs.eg.db::org.Hs.eg.db,
+  GOTerm = "GO:0006351", quiet = TRUE)
+}
+\arguments{
+\item{organismDatabase}{An organism-specific database of type 'OrgDb'}
+
+\item{GOTerm}{A character matching an accepted gene ontology term. The default term corresponds
+to "transcription, DNA-templated". (default="GO:0006351")}
+
+\item{quiet}{A logical denoting whether or not the filter should print output}
+}
+\value{
+A GeneOntologyFilter object
+}
 \description{
 A GeneOntologyFilter object allows for filtering based on gene ontology (GO) terms. Its
 associated \code{getCandidates} method uses an organism database and a GO term (e.g. GO:#######)
 to filter a list of possible regulators factors to those that match the GO term.
+
+Create a CandidateFilter using Gene Ontology
+}
+\examples{
+# Make a filter for "transcription, DNA-templated"
+library(org.Hs.eg.db)
+goFilter <- GeneOntologyFilter(org.Hs.eg.db, GOTerm="GO:0006351")
+}
+\seealso{
+\code{\link{CandidateFilter}}
 }
