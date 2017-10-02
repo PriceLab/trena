@@ -489,6 +489,13 @@ setMethod("getPfms", "MotifMatcher",
 setMethod(".parseVariantString", "MotifMatcher",
 
     function(obj, variantString) {
+           # quick sanity check to detect obvious errors in the variant string
+       is.rsid <- grepl("^rs", variantString)
+       is.explicit.chromLoc <- grepl("^chr", variantString) &&
+                               length(strsplit(variantString, ":")[[1]]) == 4
+       is.plausible.variant.string <- is.rsid || is.explicit.chromLoc
+       if(!is.plausible.variant.string)
+          stop(sprintf("variant '%s' is neither a plausible rsID nor an explicit chrom:loc:ref:var", variantString))
        if(grepl("^rs", variantString)){
           explicitly.specified.alternate.allele <- NA
           tokens <- strsplit(variantString, ":")[[1]]
