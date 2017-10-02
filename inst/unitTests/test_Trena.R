@@ -285,3 +285,53 @@ test_assessSnp_allTypesWithDeltas <- function()
 
 } # test_assessSnp_allTypesWithDeltas
 #------------------------------------------------------------------------------------------------------------------------
+test_getProximalPromoterHuman <- function()
+{
+    printf("--- test_getProximalPromoterHuman")
+
+    trena <- Trena("hg38")
+
+    # Designate the MEF2C gene and a shoulder size of 1000
+    geneSymbol <- "MEF2C"
+    tssUpstream <- 1000
+    tssDownstream <- 1000
+
+    # Pull the regions for MEF2C
+    regions <- getProximalPromoter(trena, geneSymbol, tssUpstream, tssDownstream)  
+
+    # Check the type of data returned and its size
+    checkEquals(dim(regions), c(1,3))
+    checkEquals(class(regions), "data.frame")
+    
+    # Check the nominal values (tss = 88904257)
+    tss <- 88904257
+    checkEquals(regions$chrom, "chr5")
+    checkEquals(regions$start, tss - tssUpstream)
+    checkEquals(regions$end, tss + tssDownstream)
+} # test_getProximalPromoterHuman
+#----------------------------------------------------------------------------------------------------
+test_getProximalPromoterMouse <- function(){
+
+    printf("--- test_getProximalPromoterMouse")
+
+    trena <- Trena("mm10")
+
+    # Designate the Twist2 gene and a shoulder size of 1000
+    geneSymbol <- "Twist2"
+    tssUpstream <- 1000
+    tssDownstream <- 1000
+
+    # Pull the regions for Twist2
+    regions <- getProximalPromoter(trena, geneSymbol, tssUpstream, tssDownstream)  
+
+    # Check the type of data returned and its size
+    checkEquals(dim(regions), c(1,3))
+    checkEquals(class(regions), "data.frame")
+    
+    # Check the nominal values (tss = 88904257)
+    tss <- 91801461
+    checkEquals(regions$chrom, "chr1")
+    checkEquals(regions$start, tss - tssUpstream)
+    checkEquals(regions$end, tss + tssDownstream)
+}
+

@@ -27,15 +27,16 @@ A data frame containing the gene model
 Assess the effect of a SNP using a Trena object
 }
 \examples{
-# Create a Trena object for human, retrieve regions for "MEF2C" using a footprint filter,
-# and then add the TF column
+# Create a Trena object for human, assign a variant, then assess the effects of the variant
 trena <- Trena("hg38")
-chromosome <- "chr5"
-mef2c.tss <- 88904257
-loc.start <- mef2c.tss - 1000
-loc.end   <- mef2c.tss + 1000
 
+library(MotifDb)
+jaspar.human.pfms <- as.list(query(query(MotifDb, "jaspar2016"), "sapiens"))
 
+variant <- "rs3875089" # chr18:26865469  T->C
+
+tbl <- assessSnp(trena, jaspar.human.pfms, variant, shoulder = 3,
+pwmMatchMinimumAsPercentage = 65)
 
 
 }

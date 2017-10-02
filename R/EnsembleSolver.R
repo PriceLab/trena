@@ -21,6 +21,27 @@
                             )
 
 #----------------------------------------------------------------------------------------------------
+#' Retrieve the solver names from an EnsembleSolver object
+#'
+#' @rdname getSolverNames
+#' @aliases getSolverNames
+#'
+#' @param obj An object of class Solver
+#'
+#' @return The vector of solver names associated with an EnsembleSolver object
+#'
+#' @examples
+#' # Create a Solver object using the included Alzheimer's data and retrieve the regulators
+#' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+#' targetGene <- "MEF2C"
+#' candidateRegulators <- setdiff(rownames(mtx.sub), targetGene)
+#' solver <- EnsembleSolver(mtx.sub, targetGene, candidateRegulators,
+#' solverNames = c("lasso","randomForest"))
+#' solver.names <- getSolverNames(solver) 
+
+#' @export
+setGeneric("getSolverNames", signature = "obj", function(obj) standardGeneric("getSolverNames"))
+#----------------------------------------------------------------------------------------------------
 #' Create a Solver class object using an ensemble of solvers
 #'
 #' @param mtx.assay An assay matrix of gene expression data
@@ -83,14 +104,14 @@ EnsembleSolver <- function(mtx.assay=matrix(), targetGene, candidateRegulators,
 {
     if(any(grepl(targetGene, candidateRegulators)))
         candidateRegulators <- candidateRegulators[-grep(targetGene, candidateRegulators)]
-
+    
     candidateRegulators <- intersect(candidateRegulators, rownames(mtx.assay))
     stopifnot(length(candidateRegulators) > 0)
-
+    
     # Send a warning if there's a row of zeros
     if(!is.na(max(mtx.assay)) & any(rowSums(mtx.assay) == 0))
         warning("One or more gene has zero expression; this may cause difficulty when using Bayes Spike. You may want to try 'lasso' or 'ridge' instead.")
-
+    
     obj <- .EnsembleSolver(mtx.assay = mtx.assay,
                            targetGene = targetGene,
                            candidateRegulators = candidateRegulators,
@@ -105,7 +126,7 @@ EnsembleSolver <- function(mtx.assay=matrix(), targetGene, candidateRegulators,
                            nOrderings.bayes = nOrderings.bayes,
                            quiet=quiet)
     obj
-
+    
 } # EnsembleSolver, the constructor
 #----------------------------------------------------------------------------------------------------
 #' Show the Ensemble Solver
@@ -126,21 +147,28 @@ EnsembleSolver <- function(mtx.assay=matrix(), targetGene, candidateRegulators,
 
 setMethod('show', 'EnsembleSolver',
 
-    function(object) {
-       regulator.count <- length(getRegulators(object))
-       if(regulator.count > 10){
-          regulatorString <- paste(getRegulators(object)[1:10], collapse=",")
-          regulatorString <- sprintf("%s...", regulatorString);
-          }
-       else
-          regulatorString <- paste(getRegulators(object), collapse=",")
+          function(object) {
+              regulator.count <- length(getRegulators(object))
+              if(regulator.count > 10){
+                  regulatorString <- paste(getRegulators(object)[1:10], collapse=",")
+                  regulatorString <- sprintf("%s...", regulatorString);
+              }
+              else
+                  regulatorString <- paste(getRegulators(object), collapse=",")
+              
+              msg = sprintf("EnsembleSolver with mtx.assay (%d, %d), targetGene %s, %d candidate regulators %s,  solvers: %s",
+                            nrow(getAssayData(object)), ncol(getAssayData(object)),
+                            getTarget(object), regulator.count, regulatorString,
+                            paste(object@solverNames,collapse = ", "))
+              cat (msg, '\n', sep='')
+          })
 
-       msg = sprintf("EnsembleSolver with mtx.assay (%d, %d), targetGene %s, %d candidate regulators %s,  solvers: %s",
-                     nrow(getAssayData(object)), ncol(getAssayData(object)),
-                     getTarget(object), regulator.count, regulatorString,
-                     paste(object@solverNames,collapse = ", "))
-       cat (msg, '\n', sep='')
-    })
+#----------------------------------------------------------------------------------------------------
+setMethod("getSolverNames", "EnsembleSolver",
+
+   function (obj){
+      obj@solverNames
+      })
 #----------------------------------------------------------------------------------------------------
 #' Run the Ensemble Solver
 #'
@@ -190,24 +218,47 @@ setMethod('show', 'EnsembleSolver',
 setMethod("run", "EnsembleSolver",
 
           function(obj){
-
+              
               mtx <- getAssayData(obj)
               target.gene <- getTarget(obj)
               tfs <- getRegulators(obj)
               gene.cutoff <- obj@geneCutoff
-
-               # Check if target.gene is in the bottom 10% in mean expression; if so, send a warning
-               if(rowMeans(mtx)[target.gene] < stats::quantile(rowMeans(mtx), probs = 0.1)){
-                   warning("Target gene mean expression is in the bottom 10% of all genes in the assay matrix")
-               }
-
+              
+              # Check if target.gene is in the bottom 10% in mean expression; if so, send a warning
+              if(rowMeans(mtx)[target.gene] < stats::quantile(rowMeans(mtx), probs = 0.1)){
+                  warning("Target gene mean expression is in the bottom 10% of all genes in the assay matrix")
+              }
+              
               # Create a list of solvers and a list for solutions
               out.list <- list()
-              solver.list <- obj@solverNames
+              solver.list <- tolower(getSolverNames(obj))
 
-              for(i in 1:length(solver.list)){
-                  # Find the correct solver
-                  solver <- switch(tolower(solver.list[i]),
+              # Intersect with the accepted solvers
+              accepted.solvers <- c("bayesspike", "lassopv", "lasso", "pearson",
+                                    "ridge", "randomforest", "spearman", "sqrtlasso")
+              not.accepted <- setdiff(solver.list, accepted.solvers)
+              solver.list <- intersect(solver.list, accepted.solvers)
+
+              # If there's no valid solvers, exit with an error
+              if(length(solver.list) == 0){
+                  stop("No valid solvers supplied;
+                       Run getAvailableSolvers() to see all available solvers")
+              }
+
+              # If there's any invalid solvers, throw a warning
+              if(length(not.accepted) > 0){
+                  not.accepted <- paste(not.accepted,collapse = ", ")
+                  warn.msg <- sprintf("Invalid solvers (%s) supplied, running with remaining solver(s);
+                                       Run getAvailableSolvers() to see all available solvers",
+                                      not.accepted)
+                  warning(warn.msg)
+                  }
+
+              # If there's only 1 solver, catch it, send a warning, and run THAT solver
+              if(length(solver.list) == 1){
+
+                  # Capture the correct solver
+                  solver <- switch(solver.list,                                   
                                    "lasso" = LassoSolver(mtx, target.gene, tfs,
                                                          alpha = obj@alpha.lasso, lambda = obj@lambda.lasso),
                                    "randomforest" = RandomForestSolver(mtx, target.gene, tfs),
@@ -221,196 +272,247 @@ setMethod("run", "EnsembleSolver",
                                    "ridge" = RidgeSolver(mtx, target.gene, tfs,
                                                          alpha = obj@alpha.ridge, lambda = obj@lambda.ridge))
 
+                  # Send a specific warning message
+                  warn.message <- sprintf("Only one solver(%s) was provided. Running %s instead",
+                                          solver.list, class(solver)[1])
+                  warning(warn.message)
+
+                  # Run the solver
+                  tbl.single <- run(solver)
+                  
+                  # Return the output of the solver
+                  return(tbl.single)
+              }
+              
+              
+              for(i in 1:length(solver.list)){
+                  # Find the correct solver
+                  solver <- switch(solver.list[i],
+                                   "lasso" = LassoSolver(mtx, target.gene, tfs,
+                                                         alpha = obj@alpha.lasso, lambda = obj@lambda.lasso),
+                                   "randomforest" = RandomForestSolver(mtx, target.gene, tfs),
+                                   "bayesspike" = BayesSpikeSolver(mtx, target.gene, tfs,
+                                                                   nOrderings = obj@nOrderings.bayes),
+                                   "pearson" = PearsonSolver(mtx, target.gene, tfs),
+                                   "spearman" = SpearmanSolver(mtx, target.gene, tfs),
+                                   "sqrtlasso" = SqrtLassoSolver(mtx, target.gene, tfs,
+                                                                 lambda = obj@lambda.sqrt, nCores = obj@nCores.sqrt),
+                                   "lassopv" = LassoPVSolver(mtx, target.gene, tfs),
+                                   "ridge" = RidgeSolver(mtx, target.gene, tfs,
+                                                         alpha = obj@alpha.ridge, lambda = obj@lambda.ridge))
+                  
                   # Solve each Solver object and save it to the output list
                   out.list[[i]] <- run(solver)
                   names(out.list)[i] <- paste("out",tolower(solver.list[[i]]),sep=".")
               }
-
-               # Output lasso with beta
-               if("lasso" %in% tolower(solver.list)){
-                   out.list$out.lasso$gene <- rownames(out.list$out.lasso)
-                   out.list$out.lasso <- out.list$out.lasso[, c("beta","gene")]
-                   rownames(out.list$out.lasso) <- NULL
-                   names(out.list$out.lasso) <- c("beta.lasso", "gene")
-                   lasso.med <- stats::median(out.list$out.lasso$beta.lasso)
-                   lasso.scale <- stats::mad(out.list$out.lasso$beta.lasso)
-               }
-
-               # Output randomforest IncNodePurity
-               if("randomforest" %in% tolower(solver.list)){
-                   out.list$out.randomforest <- out.list$out.randomforest$edges
-                   out.list$out.randomforest$gene <- rownames(out.list$out.randomforest)
-                   out.list$out.randomforest <- out.list$out.randomforest[, c("IncNodePurity","gene")]
-                   rownames(out.list$out.randomforest) <- NULL
-                   names(out.list$out.randomforest) <- c("rf.score", "gene")
-                   randomforest.med <- stats::median(out.list$out.randomforest$rf.score)
-                   randomforest.scale <- sqrt(mean(
-                       out.list$out.randomforest$rf.score*out.list$out.randomforest$rf.score))
-               }
-
-               # Output the z-score from bayesspike
-               if("bayesspike" %in% tolower(solver.list)){
-                   out.list$out.bayesspike$gene <- rownames(out.list$out.bayesspike)
-                   rownames(out.list$out.bayesspike) <- NULL
-                   out.list$out.bayesspike <- out.list$out.bayesspike[, c("z", "gene")]
-                   names(out.list$out.bayesspike) <- c("bayes.z", "gene")
-                   bayesspike.med <- stats::median(out.list$out.bayesspike$bayes.z)
-                   bayesspike.scale <- stats::mad(out.list$out.bayesspike$bayes.z)
-               }
-
-               # Pearson
-               if("pearson" %in% tolower(solver.list)){
-                   out.list$out.pearson$gene <- rownames(out.list$out.pearson)
-                   rownames(out.list$out.pearson) <- NULL
-                   names(out.list$out.pearson) <- c("pearson.coeff","gene")
-                   pearson.med <- stats::median(out.list$out.pearson$pearson.coeff)
-                   pearson.scale <- stats::mad(out.list$out.pearson$pearson.coeff)
-               }
-
-               #Spearman
-               if("spearman" %in% tolower(solver.list)){
-                   out.list$out.spearman$gene <- rownames(out.list$out.spearman)
-                   rownames(out.list$out.spearman) <- NULL
-                   names(out.list$out.spearman) <- c("spearman.coeff", "gene")
-                   spearman.med <- stats::median(out.list$out.spearman$spearman.coeff)
-                   spearman.scale <- stats::mad(out.list$out.spearman$spearman.coeff)
-               }
-
-               #LassoPV
-               if("lassopv" %in% tolower(solver.list)){
-                   out.list$out.lassopv$gene <- rownames(out.list$out.lassopv)
-                   rownames(out.list$out.lassopv) <- NULL
-                   out.list$out.lassopv <- out.list$out.lassopv[, c("p.values","gene")]
-                   names(out.list$out.lassopv) <- c("lasso.p.value", "gene")
-                   p.log10 <- -log10(out.list$out.lassopv$lasso.p.value)
-                   lassopv.med <- stats::median(p.log10)
-                   lassopv.scale <- sqrt(mean(p.log10*p.log10))
-               }
-
-               #SqrtLasso
-               if("sqrtlasso" %in% tolower(solver.list)){
-                   out.list$out.sqrtlasso$gene <- rownames(out.list$out.sqrtlasso)
-                   rownames(out.list$out.sqrtlasso) <- NULL
-                   out.list$out.sqrtlasso <- out.list$out.sqrtlasso[, c("beta", "gene")]
-                   names(out.list$out.sqrtlasso) <- c("beta.sqrtlasso", "gene")
-                   sqrtlasso.med <- stats::median(out.list$out.sqrtlasso$beta.sqrtlasso)
-                   sqrtlasso.scale <- stats::mad(out.list$out.sqrtlasso$beta.sqrtlasso)
-               }
-
-               #Ridge
-               if("ridge" %in% tolower(solver.list)){
-                   out.list$out.ridge$gene <- rownames(out.list$out.ridge)
-                   out.list$out.ridge <- out.list$out.ridge[, c("beta","gene")]
-                   rownames(out.list$out.ridge) <- NULL
-                   names(out.list$out.ridge) <- c("beta.ridge", "gene")
-                   ridge.med <- stats::median(out.list$out.ridge$beta.ridge)
-                   ridge.scale <- stats::mad(out.list$out.ridge$beta.ridge)
-               }
-
-               # Grab all genes for each solver to start with
-               how.many <- length(tfs)
-               top.list <- lapply(out.list, function(x) head(x$gene, how.many))
-               all.genes <- unique(as.character(unlist(top.list)))
-
-               # Run same thing in a while loop until the cutoff or 10 is reached
-               while(length(all.genes) > gene.cutoff * length(tfs) & length(all.genes) > 10){
-
-                   how.many <- round(0.75*how.many)
-                   top.list <- lapply(out.list, function(x) utils::head(x$gene, how.many))
-                   all.genes <- unique(as.character(unlist(top.list)))
-               }
-
-               # Pull out the specified genes
-               sub.list <- list()
-               for(i in 1:length(out.list)){
-
-                   sub.list[[i]] <- subset(out.list[[i]], out.list[[i]]$gene %in% all.genes)
-               }
-
-               # Merge the tables
-               tbl.all <- merge(sub.list[[1]], sub.list[[2]], by = "gene", all = TRUE)
-               if(length(sub.list) > 2){
-                   for(i in 3:(length(sub.list))){
-                       tbl.all <- merge(tbl.all, sub.list[[i]], by = "gene", all = TRUE)
-                   }
-               }
-
-               # Replace missing values and scale the data
-               # Use the *.med and *.scale values to center/scale everything
-               tbl.all[is.na(tbl.all)] <- 0
-               tbl.scale <- tbl.all[,-1]
-
-               if("lasso.p.value" %in% names(tbl.scale)){
-                   tbl.scale$lasso.p.value <- -log10(tbl.scale$lasso.p.value)
-                   tbl.scale$lasso.p.value <- scale(tbl.scale$lasso.p.value,
-                                                    center = lassopv.med,
-                                                    scale = lassopv.scale)
-               }
-
-               if("beta.lasso" %in% names(tbl.scale)){
-                   tbl.scale$beta.lasso <- scale(tbl.scale$beta.lasso,
-                                                 center = lasso.med,
-                                                 scale = lasso.scale)
-               }
-
-               if("beta.ridge" %in% names(tbl.scale)){
-                   tbl.scale$beta.ridge <- scale(tbl.scale$beta.ridge,
-                                                 center = ridge.med,
-                                                 scale = ridge.scale)
-               }
-
-               if("pearson.coeff" %in% names(tbl.scale)){
-                   tbl.scale$pearson.coeff <- scale(tbl.scale$pearson.coeff,
-                                                    center = pearson.med,
-                                                    scale = pearson.scale)
-                   }
-
-               if("spearman.coeff" %in% names(tbl.scale)){
-                   tbl.scale$spearman.coeff <- scale(tbl.scale$spearman.coeff,
-                                                     center = spearman.med,
-                                                     scale = spearman.scale)
-                   }
-
-               if("beta.sqrtlasso" %in% names(tbl.scale)){
-                   tbl.scale$beta.sqrtlasso <- scale(tbl.scale$beta.sqrtlasso,
-                                                     center = sqrtlasso.med,
-                                                     scale = sqrtlasso.scale)
-                   }
-
-               if("bayes.z" %in% names(tbl.scale)){
-                   tbl.scale$bayes.z <- scale(tbl.scale$bayes.z,
-                                              center = bayesspike.med,
-                                              scale = bayesspike.scale)
-                   }
-
-               if("rf.score" %in% names(tbl.scale)){
-                   tbl.scale$rf.score <- scale(tbl.scale$rf.score,
-                                               center = randomforest.med,
-                                               scale = randomforest.scale)
-               }
-
-               rownames(tbl.scale) <- tbl.all$gene
-
-               # Compute the scaled "concordance score"
-               pca <- stats::prcomp(tbl.scale, center=FALSE, scale.=FALSE)
-               pca$x <- pca$x / sqrt(length(which(pca$sdev > 0.1)))
-               concordance <- apply(pca$x[, pca$sdev > 0.1, drop=FALSE], 1,
-                             function(x) {sqrt(mean((2*atan(x)/pi)^2))})
-               concordance <- as.data.frame(concordance)
-               concordance$gene <- rownames(concordance)
-               rownames(concordance) <- NULL
-               tbl.all <- merge(tbl.all, concordance, by = "gene", all = TRUE)
-
-               # Transform via PCA and compute the pcaMax score
-               pcaMax <- apply(pca$x[, pca$sdev > 0.1, drop=FALSE],1, function(x) {sqrt(mean(x*x))})
-               pcaMax <- as.data.frame(pcaMax)
-               pcaMax$gene <- rownames(pcaMax)
-               rownames(pcaMax) <- NULL
-               tbl.all <- merge(tbl.all, pcaMax, by = "gene", all = TRUE)
-
-               # Sort by pcaMax
-               tbl.all <- tbl.all[order(tbl.all$pcaMax, decreasing = TRUE),]
-
-               return(tbl.all)
-           })
+              
+              # Output lasso with beta
+              if("lasso" %in% tolower(solver.list)){
+                  out.list$out.lasso$gene <- rownames(out.list$out.lasso)
+                  out.list$out.lasso <- out.list$out.lasso[, c("beta","gene")]
+                  rownames(out.list$out.lasso) <- NULL
+                  names(out.list$out.lasso) <- c("beta.lasso", "gene")
+                  lasso.med <- stats::median(out.list$out.lasso$beta.lasso)
+                  lasso.scale <- stats::mad(out.list$out.lasso$beta.lasso)
+              }
+              
+              # Output randomforest IncNodePurity
+              if("randomforest" %in% tolower(solver.list)){
+                  out.list$out.randomforest <- out.list$out.randomforest$edges
+                  out.list$out.randomforest$gene <- rownames(out.list$out.randomforest)
+                  out.list$out.randomforest <- out.list$out.randomforest[, c("IncNodePurity","gene")]
+                  rownames(out.list$out.randomforest) <- NULL
+                  names(out.list$out.randomforest) <- c("rf.score", "gene")
+                  randomforest.med <- stats::median(out.list$out.randomforest$rf.score)
+                  randomforest.scale <- sqrt(mean(
+                      out.list$out.randomforest$rf.score*out.list$out.randomforest$rf.score))
+              }
+              
+              # Output the z-score from bayesspike
+              if("bayesspike" %in% tolower(solver.list)){
+                  out.list$out.bayesspike$gene <- rownames(out.list$out.bayesspike)
+                  rownames(out.list$out.bayesspike) <- NULL
+                  out.list$out.bayesspike <- out.list$out.bayesspike[, c("z", "gene")]
+                  names(out.list$out.bayesspike) <- c("bayes.z", "gene")
+                  bayesspike.med <- stats::median(out.list$out.bayesspike$bayes.z)
+                  bayesspike.scale <- stats::mad(out.list$out.bayesspike$bayes.z)
+              }
+              
+              # Pearson
+              if("pearson" %in% tolower(solver.list)){
+                  out.list$out.pearson$gene <- rownames(out.list$out.pearson)
+                  rownames(out.list$out.pearson) <- NULL
+                  names(out.list$out.pearson) <- c("pearson.coeff","gene")
+                  pearson.med <- stats::median(out.list$out.pearson$pearson.coeff)
+                  pearson.scale <- stats::mad(out.list$out.pearson$pearson.coeff)
+              }
+              
+              #Spearman
+              if("spearman" %in% tolower(solver.list)){
+                  out.list$out.spearman$gene <- rownames(out.list$out.spearman)
+                  rownames(out.list$out.spearman) <- NULL
+                  names(out.list$out.spearman) <- c("spearman.coeff", "gene")
+                  spearman.med <- stats::median(out.list$out.spearman$spearman.coeff)
+                  spearman.scale <- stats::mad(out.list$out.spearman$spearman.coeff)
+              }
+              
+              #LassoPV
+              if("lassopv" %in% tolower(solver.list)){
+                  out.list$out.lassopv$gene <- rownames(out.list$out.lassopv)
+                  rownames(out.list$out.lassopv) <- NULL
+                  out.list$out.lassopv <- out.list$out.lassopv[, c("p.values","gene")]
+                  names(out.list$out.lassopv) <- c("lasso.p.value", "gene")
+                  p.log10 <- -log10(out.list$out.lassopv$lasso.p.value)
+                  lassopv.med <- stats::median(p.log10)
+                  lassopv.scale <- sqrt(mean(p.log10*p.log10))
+              }
+              
+              #SqrtLasso
+              if("sqrtlasso" %in% tolower(solver.list)){
+                  out.list$out.sqrtlasso$gene <- rownames(out.list$out.sqrtlasso)
+                  rownames(out.list$out.sqrtlasso) <- NULL
+                  out.list$out.sqrtlasso <- out.list$out.sqrtlasso[, c("beta", "gene")]
+                  names(out.list$out.sqrtlasso) <- c("beta.sqrtlasso", "gene")
+                  sqrtlasso.med <- stats::median(out.list$out.sqrtlasso$beta.sqrtlasso)
+                  sqrtlasso.scale <- stats::mad(out.list$out.sqrtlasso$beta.sqrtlasso)
+              }
+              
+              #Ridge
+              if("ridge" %in% tolower(solver.list)){
+                  out.list$out.ridge$gene <- rownames(out.list$out.ridge)
+                  out.list$out.ridge <- out.list$out.ridge[, c("beta","gene")]
+                  rownames(out.list$out.ridge) <- NULL
+                  names(out.list$out.ridge) <- c("beta.ridge", "gene")
+                  ridge.med <- stats::median(out.list$out.ridge$beta.ridge)
+                  ridge.scale <- stats::mad(out.list$out.ridge$beta.ridge)
+              }
+              
+              # Grab all genes for each solver to start with
+              how.many <- length(tfs)
+              top.list <- lapply(out.list, function(x) head(x$gene, how.many))
+              all.genes <- unique(as.character(unlist(top.list)))
+              
+              # Run same thing in a while loop until the cutoff or 10 is reached
+              while(length(all.genes) > gene.cutoff * length(tfs) & length(all.genes) > 10){
+                  
+                  how.many <- round(0.75*how.many)
+                  top.list <- lapply(out.list, function(x) utils::head(x$gene, how.many))
+                  all.genes <- unique(as.character(unlist(top.list)))
+              }
+              
+              # Pull out the specified genes
+              sub.list <- list()
+              for(i in 1:length(out.list)){
+                  
+                  sub.list[[i]] <- subset(out.list[[i]], out.list[[i]]$gene %in% all.genes)
+              }
+              
+              # Merge the tables
+              tbl.all <- merge(sub.list[[1]], sub.list[[2]], by = "gene", all = TRUE)
+              if(length(sub.list) > 2){
+                  for(i in 3:(length(sub.list))){
+                      tbl.all <- merge(tbl.all, sub.list[[i]], by = "gene", all = TRUE)
+                  }
+              }
+              
+              # Replace missing values and scale the data
+              # Use the *.med and *.scale values to center/scale everything
+              tbl.all[is.na(tbl.all)] <- 0
+              tbl.scale <- tbl.all[,-1]
+              
+              if("lasso.p.value" %in% names(tbl.scale)){
+                  tbl.scale$lasso.p.value <- -log10(tbl.scale$lasso.p.value)
+                  tbl.scale$lasso.p.value <- scale(tbl.scale$lasso.p.value,
+                                                   center = lassopv.med,
+                                                   scale = lassopv.scale)
+              }
+              
+              if("beta.lasso" %in% names(tbl.scale)){
+                  tbl.scale$beta.lasso <- scale(tbl.scale$beta.lasso,
+                                                center = lasso.med,
+                                                scale = lasso.scale)
+              }
+              
+              if("beta.ridge" %in% names(tbl.scale)){
+                  tbl.scale$beta.ridge <- scale(tbl.scale$beta.ridge,
+                                                center = ridge.med,
+                                                scale = ridge.scale)
+              }
+              
+              if("pearson.coeff" %in% names(tbl.scale)){
+                  tbl.scale$pearson.coeff <- scale(tbl.scale$pearson.coeff,
+                                                   center = pearson.med,
+                                                   scale = pearson.scale)
+              }
+              
+              if("spearman.coeff" %in% names(tbl.scale)){
+                  tbl.scale$spearman.coeff <- scale(tbl.scale$spearman.coeff,
+                                                    center = spearman.med,
+                                                    scale = spearman.scale)
+              }
+              
+              if("beta.sqrtlasso" %in% names(tbl.scale)){
+                  tbl.scale$beta.sqrtlasso <- scale(tbl.scale$beta.sqrtlasso,
+                                                    center = sqrtlasso.med,
+                                                    scale = sqrtlasso.scale)
+              }
+              
+              if("bayes.z" %in% names(tbl.scale)){
+                  tbl.scale$bayes.z <- scale(tbl.scale$bayes.z,
+                                             center = bayesspike.med,
+                                             scale = bayesspike.scale)
+              }
+              
+              if("rf.score" %in% names(tbl.scale)){
+                  tbl.scale$rf.score <- scale(tbl.scale$rf.score,
+                                              center = randomforest.med,
+                                              scale = randomforest.scale)
+              }
+              
+              rownames(tbl.scale) <- tbl.all$gene
+              
+              tbl.augmented <- try(.addEnsembleScores(tbl.scale, tbl.all), silent = TRUE)
+              
+              # If you get new scores, add them;
+              # Else, just keep the old table and throw a warning
+              
+              if(class(tbl.augmented) == "try-error"){
+                  warning("Signal strength of individual solvers is insufficient for adding
+composite scores. Try increasing your sample size")
+                  tbl.all$pcaMax <- NA
+                  tbl.all$concordance <- NA
+              } else {
+                  tbl.all <- tbl.augmented
+              }
+              
+              # Regardless of output, return the table of scores
+              return(tbl.all)
+              
+          })
+#----------------------------------------------------------------------------------------------------
+.addEnsembleScores <- function(tbl.scale, tbl.all) {
+    
+    # Compute the scaled "concordance score"
+    pca <- stats::prcomp(tbl.scale, center=FALSE, scale.=FALSE)
+    
+    pca$x <- pca$x / sqrt(length(which(pca$sdev > 0.1)))
+    concordance <- apply(pca$x[, pca$sdev > 0.1, drop=FALSE], 1,
+                         function(x) {sqrt(mean((2*atan(x)/pi)^2))})
+    concordance <- as.data.frame(concordance)
+    concordance$gene <- rownames(concordance)
+    rownames(concordance) <- NULL
+    tbl.all <- merge(tbl.all, concordance, by = "gene", all = TRUE)
+    
+    # Transform via PCA and compute the pcaMax score
+    pcaMax <- apply(pca$x[, pca$sdev > 0.1, drop=FALSE],1, function(x) {sqrt(mean(x*x))})
+    pcaMax <- as.data.frame(pcaMax)
+    pcaMax$gene <- rownames(pcaMax)
+    rownames(pcaMax) <- NULL
+    tbl.all <- merge(tbl.all, pcaMax, by = "gene", all = TRUE)
+    
+    # Sort by pcaMax
+    tbl.all <- tbl.all[order(tbl.all$pcaMax, decreasing = TRUE),]
+    
+    return(tbl.all)
+}
 #----------------------------------------------------------------------------------------------------

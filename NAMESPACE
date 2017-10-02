@@ -30,7 +30,8 @@ export(
     run,
     show,
     parseChromLocString,
-    parseDatabaseUri
+    parseDatabaseUri,
+    getAvailableSolvers
 )
 
 exportMethods(
@@ -52,12 +53,13 @@ exportMethods(
     getRegulatoryRegions,
     getPfms,
     findMatchesByChromosomalRegion,
-
+    getProximalPromoter,
     getRegulatoryChromosomalRegions,
     getRegulatoryTableColumnNames,
     getGeneModelTableColumnNames,
     createGeneModel,
-    assessSnp
+    assessSnp,
+    getSolverNames
 )
 
 import(
@@ -87,3 +89,5 @@ importFrom(Biostrings, IUPAC_CODE_MAP)
 importFrom(Biostrings, maxScore)
 importFrom(Biostrings, matchPWM)
 importFrom(Biostrings, reverseComplement)
+importFrom(biomaRt, useMart)
+importFrom(biomaRt, getBM)

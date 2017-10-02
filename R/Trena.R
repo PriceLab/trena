@@ -149,20 +149,48 @@ setGeneric('createGeneModel', signature='obj', function(obj, targetGene,  solver
 #' @export
 #'
 #' @examples
-#' # Create a Trena object for human, retrieve regions for "MEF2C" using a footprint filter,
-#' # and then add the TF column
+#' # Create a Trena object for human, assign a variant, then assess the effects of the variant
 #' trena <- Trena("hg38")
-#' chromosome <- "chr5"
-#' mef2c.tss <- 88904257
-#' loc.start <- mef2c.tss - 1000
-#' loc.end   <- mef2c.tss + 1000
 #'
+#' library(MotifDb)
+#' jaspar.human.pfms <- as.list(query(query(MotifDb, "jaspar2016"), "sapiens"))
 #'
+#' variant <- "rs3875089" # chr18:26865469  T->C
+#' 
+#' tbl <- assessSnp(trena, jaspar.human.pfms, variant, shoulder = 3,
+#' pwmMatchMinimumAsPercentage = 65)
 #'
 #'
 
 setGeneric('assessSnp', signature='obj', function(obj, pfms, variant, shoulder, pwmMatchMinimumAsPercentage, relaxedMatchDelta=25)
-              standardGeneric('assessSnp'))
+    standardGeneric('assessSnp'))
+
+#' Grab the region of the proximal promoter for a given gene symbol
+#'
+#' For the genome of a given Trena object, retrieve a data frame containing the region
+#' surrounding a target gene.
+#'
+#' @rdname getProximalPromoter
+#' @aliases getProximalPromoter
+#'
+#' @param obj An object of class Trena
+#' @param geneSymbol A gene of interest
+#' @param tssUpstream A designated distance upstream of the promoter to use as a shoulder
+#' (default = 1000)
+#' @param tssDownstream A designated distance downstream of the promoter to use as a shoulder
+#' (default = 1000)
+#'
+#' @return A dataframe containing the regions surrounding the proximal promoter
+#'
+#' @export
+#'
+#' @examples
+#' # Retrieve the proximal promoter for MEF2C using a shoulder size of 2000 on each side
+#' trena <- Trena("hg38")
+#' regions <- getProximalPromoter(trena, "MEF2C", 2000, 2000)
+
+setGeneric('getProximalPromoter', signature='obj', function(obj, geneSymbol, tssUpstream, tssDownstream)
+              standardGeneric('getProximalPromoter'))
 #----------------------------------------------------------------------------------------------------
 # a temporary hack: some constants
 genome.db.uri <- "postgres://bddsrds.globusgenomics.org/hg38"   # has gtf and motifsgenes tables
@@ -171,13 +199,13 @@ genome.db.uri <- "postgres://bddsrds.globusgenomics.org/hg38"   # has gtf and mo
 #'
 #' @description
 #' The Trena class provides a convenient wrapper for the most commonly used filters and solver in the \code{trena}
-#' package. Given a particular genome (one of \code{c("hg19","hg38","mm10")}, the Trena class provides methods to
+#' package. Given a particular genome (one of \code{c("hg38","mm10")}, the Trena class provides methods to
 #' retrieve information about possible regulators for a target gene, assess the effects of SNPs, and create gene models
 #' using the flexible \code{\link{EnsembleSolver}} class.
 #'
 #' @rdname Trena-class
 #'
-#' @param genomeName A string indicating the genome used by the Trena object. Currently, only human and mouse ("hg19",
+#' @param genomeName A string indicating the genome used by the Trena object. Currently, only human and mouse (
 #' "hg38","mm10") are supported
 #' @param quiet A logical indicating whether or not the Trena object should print output
 #'
@@ -195,7 +223,7 @@ genome.db.uri <- "postgres://bddsrds.globusgenomics.org/hg38"   # has gtf and mo
 
 Trena = function(genomeName, quiet=TRUE)
 {
-   stopifnot(genomeName %in% c("hg19", "hg38", "mm10"))
+   stopifnot(genomeName %in% c("hg38", "mm10"))
 
    obj <- .Trena(genomeName=genomeName, quiet=quiet)
 
@@ -442,4 +470,75 @@ setMethod('assessSnp', 'Trena',
         tbl
         }) # assessSnp
 
+#----------------------------------------------------------------------------------------------------
+setMethod("getProximalPromoter", "Trena",
+
+          function(obj, geneSymbol,                   
+                   tssUpstream = 1000,                   
+                   tssDownstream = 1000){
+
+              # Grab from gtf on BDDS if it's hg38
+              if(obj@genomeName == "hg38"){
+                  database.uri = "postgres://bddsrds.globusgenomics.org/hg38"
+                  host <- "bddsrds.globusgenomics.org"
+                  dbname <- "hg38"                  
+                  driver <- RPostgreSQL::PostgreSQL()
+
+                  genome.db <- DBI::dbConnect(driver,
+                                    user = "trena",
+                                    password = "trena",
+                                    dbname = dbname,
+                                    host = host)
+
+                  query <- sprintf("select * from gtf where moleculetype='gene' and gene_biotype='protein_coding' and gene_name='%s'",
+                                   geneSymbol)
+
+                  tbl.loc <- dbGetQuery(genome.db, query)
+                  chrom <- tbl.loc$chr[1]
+                  start.orig <- tbl.loc$start[1]                  
+                  end.orig   <- tbl.loc$endpos[1]                  
+                  strand     <- tbl.loc$strand[1]                  
+                  DBI::dbDisconnect(genome.db)
+
+                  if(strand == "-"){ # reverse (minus) strand.  TSS is at "end" position
+                      start.loc <- end.orig - tssDownstream                      
+                      end.loc   <- end.orig + tssUpstream                      
+                  }
+                  
+                  else{ #  forward (plus) strand.  TSS is at "start" position                      
+                      start.loc <- start.orig - tssUpstream                      
+                      end.loc   <- start.orig + tssDownstream                      
+                  }
+                                               
+              } else { # Grab from biomaRt for mm10
+
+                  mm10.mart <- biomaRt::useMart(biomart="ensembl", dataset="mmusculus_gene_ensembl")
+
+                  tbl.geneInfo <- biomaRt::getBM(attributes=c("chromosome_name",
+                                                              "transcription_start_site",
+                                                              "mgi_symbol",
+                                                              "strand"),                                                 
+                                                 filters="mgi_symbol", value=geneSymbol, mart=mm10.mart)
+                  
+                  # make sure all transcripts are on the same strand                  
+                  strand <- unique(tbl.geneInfo$strand)                  
+                  stopifnot(length(strand) == 1)                  
+                  chrom <- sprintf("chr%s", unique(tbl.geneInfo$chromosome_name))                  
+                  stopifnot(length(chrom) == 1)
+                  
+                  # assume + strand                  
+                  tss <- min(tbl.geneInfo$transcription_start_site)                  
+                  start.loc <- tss - tssUpstream                  
+                  end.loc   <- tss + tssDownstream
+                  
+                  if(strand == -1){                      
+                      tss <- max(tbl.geneInfo$transcription_start_site)                      
+                      start.loc <- tss - tssDownstream                      
+                      end.loc   <- tss + tssUpstream                      
+                  }                  
+              }              
+
+              return (data.frame(chrom=chrom, start=start.loc, end=end.loc, stringsAsFactors=FALSE))              
+
+          })# getProximalPromoter
 #----------------------------------------------------------------------------------------------------

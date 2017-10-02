@@ -31,3 +31,12 @@ parseDatabaseUri <- function(database.uri)
 
 } # parseDatabaseUri
 #----------------------------------------------------------------------------------------------------
+getAvailableSolvers <- function() {
+
+    # Create the list of available solvers
+    availableSolvers <- c("BayesSpike", "LassoPV", "Lasso", "Pearson",
+                          "RandomForest", "Ridge", "Spearman", "SqrtLasso")
+    
+    return(availableSolvers)
+} # getAvailableSolvers
+#----------------------------------------------------------------------------------------------------
