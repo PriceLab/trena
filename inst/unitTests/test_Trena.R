@@ -206,6 +206,12 @@ test_assessSnp <- function()
 
    trena <- Trena("hg38")
    jaspar.human.pfms <- as.list(query(query(MotifDb, "jaspar2016"), "sapiens"))
+
+       # first check for bogus variant name
+   bogus.variant <- "rsBogus"
+   checkEquals(assessSnp(trena, jaspar.human.pfms, bogus.variant, shoulder=5, pwmMatchMinimumAsPercentage=65),
+               data.frame())
+
    variant <- "rs3875089"   # chr18:26865469  T->C
 
       # a shoulder of 3 gives us a search region of chr18:26865466-26865472

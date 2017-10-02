@@ -345,7 +345,11 @@ setMethod('assessSnp', 'Trena',
      function(obj, pfms, variant, shoulder, pwmMatchMinimumAsPercentage, relaxedMatchDelta=25){
 
         motifMatcher <- MotifMatcher(genomeName=obj@genomeName, pfms=pfms, quiet=obj@quiet)
-        tbl.variant <- trena:::.parseVariantString(motifMatcher, variant)
+        tbl.variant <- try(trena:::.parseVariantString(motifMatcher, variant), silent=TRUE)
+        if(is(tbl.variant, "try-error")){
+           printf("error, unrecognized variant name: '%s'", variant)
+           return(data.frame())
+           }
         tbl.regions <- data.frame(chrom=tbl.variant$chrom,
                                   start=tbl.variant$loc-shoulder,
                                   end=tbl.variant$loc+shoulder,

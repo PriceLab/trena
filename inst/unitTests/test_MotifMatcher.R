@@ -172,7 +172,7 @@ test_getSequence <- function(indirect=FALSE)
 #----------------------------------------------------------------------------------------------------
 test_.parseVariantString <- function()
 {
-   mm <- MotifMatcher(genomeName="hg38", pfms=list())
+   mm <- MotifMatcher(genomeName="hg38", pfms=list())   # no actual pfms needed here
 
    tbl.variant <- trena:::.parseVariantString(mm, "rs13384219")
    checkEquals(dim(tbl.variant), c(1, 4))
@@ -217,6 +217,10 @@ test_.parseVariantString <- function()
    checkException(
       tbl.2vars <- trena:::.parseVariantString(mm, "rs3763040:C"),
       "caught!", silent=TRUE)
+
+      # fail again on purpose, giving a bogus rsid
+   failure <- try(trena:::.parseVariantString(mm, "bogus"), silent=TRUE)
+   checkEquals(is(failure), "try-error")
 
 } # test_.parseVariantString
 #----------------------------------------------------------------------------------------------------
