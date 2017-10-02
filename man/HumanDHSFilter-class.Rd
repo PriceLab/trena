@@ -5,10 +5,62 @@
 \alias{HumanDHSFilter-class}
 \alias{.HumanDHSFilter}
 \alias{HumanDHSFilter}
+\alias{HumanDHSFilter}
 \title{Create a HumanDHSFilter object}
+\usage{
+HumanDHSFilter(genomeName, encodeTableName = "wgEncodeRegDnaseClustered",
+  pwmMatchPercentageThreshold, geneInfoDatabase.uri, regions,
+  variants = NA_character_, quiet = TRUE)
+}
+\arguments{
+\item{genomeName}{A character string indicating the reference genome; currently, the only
+accepted strings are "hg38" and "hg19", both of which are human genomes.}
+
+\item{encodeTableName}{(default = "wgEncodeRegDnaseClustered")}
+
+\item{pwmMatchPercentageThreshold}{A numeric from 0-100 to serve as a threshold for a match}
+
+\item{geneInfoDatabase.uri}{An address for a gene database}
+
+\item{regions}{A data frame containing the regions of interest}
+
+\item{variants}{A character vector containing a list of variants}
+
+\item{quiet}{A logical denoting whether or not the solver should print output}
+}
+\value{
+A CandidateFilter class object that filters using Human DHS data
+}
 \description{
 A HumanDHSFilter object allows for filtering based on DNAse hypersensitivity (DHS) data. Its
 associated \code{getCandidates} method uses a genome from a BSgenome database (either hg19 or
 hg38), DNA region specifications, and (variants/pfms,encodetablename, match%)
 to filter a list of possible regulators factors to those that match the supplied criteria.
+
+Create a CandidateFilter using Human DNAse Hypersensitivity
+}
+\examples{
+load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+targetGene <- "VRK2"
+promoter.length <- 1000
+genome <- "hg38"
+db.address <- system.file(package="trena", "extdata")
+genome.db.uri    <- paste("sqlite:/", db.address, "vrk2.genome.db",  sep = "/")
+gene.spec=list(targetGene=target.gene,
+tssUpstream=promoter.length,tssDownstream=promoter.length)
+
+hd.filter <- HumanDHSFilter(genome, pwmMatchPercentageThreshold = 85,
+geneInfoDatabase.uri = genome.db.uri, regions = tbl.regions)
+}
+\seealso{
+\code{\link{getCandidates-HumanDHSFilter}},
+
+Other Solver class objects: \code{\link{BayesSpikeSolver}},
+  \code{\link{EnsembleSolver}},
+  \code{\link{LassoPVSolver}}, \code{\link{LassoSolver}},
+  \code{\link{PearsonSolver}},
+  \code{\link{RandomForestSolver}},
+  \code{\link{RidgeSolver}}, \code{\link{Solver-class}},
+  \code{\link{SpearmanSolver}},
+  \code{\link{SqrtLassoSolver}}
 }

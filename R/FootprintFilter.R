@@ -10,7 +10,6 @@
 #' @include FootprintFinder.R
 #' @import methods
 #'
-#' @name FootprintFilter-class
 #' @rdname FootprintFilter-class
 #' @aliases FootprintFilter
 
@@ -29,19 +28,8 @@ printf <- function(...) print(noquote(sprintf(...)))
 #'
 #' @param genomeDB A connection to a database that contains genome information
 #' @param footprintDB A connection to a database that contains footprint information
-#' @param geneCenteredSpec A named list that specifies the regions of interest using a target gene
-#' and upstream/downstream sizes. If specified,it t should contain the following fields
-#' (default = list()):
-#' \itemize{
-#' \item{"targetGene" A designated target gene that should be part of the mtx.assay data}
-#' \item{"tssUpstream" An integer denoting the distance upstream of the target gene
-#' to look for footprints}
-#' \item{"tssDownstream" An integer denoting the distance downstream of the target gene
-#' to look for footprints}
-#' }
-#' @param regionsSpec A character vector that specifies the regions of interest directly, using a
-#' string containing chromosome number, starting position, and ending position. The string should
-#' be formatted as follows: "chr##:start-end" (e.g. "chr1:10000-20000"). (default = list())
+#' @param regions A data frame that specifies the regions of interest
+#' (default = data.frame())
 #' @param quiet A logical denoting whether or not the filter should print output
 #'
 #' @seealso \code{\link{getCandidates-FootprintFilter}}
@@ -63,7 +51,7 @@ printf <- function(...) print(noquote(sprintf(...)))
 #' geneCenteredSpec <- list(targetGene = target.gene, tssUpstream = size.upstream,
 #' tssDownstream = size.downstream)
 #' footprint.filter <- FootprintFilter(genomeDB = genome.db.uri, footprintDB = project.db.uri,
-#' geneCenteredSpec = geneCenteredSpec)
+#' regions = regions)
 
 FootprintFilter <- function(genomeDB, footprintDB, regions=data.frame(), quiet=TRUE)
 {
@@ -102,7 +90,7 @@ FootprintFilter <- function(genomeDB, footprintDB, regions=data.frame(), quiet=T
 #' size.downstream <- 1000
 #' geneCenteredSpec <- list(targetGene = target.gene, tssUpstream = size.upstream, tssDownstream = size.downstream)
 #' footprint.filter <- FootprintFilter(genomeDB = genome.db.uri, footprintDB = project.db.uri,
-#' geneCenteredSpec = geneCenteredSpec)
+#' regions = regions)
 #' tfs <- getCandidates(footprint.filter)
 #'
 #' # Perform the same operation, but use a region spec
@@ -114,7 +102,6 @@ FootprintFilter <- function(genomeDB, footprintDB, regions=data.frame(), quiet=T
 #' footprint.filter <- FootprintFilter(genomeDB = genome.db.uri,
 #' footprintDB = project.db.uri, regionsSpec = regionsSpec)
 #' tfs <- getCandidates(footprint.filter)
-
 
 setMethod("getCandidates", "FootprintFilter",
 

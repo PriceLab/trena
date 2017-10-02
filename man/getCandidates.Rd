@@ -4,7 +4,7 @@
 \alias{getCandidates}
 \title{Get candidate genes using a CandidateFilter object}
 \usage{
-getCandidates(obj, ...)
+getCandidates(obj)
 }
 \arguments{
 \item{obj}{An object of a CandidateFilter class}
@@ -19,6 +19,5 @@ Get candidate genes using a CandidateFilter object
 Other getCandidate Methods: \code{\link{getCandidates,FootprintFilter-method}},
   \code{\link{getCandidates,GeneOntologyFilter-method}},
   \code{\link{getCandidates,HumanDHSFilter-method}},
-  \code{\link{getCandidates,VarianceFilter-method}},
-  \code{\link{getRegulatoryRegions,HumanDHSFilter-method}}
+  \code{\link{getCandidates,VarianceFilter-method}}
 }

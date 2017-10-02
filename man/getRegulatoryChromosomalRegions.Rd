@@ -5,8 +5,7 @@
 \title{Get the regulatory chromosomal regions for a Trena object}
 \usage{
 getRegulatoryChromosomalRegions(obj, chromosome, chromStart, chromEnd,
-  regulatoryRegionSources, targetGene, targetGeneTSS, combine = FALSE,
-  quiet = FALSE)
+  regulatoryRegionSources, targetGene, targetGeneTSS, combine = FALSE)
 }
 \arguments{
 \item{obj}{An object of class Trena}
@@ -25,8 +24,6 @@ addresses of footprint databases or the names of DHS databases}
 \item{targetGeneTSS}{An integer giving the location of the target gene's transcription start site}
 
 \item{combine}{A logical indicating whether or not to combine the output into one data frame (default = FALSE)}
-
-\item{quiet}{A logical indicating whether or not the method should print output (default = FALSE)}
 }
 \value{
 A list of regulatory regions for the supplied target gene. If \code{combine} is set to \code{TRUE},

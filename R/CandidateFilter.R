@@ -21,12 +21,12 @@ printf <- function(...) print(noquote(sprintf(...)))
 #' @aliases getCandidates
 #'
 #' @param obj An object of a CandidateFilter class
-#'
+#' 
 #' @return A vector containing genes from the assay matrix that are selected by the filter
 #'
 #' @family getCandidate Methods
 #' @export
-setGeneric("getCandidates", signature="obj", function(obj, ...) standardGeneric("getCandidates"))
+setGeneric("getCandidates", signature="obj", function(obj) standardGeneric("getCandidates"))
 
 #----------------------------------------------------------------------------------------------------
 #' CandidateFilter

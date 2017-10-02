@@ -10,7 +10,6 @@
 #' @import methods
 #' @import BSgenome
 #'
-#' @name HumanDHSFilter-class
 #' @rdname HumanDHSFilter-class
 #' @aliases HumanDHSFilter
 
@@ -30,7 +29,82 @@
 #----------------------------------------------------------------------------------------------------
 printf <- function(...) print(noquote(sprintf(...)))
 #----------------------------------------------------------------------------------------------------
+#' Get Encode regulatory tables using a human DHS filter
+#'
+#' @rdname getEncodeRegulatoryTableNames-HumanDHSFilter
+#' @aliases getEncodeRegulatoryTableNames
+#'
+#' @param obj An object of class HumanDHSFilter
+#'
+#' @seealso \code{\link{HumanDHSFilter}}
+#'
+#' @return A character vector containing the names of the Encode regulatory tables for the regions
+#' contained in the HumanDHSFilter object
+#'
+#' @export
+#'
+#' @examples
+#'
+#' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+#' targetGene <- "VRK2"
+#' promoter.length <- 1000
+#' genome <- "hg38"
+#' db.address <- system.file(package="trena", "extdata")
+#' genome.db.uri    <- paste("sqlite:/", db.address, "vrk2.genome.db",  sep = "/")
+#' gene.spec=list(targetGene=target.gene,
+#' tssUpstream=promoter.length,tssDownstream=promoter.length)
+#'
+#' hd.filter <- HumanDHSFilter(genome, pwmMatchPercentageThreshold = 85,
+#' geneInfoDatabase.uri = genome.db.uri, regions = tbl.regions)
+#'
+#' getEncodeRegulatoryTableNames(hd.filter) 
+
 setGeneric("getEncodeRegulatoryTableNames", signature="obj", function(obj) standardGeneric ("getEncodeRegulatoryTableNames"))
+
+#' Get a tabel of regulatory regions for a Human DHS filter
+#'
+#' @aliases getRegulatoryRegions
+#' @rdname getRegulatoryRegions
+#'
+#' @param obj An object of class HumanDHSFilter
+#' @param encode.table.name A vector of names for Encode tables
+#' @param chromosome The chromosome of interest
+#' @param start The starting position
+#' @param end The ending position
+#' @param score.threshold A threshold for the score (default = 200)
+#' @param quiet A logical indicating whether the method should print output
+#'
+#' @seealso \code{\link{HumanDHSFilter}}
+#'
+#' @return A data frame containing the regulatory regions for the filter, including the
+#' chromosome, start, and end positions, plus the count and score of each region.
+#'
+#' @export
+#'
+#' @examples
+#'
+#' # Make a filter for "transcription, DNA-templated" and use it to filter candidates
+#' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+#' targetGene <- "VRK2"
+#' promoter.length <- 1000
+#' genome <- "hg38"
+#' db.address <- system.file(package="trena", "extdata")
+#' genome.db.uri    <- paste("sqlite:/", db.address, "vrk2.genome.db",  sep = "/")
+#' gene.spec=list(targetGene=target.gene,
+#' tssUpstream=promoter.length,tssDownstream=promoter.length)
+#'
+#' hd.filter <- HumanDHSFilter(genome, pwmMatchPercentageThreshold = 85,
+#' geneInfoDatabase.uri = genome.db.uri, regions = tbl.regions)
+#'
+#' chrom <- "chr2"
+#' rs13384219.loc <- 57907323
+#' start <- rs13384219.loc - 10
+#' end <- rs13384219.loc + 10
+#'
+#' tableNames <- getEncodeRegulatoryTableNames(hdf)
+#'
+#' getRegulatoryRegions(hd.filter, tableNames[1], chrom, start, end)
+
 setGeneric("getRegulatoryRegions", signature="obj",
            function(obj, encode.table.name, chromosome, start, end, score.threshold=200, quiet=TRUE)
                standardGeneric ("getRegulatoryRegions"))
@@ -42,8 +116,8 @@ setGeneric("getRegulatoryRegions", signature="obj",
 #' @param encodeTableName (default = "wgEncodeRegDnaseClustered")
 #' @param pwmMatchPercentageThreshold A numeric from 0-100 to serve as a threshold for a match
 #' @param geneInfoDatabase.uri An address for a gene database
-#' @param regionsSpec A regions spec
-#' @param variants Variants
+#' @param regions A data frame containing the regions of interest
+#' @param variants A character vector containing a list of variants
 #' @param quiet A logical denoting whether or not the solver should print output
 #'
 #' @return A CandidateFilter class object that filters using Human DHS data
@@ -53,6 +127,8 @@ setGeneric("getRegulatoryRegions", signature="obj",
 #' @family Solver class objects
 #'
 #' @export
+#'
+#' @rdname HumanDHSFilter-class
 #'
 #' @examples
 #' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
@@ -106,36 +182,6 @@ HumanDHSFilter <- function(genomeName,
 
 } # HumanDHSFilter, the constructor
 #----------------------------------------------------------------------------------------------------
-#' Get Encode regulatory tables using a human DHS filter
-#'
-#' @rdname getEncodeRegulatoryTableNames-HumanDHSFilter
-#' @aliases getEncodeRegulatoryTableNames
-#'
-#' @param obj An object of class HumanDHSFilter
-#'
-#' @seealso \code{\link{HumanDHSFilter}}
-#'
-#' @return A character vector containing the names of the Encode regulatory tables for the regions
-#' contained in the HumanDHSFilter object
-#'
-#' @export
-#'
-#' @examples
-#'
-#' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
-#' targetGene <- "VRK2"
-#' promoter.length <- 1000
-#' genome <- "hg38"
-#' db.address <- system.file(package="trena", "extdata")
-#' genome.db.uri    <- paste("sqlite:/", db.address, "vrk2.genome.db",  sep = "/")
-#' gene.spec=list(targetGene=target.gene,
-#' tssUpstream=promoter.length,tssDownstream=promoter.length)
-#'
-#' hd.filter <- HumanDHSFilter(genome, pwmMatchPercentageThreshold = 85,
-#' geneInfoDatabase.uri = genome.db.uri, regions = tbl.regions)
-#'
-#' getEncodeRegulatoryTableNames(hd.filter)
-
 setMethod("getEncodeRegulatoryTableNames", "HumanDHSFilter",
 
      function(obj){
@@ -157,7 +203,6 @@ setMethod("getEncodeRegulatoryTableNames", "HumanDHSFilter",
        lapply(dbListConnections(driver), DBI::dbDisconnect)
        invisible(tableNames)
        })
-
 #----------------------------------------------------------------------------------------------------
 #' Show the details of a human DHS filter
 #'
@@ -194,65 +239,6 @@ setMethod("show", "HumanDHSFilter",
         s <- sprintf("HumanDHSFilter...")
         cat(s, sep="\n")
         })
-
-#----------------------------------------------------------------------------------------------------
-#' Get candidate genes using a human DHS filter
-#'
-#' @aliases geneSymbolToTSS
-#'
-#' @param obj An object of class HumanDHSFilter
-#' @param geneSymbol A gene of interest
-#'
-#' @seealso \code{\link{HumanDHSFilter}}
-#'
-#' @return A list, where one element is a character vector of chromosomes in which the geneSymbol
-#' is found and the other is a vector of the transcription start sites of the geneSymbol
-#'
-#' @export
-#'
-#' @examples
-#'
-#' # Make a filter for "transcription, DNA-templated" and use it to filter candidates
-#' #' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
-#' targetGene <- "VRK2"
-#' promoter.length <- 1000
-#' genome <- "hg38"
-#' db.address <- system.file(package="trena", "extdata")
-#' genome.db.uri    <- paste("sqlite:/", db.address, "vrk2.genome.db",  sep = "/")
-#' gene.spec=list(targetGene=target.gene,
-#' tssUpstream=promoter.length,tssDownstream=promoter.length)
-#'
-#' hd.filter <- HumanDHSFilter(genome, pwmMatchPercentageThreshold = 85,
-#' geneInfoDatabase.uri = genome.db.uri, regions = tbl.regions)
-#'
-#' geneSymbolToTSS(hd.filter, "VRK2")
-
-# setMethod("geneSymbolToTSS", "HumanDHSFilter",
-#
-#      function(obj, geneSymbol){
-#         geneInfo.db.info <- parseDatabaseUri(obj@geneInfoDatabase.uri)
-#         host <- geneInfo.db.info$host
-#         dbname <- geneInfo.db.info$name
-#         if(geneInfo.db.info$brand == "postgres"){
-#             db.geneInfo <- DBI::dbConnect(RPostgreSQL::PostgreSQL(),
-#                                           user= "trena",
-#                                           password="trena",
-#                                           dbname=dbname,
-#                                           host=host)}
-#         if(geneInfo.db.info$brand == "sqlite"){
-#             db.geneInfo <- DBI::dbConnect(RSQLite::SQLite(),
-#                                           dbname = paste(host, dbname, sep = "/"))}
-#         #print(dbListTables(db.geneInfo))
-#         #db.gtf <- dbConnect(PostgreSQL(), user= "trena", password="trena", dbname="gtf", host="whovian")
-#         query <- sprintf("select * from gtf where moleculetype='gene' and gene_biotype='protein_coding' and gene_name='%s'",
-#                          obj@geneCenteredSpec$targetGene)
-#         tbl <- dbGetQuery(db.geneInfo, query);
-#         tss <- tbl$start[1];
-#         chrom <- tbl$chr
-#         DBI::dbDisconnect(db.geneInfo)
-#         list(chrom=chrom, tss=tss)
-#         })
-#
 #----------------------------------------------------------------------------------------------------
 #' Get candidate genes using a human DHS filter
 #'
@@ -335,45 +321,6 @@ setMethod("getCandidates", "HumanDHSFilter",
     }) # getCandidates
 
 #----------------------------------------------------------------------------------------------------
-#' Get candidate genes using a human DHS filter
-#'
-#' @aliases getCandidates-FootprintFilter
-#'
-#' @param obj An object of class FootprintFilter
-#'
-#' @seealso \code{\link{FootprintFilter}}
-#'
-#' @family getCandidate Methods
-#'
-#' @return A list, where one element a character vector of transcription factors that match
-#' the GO term and the other is an empty data frame.
-#'
-#' @export
-#'
-#' @examples
-#'
-#' # Make a filter for "transcription, DNA-templated" and use it to filter candidates
-#' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
-#' targetGene <- "VRK2"
-#' promoter.length <- 1000
-#' genome <- "hg38"
-#' db.address <- system.file(package="trena", "extdata")
-#' genome.db.uri    <- paste("sqlite:/", db.address, "vrk2.genome.db",  sep = "/")
-#' gene.spec=list(targetGene=target.gene,
-#' tssUpstream=promoter.length,tssDownstream=promoter.length)
-#'
-#' hd.filter <- HumanDHSFilter(genome, pwmMatchPercentageThreshold = 85,
-#' geneInfoDatabase.uri = genome.db.uri, regions = tbl.regions)
-#'
-#' chrom <- "chr2"
-#' rs13384219.loc <- 57907323
-#' start <- rs13384219.loc - 10
-#' end <- rs13384219.loc + 10
-#'
-#' tableNames <- getEncodeRegulatoryTableNames(hdf)
-#'
-#' getRegulatoryRegions(hd.filter, tableNames[1], chrom, start, end)
-
 setMethod("getRegulatoryRegions", "HumanDHSFilter",
 
     function(obj, encode.table.name, chromosome, start, end, score.threshold=0) {
