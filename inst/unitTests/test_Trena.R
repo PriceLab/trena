@@ -24,7 +24,9 @@ runTests <- function()
 
    test_createGeneModel()
    test_assessSnp()
-   # test_assessSnp_allTypesWithDeltas()
+
+   test_getProximalPromoterHuman()
+   test_getProximalPromoterMouse()
 
    checkEquals(openPostgresConnections(), 0)
 
@@ -303,17 +305,22 @@ test_getProximalPromoterHuman <- function()
     tssDownstream <- 1000
 
     # Pull the regions for MEF2C
-    regions <- getProximalPromoter(trena, geneSymbol, tssUpstream, tssDownstream)  
+    regions <- getProximalPromoter(trena, geneSymbol, tssUpstream, tssDownstream)
 
     # Check the type of data returned and its size
     checkEquals(dim(regions), c(1,3))
     checkEquals(class(regions), "data.frame")
-    
+
     # Check the nominal values (tss = 88904257)
     tss <- 88904257
     checkEquals(regions$chrom, "chr5")
     checkEquals(regions$start, tss - tssUpstream)
     checkEquals(regions$end, tss + tssDownstream)
+
+    # check with bogus gene symbol
+    checkTrue(is.na(getProximalPromoter(trena, "bogus", tssUpstream, tssDownstream)))
+
+
 } # test_getProximalPromoterHuman
 #----------------------------------------------------------------------------------------------------
 test_getProximalPromoterMouse <- function(){
@@ -328,16 +335,20 @@ test_getProximalPromoterMouse <- function(){
     tssDownstream <- 1000
 
     # Pull the regions for Twist2
-    regions <- getProximalPromoter(trena, geneSymbol, tssUpstream, tssDownstream)  
+    regions <- getProximalPromoter(trena, geneSymbol, tssUpstream, tssDownstream)
 
     # Check the type of data returned and its size
     checkEquals(dim(regions), c(1,3))
     checkEquals(class(regions), "data.frame")
-    
+
     # Check the nominal values (tss = 88904257)
     tss <- 91801461
     checkEquals(regions$chrom, "chr1")
     checkEquals(regions$start, tss - tssUpstream)
     checkEquals(regions$end, tss + tssDownstream)
-}
 
+    # check with bogus gene symbol
+    checkTrue(is.na(getProximalPromoter(trena, "bogus", tssUpstream, tssDownstream)))
+
+} # test_getProximalPromoterMouse
+#----------------------------------------------------------------------------------------------------

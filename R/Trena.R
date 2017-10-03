@@ -156,7 +156,7 @@ setGeneric('createGeneModel', signature='obj', function(obj, targetGene,  solver
 #' jaspar.human.pfms <- as.list(query(query(MotifDb, "jaspar2016"), "sapiens"))
 #'
 #' variant <- "rs3875089" # chr18:26865469  T->C
-#' 
+#'
 #' tbl <- assessSnp(trena, jaspar.human.pfms, variant, shoulder = 3,
 #' pwmMatchMinimumAsPercentage = 65)
 #'
@@ -477,15 +477,15 @@ setMethod('assessSnp', 'Trena',
 #----------------------------------------------------------------------------------------------------
 setMethod("getProximalPromoter", "Trena",
 
-          function(obj, geneSymbol,                   
-                   tssUpstream = 1000,                   
+          function(obj, geneSymbol,
+                   tssUpstream = 1000,
                    tssDownstream = 1000){
 
               # Grab from gtf on BDDS if it's hg38
               if(obj@genomeName == "hg38"){
                   database.uri = "postgres://bddsrds.globusgenomics.org/hg38"
                   host <- "bddsrds.globusgenomics.org"
-                  dbname <- "hg38"                  
+                  dbname <- "hg38"
                   driver <- RPostgreSQL::PostgreSQL()
 
                   genome.db <- DBI::dbConnect(driver,
@@ -498,22 +498,24 @@ setMethod("getProximalPromoter", "Trena",
                                    geneSymbol)
 
                   tbl.loc <- dbGetQuery(genome.db, query)
+                  if(nrow(tbl.loc) == 0)
+                    return(NA)
                   chrom <- tbl.loc$chr[1]
-                  start.orig <- tbl.loc$start[1]                  
-                  end.orig   <- tbl.loc$endpos[1]                  
-                  strand     <- tbl.loc$strand[1]                  
+                  start.orig <- tbl.loc$start[1]
+                  end.orig   <- tbl.loc$endpos[1]
+                  strand     <- tbl.loc$strand[1]
                   DBI::dbDisconnect(genome.db)
 
                   if(strand == "-"){ # reverse (minus) strand.  TSS is at "end" position
-                      start.loc <- end.orig - tssDownstream                      
-                      end.loc   <- end.orig + tssUpstream                      
+                      start.loc <- end.orig - tssDownstream
+                      end.loc   <- end.orig + tssUpstream
                   }
-                  
-                  else{ #  forward (plus) strand.  TSS is at "start" position                      
-                      start.loc <- start.orig - tssUpstream                      
-                      end.loc   <- start.orig + tssDownstream                      
+
+                  else{ #  forward (plus) strand.  TSS is at "start" position
+                      start.loc <- start.orig - tssUpstream
+                      end.loc   <- start.orig + tssDownstream
                   }
-                                               
+
               } else { # Grab from biomaRt for mm10
 
                   mm10.mart <- biomaRt::useMart(biomart="ensembl", dataset="mmusculus_gene_ensembl")
@@ -521,28 +523,31 @@ setMethod("getProximalPromoter", "Trena",
                   tbl.geneInfo <- biomaRt::getBM(attributes=c("chromosome_name",
                                                               "transcription_start_site",
                                                               "mgi_symbol",
-                                                              "strand"),                                                 
+                                                              "strand"),
                                                  filters="mgi_symbol", value=geneSymbol, mart=mm10.mart)
-                  
-                  # make sure all transcripts are on the same strand                  
-                  strand <- unique(tbl.geneInfo$strand)                  
-                  stopifnot(length(strand) == 1)                  
-                  chrom <- sprintf("chr%s", unique(tbl.geneInfo$chromosome_name))                  
-                  stopifnot(length(chrom) == 1)
-                  
-                  # assume + strand                  
-                  tss <- min(tbl.geneInfo$transcription_start_site)                  
-                  start.loc <- tss - tssUpstream                  
-                  end.loc   <- tss + tssDownstream
-                  
-                  if(strand == -1){                      
-                      tss <- max(tbl.geneInfo$transcription_start_site)                      
-                      start.loc <- tss - tssDownstream                      
-                      end.loc   <- tss + tssUpstream                      
-                  }                  
-              }              
 
-              return (data.frame(chrom=chrom, start=start.loc, end=end.loc, stringsAsFactors=FALSE))              
+                 if(nrow(tbl.geneInfo) == 0)
+                    return(NA)
+
+                  # make sure all transcripts are on the same strand
+                  strand <- unique(tbl.geneInfo$strand)
+                  stopifnot(length(strand) == 1)
+                  chrom <- sprintf("chr%s", unique(tbl.geneInfo$chromosome_name))
+                  stopifnot(length(chrom) == 1)
+
+                  # assume + strand
+                  tss <- min(tbl.geneInfo$transcription_start_site)
+                  start.loc <- tss - tssUpstream
+                  end.loc   <- tss + tssDownstream
+
+                  if(strand == -1){
+                      tss <- max(tbl.geneInfo$transcription_start_site)
+                      start.loc <- tss - tssDownstream
+                      end.loc   <- tss + tssUpstream
+                  }
+              }
+
+              return (data.frame(chrom=chrom, start=start.loc, end=end.loc, stringsAsFactors=FALSE))
 
           })# getProximalPromoter
 #----------------------------------------------------------------------------------------------------
