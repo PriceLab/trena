@@ -37,8 +37,11 @@ project.db.uri <- paste("sqlite:/",db.address,"project.sub.db", sep = "/")
 target.gene <- "MEF2C"
 size.upstream <- 1000
 size.downstream <- 1000
-geneCenteredSpec <- list(targetGene = target.gene, tssUpstream = size.upstream,
-tssDownstream = size.downstream)
+
+# Construct a Trena object and use it to retrive the regions
+trena <- Trena("hg38")
+regions <- getProximalPromoter(trena,target.gene, size.upstream, size.downstream)
+ 
 footprint.filter <- FootprintFilter(genomeDB = genome.db.uri, footprintDB = project.db.uri,
 regions = regions)
 }

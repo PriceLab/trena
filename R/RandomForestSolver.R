@@ -116,7 +116,7 @@ setMethod('show', 'RandomForestSolver',
 #' targetGene <- "MEF2C"
 #' candidateRegulators <- setdiff(rownames(mtx.sub), targetGene)
 #' rf.solver <- RandomForestSolver(mtx.sub, targetGene, candidateRegulators)
-#' tbl <- solve(rf.solver)
+#' tbl <- run(rf.solver)
 
 
 setMethod("run", "RandomForestSolver",
@@ -135,17 +135,18 @@ setMethod("run", "RandomForestSolver",
       stopifnot(target.gene %in% rownames(mtx))           
       stopifnot(all(tfs %in% rownames(mtx)))      
       if(length(tfs)==0) return(NULL)      
-
+      
       x <- t(mtx[tfs,,drop=FALSE])      
       y <- as.vector(t(mtx[target.gene,])) # Change y to a vector to avoid RF warning      
-
-     fit <- randomForest( x = x, y = y )
-     edges = as.data.frame(fit$importance)
-     pred.values = stats::predict(fit)
-     r2 = stats::cor(pred.values , mtx[target.gene,])^2
-     gene.cor <- sapply(rownames(edges), function(tf) stats::cor(mtx[tf,], mtx[target.gene,]))
-     edges$gene.cor <- gene.cor
-     edges <- edges[order(edges$IncNodePurity, decreasing=TRUE),]
-     return(list(edges = edges , r2 = r2))
+      
+      fit <- randomForest( x = x, y = y )
+      edges = as.data.frame(fit$importance)
+      pred.values = stats::predict(fit)
+      #r2 = stats::cor(pred.values , mtx[target.gene,])^2
+      gene.cor <- sapply(rownames(edges), function(tf) stats::cor(mtx[tf,], mtx[target.gene,]))
+      edges$gene.cor <- gene.cor
+      edges <- edges[order(edges$IncNodePurity, decreasing=TRUE),]
+      #return(list(edges = edges , r2 = r2))
+      return(edges)
      })
 #----------------------------------------------------------------------------------------------------

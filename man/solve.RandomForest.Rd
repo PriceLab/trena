@@ -26,7 +26,7 @@ load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RD
 targetGene <- "MEF2C"
 candidateRegulators <- setdiff(rownames(mtx.sub), targetGene)
 rf.solver <- RandomForestSolver(mtx.sub, targetGene, candidateRegulators)
-tbl <- solve(rf.solver)
+tbl <- run(rf.solver)
 }
 \seealso{
 \code{\link{randomForest}}, \code{\link{RandomForestSolver}}

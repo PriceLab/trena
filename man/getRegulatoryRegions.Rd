@@ -38,8 +38,10 @@ promoter.length <- 1000
 genome <- "hg38"
 db.address <- system.file(package="trena", "extdata")
 genome.db.uri    <- paste("sqlite:/", db.address, "vrk2.genome.db",  sep = "/")
-gene.spec=list(targetGene=target.gene,
-tssUpstream=promoter.length,tssDownstream=promoter.length)
+
+# Grab regions for VRK2 using shoulder size of 1000
+trena <- Trena(genome)
+tbl.regions <- getProximalPromoter(trena, "VRK2", 1000, 1000)
 
 hd.filter <- HumanDHSFilter(genome, pwmMatchPercentageThreshold = 85,
 geneInfoDatabase.uri = genome.db.uri, regions = tbl.regions)
@@ -49,7 +51,7 @@ rs13384219.loc <- 57907323
 start <- rs13384219.loc - 10
 end <- rs13384219.loc + 10
 
-tableNames <- getEncodeRegulatoryTableNames(hdf)
+tableNames <- getEncodeRegulatoryTableNames(hd.filter)
 
 getRegulatoryRegions(hd.filter, tableNames[1], chrom, start, end)
 }

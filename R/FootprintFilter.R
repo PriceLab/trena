@@ -48,8 +48,11 @@ printf <- function(...) print(noquote(sprintf(...)))
 #' target.gene <- "MEF2C"
 #' size.upstream <- 1000
 #' size.downstream <- 1000
-#' geneCenteredSpec <- list(targetGene = target.gene, tssUpstream = size.upstream,
-#' tssDownstream = size.downstream)
+#'
+#' # Construct a Trena object and use it to retrive the regions
+#' trena <- Trena("hg38")
+#' regions <- getProximalPromoter(trena,target.gene, size.upstream, size.downstream)
+#'  
 #' footprint.filter <- FootprintFilter(genomeDB = genome.db.uri, footprintDB = project.db.uri,
 #' regions = regions)
 
@@ -81,27 +84,21 @@ FootprintFilter <- function(genomeDB, footprintDB, regions=data.frame(), quiet=T
 #' @examples
 #'
 #' # Use footprint filter with the included SQLite database for MEF2C to filter candidates
-#' # in the included Alzheimer's dataset with a gene-centered spec
+#' # in the included Alzheimer's dataset, using the Trena object to get regions
 #' target.gene <- "MEF2C"
 #' db.address <- system.file(package="trena", "extdata")
 #' genome.db.uri <- paste("sqlite:/",db.address,"genome.sub.db", sep = "/")
 #' project.db.uri <- paste("sqlite:/",db.address,"project.sub.db", sep = "/")
 #' size.upstream <- 1000
 #' size.downstream <- 1000
-#' geneCenteredSpec <- list(targetGene = target.gene, tssUpstream = size.upstream, tssDownstream = size.downstream)
+#'
+#' # Construct a Trena object and use it to retrive the regions
+#' trena <- Trena("hg38")
+#' regions <- getProximalPromoter(trena,target.gene, size.upstream, size.downstream)
+#'
 #' footprint.filter <- FootprintFilter(genomeDB = genome.db.uri, footprintDB = project.db.uri,
 #' regions = regions)
-#' tfs <- getCandidates(footprint.filter)
-#'
-#' # Perform the same operation, but use a region spec
-#' mef2c.tss <- 88904257 # Empirically assign the MEF2C TSS as the location
-#' chrom <- "chr5"
-#' start <- mef2c.tss - 1000
-#' end <- mef2c.tss + 1000
-#' regionsSpec <- sprintf("%s:%d-%d", chrom, start, end)
-#' footprint.filter <- FootprintFilter(genomeDB = genome.db.uri,
-#' footprintDB = project.db.uri, regionsSpec = regionsSpec)
-#' tfs <- getCandidates(footprint.filter)
+#' footprints <- getCandidates(footprint.filter)
 
 setMethod("getCandidates", "FootprintFilter",
 
