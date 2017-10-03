@@ -58,19 +58,19 @@ SqrtLassoSolver <- function(mtx.assay=matrix(), targetGene, candidateRegulators,
     
     stopifnot(length(candidateRegulators) > 0)    
 
-    obj <- .SqrtLassoSolver(mtx.assay=mtx.assay,                        
-                        quiet=quiet,                        
-                        targetGene=targetGene,                        
-                        candidateRegulators=candidateRegulators,                        
-                        regulatorWeights=regulatorWeights,                        
-                        lambda = lambda,                        
-                        nCores = nCores                        
-                       )
-
+    obj <- .SqrtLassoSolver(Solver(mtx.assay=mtx.assay,                        
+                                   quiet=quiet,                        
+                                   targetGene=targetGene,                        
+                                   candidateRegulators=candidateRegulators),  
+                            regulatorWeights=regulatorWeights,                        
+                            lambda = lambda,                        
+                            nCores = nCores                        
+                            )
+    
     # Send a warning if there's a row of zeros
     if(!is.na(max(mtx.assay)) & any(rowSums(mtx.assay) == 0))
-       warning("One or more gene has zero expression; this may cause problems when using Square Root LASSO. You may want to try 'lasso' or 'ridge' instead.")
-
+        warning("One or more gene has zero expression; this may cause problems when using Square Root LASSO. You may want to try 'lasso' or 'ridge' instead.")
+    
     obj
 
 } # SqrtLassoSolver, the constructor
@@ -146,15 +146,7 @@ setMethod("run", "SqrtLassoSolver",
               target.gene <- getTarget(obj)
               tfs <- getRegulators(obj)
               lambda <- obj@lambda
-              nCores <- obj@nCores
-              
-              if(length(tfs) == 0)                  
-                  return(data.frame())              
-
-              # Check if target.gene is in the bottom 10% in mean expression; if so, send a warning
-              if(rowMeans(mtx)[target.gene] < stats::quantile(rowMeans(mtx), probs = 0.1)){
-                  warning("Target gene mean expression is in the bottom 10% of all genes in the assay matrix")
-                  }
+              nCores <- obj@nCores            
 
               # we don't try to handle tf self-regulation              
               deleters <- grep(target.gene, tfs)              

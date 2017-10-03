@@ -56,14 +56,14 @@ LassoSolver <- function(mtx.assay=matrix(), targetGene, candidateRegulators,
    candidateRegulators <- intersect(candidateRegulators, rownames(mtx.assay))
    stopifnot(length(candidateRegulators) > 0)
 
-   obj <- .LassoSolver(mtx.assay=mtx.assay,
+   obj <- .LassoSolver(Solver(mtx.assay=mtx.assay,
                               quiet=quiet,
                               targetGene=targetGene,
-                              candidateRegulators=candidateRegulators,
-                              regulatorWeights=regulatorWeights,
-                              alpha = alpha,
-                              lambda = lambda,
-                              keep.metrics = keep.metrics
+                              candidateRegulators=candidateRegulators),
+                       regulatorWeights=regulatorWeights,
+                       alpha = alpha,
+                       lambda = lambda,
+                       keep.metrics = keep.metrics
                        )
     obj
 
@@ -134,12 +134,7 @@ setMethod("run", "LassoSolver",
       mtx <- getAssayData(obj)
       target.gene <- getTarget(obj)
       tfs <- getRegulators(obj)
-      
-      # Check if target.gene is in the bottom 10% in mean expression; if so, send a warning
-      if(rowMeans(mtx)[target.gene] < stats::quantile(rowMeans(mtx), probs = 0.1)){          
-          warning("Target gene mean expression is in the bottom 10% of all genes in the assay matrix")          
-      }      
-      
+                
       mtx.beta <- .elasticNetSolver(obj, target.gene, tfs,
                                     obj@regulatorWeights,
                                     obj@alpha,

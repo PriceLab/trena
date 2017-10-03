@@ -118,40 +118,53 @@ setGeneric("getRegulators", signature = "obj", function(obj) standardGeneric("ge
 Solver <- function(mtx.assay=matrix(), targetGene, candidateRegulators, quiet=TRUE)
 {
     # If a matrix is supplied, check the distribution to see if it's too big
+    # Also check to make sure target gene is well-enough expressed
     if(!is.na(max(mtx.assay))){
         mtx.ratio <- (max(mtx.assay) - stats::quantile(mtx.assay,0.75))/(stats::quantile(mtx.assay,0.75) - stats::median(mtx.assay))
         if(mtx.ratio > 1000){
             warning("Assay matrix may contain highly skewed data; consider transforming your matrix.")
-            }
-    }    
+        }
+        
+        if(rowMeans(mtx.assay)[targetGene] < stats::quantile(rowMeans(mtx.assay), probs = 0.1)){
+            warning("Target gene mean expression is in the bottom 10% of all genes in the assay matrix")
+        } 
+    }
 
+    # Check to make sure the candidate regulators and target gene aren't empty;
+    # If they are, send up a warning
+    if(length(targetGene) == 0) {
+        warning("No target gene supplied; please supply a target gene to avoid errors")
+    }
+    if(length(candidateRegulators) == 0) {
+        warning("No regulators supplied; please supply regulators to avoid errors")
+        }
+    
     env <- new.env(parent=emptyenv())
     .Solver(mtx.assay=mtx.assay,
             targetGene = targetGene,
             candidateRegulators = candidateRegulators,
             quiet=quiet,
             state=env)
-
+    
 } # Solver, the constructor
 #----------------------------------------------------------------------------------------------------
 setMethod("getAssayData", "Solver",
-
-   function (obj){
-      obj@mtx.assay
-      })
+          
+          function (obj){
+              obj@mtx.assay
+          })
 #----------------------------------------------------------------------------------------------------
 setMethod("getTarget", "Solver",
-
-   function (obj){
-      obj@targetGene
-      })
+          
+          function (obj){
+              obj@targetGene
+          })
 #----------------------------------------------------------------------------------------------------
 setMethod("getRegulators", "Solver",
-
-   function (obj){
-      obj@candidateRegulators
-   })
-
+          
+          function (obj){
+              obj@candidateRegulators
+          })
 #----------------------------------------------------------------------------------------------------
 #' Rescale the Predictor Weights
 #'
@@ -181,7 +194,7 @@ setMethod("getRegulators", "Solver",
 #' cooked.values <- rescalePredictorWeights(ls, rawValue.min = 1, rawValue.max = 1000000, raw.values)
 
 setMethod("rescalePredictorWeights", "Solver",
-
+          
           function(obj, rawValue.min, rawValue.max, rawValues){
               1 - ((rawValues-rawValue.min)/(rawValue.max-rawValue.min))
           })

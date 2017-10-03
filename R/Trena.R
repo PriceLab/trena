@@ -498,13 +498,15 @@ setMethod("getProximalPromoter", "Trena",
                                    geneSymbol)
 
                   tbl.loc <- dbGetQuery(genome.db, query)
+                  DBI::dbDisconnect(genome.db)
+                  
                   if(nrow(tbl.loc) == 0)
                     return(NA)
                   chrom <- tbl.loc$chr[1]
                   start.orig <- tbl.loc$start[1]
                   end.orig   <- tbl.loc$endpos[1]
                   strand     <- tbl.loc$strand[1]
-                  DBI::dbDisconnect(genome.db)
+                  
 
                   if(strand == "-"){ # reverse (minus) strand.  TSS is at "end" position
                       start.loc <- end.orig - tssDownstream

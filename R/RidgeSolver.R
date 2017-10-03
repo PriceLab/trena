@@ -45,7 +45,7 @@
 #' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
 #' target.gene <- "MEF2C"
 #' tfs <- setdiff(rownames(mtx.sub), target.gene)
-#' ridge.solver <- LassoSolver(mtx.sub, target.gene, tfs)
+#' ridge.solver <- RidgeSolver(mtx.sub, target.gene, tfs)
 
 RidgeSolver <- function(mtx.assay=matrix(), targetGene, candidateRegulators,
                         regulatorWeights = rep(1, length(candidateRegulators)),
@@ -58,14 +58,14 @@ RidgeSolver <- function(mtx.assay=matrix(), targetGene, candidateRegulators,
    candidateRegulators <- intersect(candidateRegulators, rownames(mtx.assay))
    stopifnot(length(candidateRegulators) > 0)
 
-   obj <- .RidgeSolver(mtx.assay=mtx.assay,
+   obj <- .RidgeSolver(Solver(mtx.assay=mtx.assay,
                               quiet=quiet,
                               targetGene=targetGene,
-                              candidateRegulators=candidateRegulators,
-                              regulatorWeights=regulatorWeights,
-                              alpha = alpha,
-                              lambda = lambda,
-                              keep.metrics = keep.metrics
+                              candidateRegulators=candidateRegulators),
+                       regulatorWeights=regulatorWeights,
+                       alpha = alpha,
+                       lambda = lambda,
+                       keep.metrics = keep.metrics
                        )
     obj
 
@@ -136,12 +136,7 @@ setMethod("run", "RidgeSolver",
 
       mtx <- getAssayData(obj)
       target.gene <- getTarget(obj)
-      tfs <- getRegulators(obj)
-      
-      # Check if target.gene is in the bottom 10% in mean expression; if so, send a warning      
-      if(rowMeans(mtx)[target.gene] < stats::quantile(rowMeans(mtx), probs = 0.1)){          
-          warning("Target gene mean expression is in the bottom 10% of all genes in the assay matrix")          
-      }      
+      tfs <- getRegulators(obj)    
 
       mtx.beta <- .elasticNetSolver(obj, target.gene, tfs,
                                     obj@regulatorWeights,

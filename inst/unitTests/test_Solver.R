@@ -9,14 +9,15 @@ runTests <- function()
     test_getTarget()
     test_getRegulators()
     test_eliminateSelfTFs()    
-    test_MatrixWarnings()    
+    test_MatrixWarnings()
+    test_TargetAndRegulatorWarnings()
    
 } # runTests
 #----------------------------------------------------------------------------------------------------
 test_getAssayData <- function()
 {
     printf("--- test_getAssayData")
-    mtx <- matrix(1:9, nrow = 3)
+    mtx <- matrix(rnorm(9), nrow = 3)
     rownames(mtx) <- c("gene1","gene2","gene3")
     solver <- Solver(mtx, "gene1", c("gene2","gene3"))    
     checkEquals(class(getAssayData(solver)), "matrix")
@@ -27,7 +28,7 @@ test_getAssayData <- function()
 test_getTarget <- function()
 {
     printf("--- test_getTarget")
-    mtx <- matrix(1:9, nrow = 3)
+    mtx <- matrix(rnorm(9), nrow = 3)
     rownames(mtx) <- c("gene1","gene2","gene3")
     solver <- Solver(mtx, "gene1", c("gene2","gene3"))    
     checkEquals(class(getTarget(solver)), "character")
@@ -38,7 +39,7 @@ test_getTarget <- function()
 test_getRegulators <- function()
 {
     printf("--- test_getRegulators")
-    mtx <- matrix(1:9, nrow = 3)
+    mtx <- matrix(9:1, nrow = 3)
     rownames(mtx) <- c("gene1","gene2","gene3")
     solver <- Solver(mtx, "gene1", c("gene2","gene3"))    
     checkEquals(length(getRegulators(solver)), 2)
@@ -82,7 +83,7 @@ test_MatrixWarnings <- function()
     rownames(test.mtx) <- paste0("gene",1:100)
     target.gene <- "gene1"
     tfs <- setdiff(rownames(test.mtx),target.gene)
-    checkException(solver(test.mtx,target.gene,tfs), silent = TRUE)
+    checkException(Solver(test.mtx,target.gene,tfs), silent = TRUE)
 
     # Check that a matrix with a row of 0's produces an error for most solvers
     test.mtx[1,] <- 0
@@ -94,14 +95,41 @@ test_MatrixWarnings <- function()
     checkException(SpearmanSolver(test.mtx, target.gene, tfs), silent = TRUE)
     checkException(EnsembleSolver(test.mtx, target.gene, tfs), silent = TRUE)
 
-    # Check that a target gene with low expression causes a warning for a solver
+    # Check that a target gene with low expression causes a warning for all solvers
     test.mtx[1,] <- 0.1
-    solver <- EnsembleSolver(test.mtx, target.gene, tfs)
-    checkException(run(solver), silent = TRUE)    
+    checkException(BayesSpikeSolver(test.mtx, target.gene, tfs), silent = TRUE)
+    checkException(LassoPVSolver(test.mtx, target.gene, tfs), silent = TRUE)
+    checkException(SqrtLassoSolver(test.mtx, target.gene, tfs), silent = TRUE)
+    checkException(RandomForestSolver(test.mtx, target.gene, tfs), silent = TRUE)
+    checkException(PearsonSolver(test.mtx, target.gene, tfs), silent = TRUE)
+    checkException(SpearmanSolver(test.mtx, target.gene, tfs), silent = TRUE)
+    checkException(EnsembleSolver(test.mtx, target.gene, tfs), silent = TRUE)
+    checkException(LassoSolver(test.mtx, target.gene, tfs), silent = TRUE)
+    checkException(RidgeSolver(test.mtx, target.gene, tfs), silent = TRUE)    
     
     # Change warnings back to warnings
     options(warn = 1)
 
 } #test_MatrixWarnings
 #----------------------------------------------------------------------------------------------------
+test_TargetAndRegulatorWarnings <- function()
+{
+    printf("--- test_TargetAndRegulatorWarnings")
+
+    # Change warnings to errors
+    options(warn = 2)
+
+    # Make fake data
+    test.mtx <- matrix(rnorm(10000), nrow = 100)
+    rownames(test.mtx) <- paste0("gene",1:100)
+
+    # Test for error with empty target and empty candidates
+    checkException(Solver(test.mtx, targetGene = character(0),
+                          candidateRegulators = rownames(test.mtx)), silent = TRUE)
+    checkException(Solver(test.mtx, targetGene = "gene1",
+                          candidateRegulators = character(0)), silent = TRUE)    
+
+    options(warn = 1)
+} #test_TargetAndRegulatorWarnings
+#----------------------------------------------------------------------------------------------------    
 if(!interactive()) runTests()

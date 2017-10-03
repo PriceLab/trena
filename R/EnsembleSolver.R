@@ -112,9 +112,10 @@ EnsembleSolver <- function(mtx.assay=matrix(), targetGene, candidateRegulators,
     if(!is.na(max(mtx.assay)) & any(rowSums(mtx.assay) == 0))
         warning("One or more gene has zero expression; this may cause difficulty when using Bayes Spike. You may want to try 'lasso' or 'ridge' instead.")
     
-    obj <- .EnsembleSolver(mtx.assay = mtx.assay,
-                           targetGene = targetGene,
-                           candidateRegulators = candidateRegulators,
+    obj <- .EnsembleSolver(Solver(mtx.assay = mtx.assay,
+                                  targetGene = targetGene,
+                                  candidateRegulators = candidateRegulators,
+                                  quiet = quiet),
                            solverNames = solverNames,
                            geneCutoff = geneCutoff,
                            alpha.lasso = alpha.lasso,
@@ -123,8 +124,7 @@ EnsembleSolver <- function(mtx.assay=matrix(), targetGene, candidateRegulators,
                            lambda.ridge = lambda.ridge,
                            lambda.sqrt = lambda.sqrt,
                            nCores.sqrt = nCores.sqrt,
-                           nOrderings.bayes = nOrderings.bayes,
-                           quiet=quiet)
+                           nOrderings.bayes = nOrderings.bayes)
     obj
     
 } # EnsembleSolver, the constructor
@@ -223,11 +223,6 @@ setMethod("run", "EnsembleSolver",
               target.gene <- getTarget(obj)
               tfs <- getRegulators(obj)
               gene.cutoff <- obj@geneCutoff
-              
-              # Check if target.gene is in the bottom 10% in mean expression; if so, send a warning
-              if(rowMeans(mtx)[target.gene] < stats::quantile(rowMeans(mtx), probs = 0.1)){
-                  warning("Target gene mean expression is in the bottom 10% of all genes in the assay matrix")
-              }
               
               # Create a list of solvers and a list for solutions
               out.list <- list()

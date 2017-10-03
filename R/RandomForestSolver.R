@@ -46,17 +46,18 @@ RandomForestSolver <- function(mtx.assay=matrix(), targetGene, candidateRegulato
    candidateRegulators <- intersect(candidateRegulators, rownames(mtx.assay))
    stopifnot(length(candidateRegulators) > 0)
 
-   obj <- .RandomForestSolver(mtx.assay=mtx.assay, quiet=quiet,
-                              targetGene=targetGene,
-                              candidateRegulators=candidateRegulators,
+   obj <- .RandomForestSolver(Solver(mtx.assay=mtx.assay,
+                                     quiet=quiet,
+                                     targetGene=targetGene,
+                                     candidateRegulators=candidateRegulators),
                               regulatorWeights=regulatorWeights)
-
-    # Send a warning if there's a row of zeros
-    if(!is.na(max(mtx.assay)) & any(rowSums(mtx.assay) == 0))
+   
+   # Send a warning if there's a row of zeros
+   if(!is.na(max(mtx.assay)) & any(rowSums(mtx.assay) == 0))
        warning("One or more gene has zero expression; this may yield warnings when using Random Forest.")
-
-    obj
-
+   
+   obj
+   
 } # RandomForestSolver, the constructor
 #----------------------------------------------------------------------------------------------------
 #' Show the Random Forest Solver
@@ -125,12 +126,7 @@ setMethod("run", "RandomForestSolver",
 
       mtx <- getAssayData(obj)
       target.gene <- getTarget(obj)
-      tfs <- getRegulators(obj)
-      
-      # Check if target.gene is in the bottom 10% in mean expression; if so, send a warning
-      if(rowMeans(mtx)[target.gene] < stats::quantile(rowMeans(mtx), probs = 0.1)){
-          warning("Target gene mean expression is in the bottom 10% of all genes in the assay matrix")
-      }     
+      tfs <- getRegulators(obj)    
       
       stopifnot(target.gene %in% rownames(mtx))           
       stopifnot(all(tfs %in% rownames(mtx)))      

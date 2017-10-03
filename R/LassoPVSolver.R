@@ -120,11 +120,6 @@ setMethod("run", "LassoPVSolver",
               mtx <- getAssayData(obj)
               target.gene <- getTarget(obj)
               tfs <- getRegulators(obj)             
-
-              # Check if target.gene is in the bottom 10% in mean expression; if so, send a warning         
-              if(rowMeans(mtx)[target.gene] < stats::quantile(rowMeans(mtx), probs = 0.1)){                 
-                  warning("Target gene mean expression is in the bottom 10% of all genes in the assay matrix")            
-              }
               
               # we don't try to handle tf self-regulation           
               deleters <- grep(target.gene, tfs)

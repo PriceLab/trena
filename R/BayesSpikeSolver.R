@@ -45,11 +45,11 @@ BayesSpikeSolver <- function(mtx.assay=matrix(), targetGene, candidateRegulators
     candidateRegulators <- intersect(candidateRegulators, rownames(mtx.assay))    
     stopifnot(length(candidateRegulators) > 0)    
    
-    obj <- .BayesSpikeSolver(mtx.assay=mtx.assay,                             
-                             targetGene = targetGene,
-                             candidateRegulators = candidateRegulators,
-                             nOrderings = nOrderings,
-                             quiet=quiet)
+    obj <- .BayesSpikeSolver(Solver(mtx.assay=mtx.assay,                             
+                                    targetGene = targetGene,
+                                    candidateRegulators = candidateRegulators,
+                                    quiet = quiet),
+                             nOrderings = nOrderings)
 
     # Send a warning if there's a row of zeros
     if(!is.na(max(mtx.assay)) & any(rowSums(mtx.assay) == 0))
@@ -131,11 +131,7 @@ setMethod("run", "BayesSpikeSolver",
       tfs <- getRegulators(obj)
       stopifnot(target.gene %in% rownames(mtx))      
       stopifnot(all(tfs %in% rownames(mtx)))
-            
-      # Check if target.gene is in the bottom 10% in mean expression; if so, send a warning      
-      if(rowMeans(mtx)[target.gene] < stats::quantile(rowMeans(mtx), probs = 0.1)){                   
-          warning("Target gene mean expression is in the bottom 10% of all genes in the assay matrix")         
-      }           
+                     
       # we don't try to handle tf self-regulation      
       deleters <- grep(target.gene, tfs)      
       if(length(deleters) > 0){          
