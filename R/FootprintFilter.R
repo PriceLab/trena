@@ -108,8 +108,6 @@ setMethod("getCandidates", "FootprintFilter",
          fp <- FootprintFinder(obj@genomeDB, obj@footprintDB)
          tbl.out <- data.frame()
 
-        #for(region in obj@regions){
-           #chromLoc <- parseChromLocString(region)
         for(r in 1:nrow(obj@regions)){
            chromLoc <- as.list(obj@regions[r,])
            if(!obj@quiet) printf(" FootprintFilter::getCandidates, getFootprintsInRegion %s-%s",
