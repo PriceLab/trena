@@ -257,9 +257,7 @@ setMethod('getGeneModelTableColumnNames', 'Trena',
        return(tbl.fp)
        }
 
-    colnames.raw <- c("loc", "chrom", "start", "endpos", "fp_start", "fp_end", "type", "name", "length", "strand",
-                      "sample_id", "method", "provenance", "score1", "score2", "score3", "score4", "score5", "score6")
-    tbl.fp <- tbl.fp[, c("chrom", "start", "endpos", "name", "length", "strand", "score1", "score2", "score3")]
+    tbl.fp <- tbl.fp[, c("chrom", "start", "endpos", "motifName", "length", "strand", "score1", "score2", "score3")]
     colnames(tbl.fp) <- c("chrom", "motifStart", "motifEnd", "motifName", "length", "strand", "score1", "score", "score3")
 
     distance <- tbl.fp$motifStart - targetGeneTSS
