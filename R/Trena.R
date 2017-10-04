@@ -253,7 +253,7 @@ setMethod('getGeneModelTableColumnNames', 'Trena',
     tbl.fp <- getCandidates(fpFilter)
 
     if(nrow(tbl.fp) == 0){
-       warning("no footprints found in %s:%d-%d, targetGene is %s", chromosome, chromeStart, chromEnd, targetGene);
+       warning("no footprints found in %s:%d-%d, targetGene is %s", chromosome, chromStart, chromEnd, targetGene);
        return(tbl.fp)
        }
 

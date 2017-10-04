@@ -106,45 +106,39 @@ db.address <- system.file(package="trena", "extdata")
 genome.db.uri <- paste("sqlite:/",db.address,"genome.sub.db", sep = "/")
 project.db.uri <- paste("sqlite:/",db.address,"project.sub.db", sep = "/")
 
-# Create the specs for the gene region
+# Create the specs for the gene region and retrieve it
 target.gene <- "MEF2C"
 size.upstream <- 1000
 size.downstream <- 1000
-geneCenteredSpec <- list(targetGene = target.gene, tssUpstream = size.upstream, tssDownstream = size.downstream)
+trena <- Trena("hg38")
+gene.regions <- getProximalPromoter(trena, target.gene, size.upstream, size.downstream)
 
 # Create a filter using the geneCenteredSpec option
 footprint.filter <- FootprintFilter(genomeDB = genome.db.uri, footprintDB = project.db.uri,
-geneCenteredSpec = geneCenteredSpec)
+regions = gene.regions)
 
 # Run the getCandidates method
-tfs <- getCandidates(footprint.filter)
-str(tfs)
+tbl <- getCandidates(footprint.filter)
+str(tbl)
 ```
 
-Then, we'll use the `regionsSpec` option to return the same information by supplying the specific transcription start site for MEF2C:
+A FootprintFilter will only retrieve footprints and their motifs; to associate these motifs with transcription factors, we recommend using the MotifDb package, which is already required for trena. The `associateTranscriptionFactors` adds the transcription factors, which can then be used later as candidate regulators. To do this, we'll just have to change the name of the motif column from `name` to `motifName`
 
-```{r}
+```{r message = FALSE, warning= FALSE}
+library(MotifDb)
 
-# Create the regionsSpec information
-mef2c.tss <- 88904257   # minus strand
-   chrom <- "chr5"
-   start <- mef2c.tss - 1000
-   end   <- mef2c.tss + 1000
-   chromLoc <- sprintf("%s:%d-%d", chrom, start, end)
-regionsSpec <- c(chromLoc)
+names(tbl)[8] <- "motifName"
 
-# Create the filter
-footprint.filter <- FootprintFilter(genomeDB = genome.db.uri, footprintDB = project.db.uri, regionsSpec = regionsSpec)
+tbl.tfs <- associateTranscriptionFactors(MotifDb, tbl, source="MotifDb", expand.rows=TRUE)
+str(tbl.tfs)
 
-# Grab the candidates and return
-tfs <- getCandidates(footprint.filter)
-str(tfs)
 ```
+
 
 The FootprintFilter makes use of another class in the package, the FootprintFinder. This class provides an interface to PostgreSQL and SQLite databases of a specific 2-table schema and has a family of methods for accessing footprint data. To demonstrate some of this functionality, we will use the FootprintFinder to extract footprints from a particular region. In the previous example, we used an SQLite database included in the package; essentially a small snapshot of a larger dataset. More usefully, there are now publically available databases of footprints for use at [bddsrds.globusgenomics.org](). For this exmple, we will access footprints for brain tissue obtained using the HINT method for a seed size of 20 bp; other methods, issues, and alignments are also available. We can access this information as follows (this example will take a bit longer):
 
 ```{r}
-genome.db.uri    <- "postgres://bddsrds.globusgenomics.org/hg38"  # has gtf and motifsgenes tables
+genome.db.uri    <- "postgres://bddsrds.globusgenomics.org/hg38"  # has gtf table
 footprint.db.uri <- "postgres://bddsrds.globusgenomics.org/brain_hint_20"  # has hits and regions tables
 fpf <- FootprintFinder(genome.db.uri, footprint.db.uri, quiet=FALSE)
 tbl.fp <- getFootprintsInRegion(fpf, "chr5", 88822685, 89011824)
@@ -172,7 +166,7 @@ When it comes to selecting a solver, we recommend doing some critical thinking a
 ```{r}
 lasso.solver <- LassoSolver(mtx.assay = mtx.voom,
                             targetGene = "MEF2C",
-                            candidateRegulators = tfs$tfs
+                            candidateRegulators = tbl.tfs$geneSymbol
                             )
 ```
 
@@ -192,7 +186,7 @@ First, we will alter a different parameter of the `LassoSolver` object, the `kee
 set.seed(10)
 lasso.solver.keep <- LassoSolver(mtx.assay = mtx.voom,
                                  targetGene = "MEF2C",
-                                 candidateRegulators = tfs$tfs,
+                                 candidateRegulators = tbl.tfs$geneSymbol,
                                  keep.metrics = TRUE
                                  )
 tbl.keep <- run(lasso.solver.keep)
@@ -206,7 +200,7 @@ Now we can change the value of `lambda` to change how many features are returned
 ```{r}
 lasso.solver.lenient  <- LassoSolver(mtx.assay = mtx.voom,
                                      targetGene = "MEF2C",
-                                     candidateRegulators = tfs$tfs,
+                                     candidateRegulators = tbl.tfs$geneSymbol,
                                      lambda = 0.05
                                      )
 tbl.lenient <- run(lasso.solver.lenient)
@@ -234,7 +228,7 @@ We can see this in action by constructing and running an `EnsembleSolver` object
 ```{r}
 ensemble.solver <- EnsembleSolver(mtx.assay = mtx.voom, 
                                   targetGene = "MEF2C",
-                                  candidateRegulators = tfs$tfs)
+                                  candidateRegulators = tbl.tfs$geneSymbol)
 tbl.out <- run(ensemble.solver)
 tbl.out
 ```
@@ -244,7 +238,7 @@ Note that in the final data frame, regulators are returned in descending order o
 ```{r}
 ensemble.full <- EnsembleSolver(mtx.assay = mtx.voom,
                                 targetGene = "MEF2C",
-                                candidateRegulators = tfs$tfs,
+                                candidateRegulators = tbl.tfs$geneSymbol,
                                 solverNames = c("lasso","pearson","randomforest","ridge"),
                                 geneCutoff = 1
                                 )

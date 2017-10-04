@@ -43,15 +43,15 @@ Create a CandidateFilter using Human DNAse Hypersensitivity
 load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
 targetGene <- "VRK2"
 promoter.length <- 1000
-genome <- "hg38"
+genomeName <- "hg38"
 db.address <- system.file(package="trena", "extdata")
 genome.db.uri    <- paste("sqlite:/", db.address, "vrk2.genome.db",  sep = "/")
 
 # Grab regions for VRK2 using shoulder size of 1000
-trena <- Trena(genome)
+trena <- Trena(genomeName)
 tbl.regions <- getProximalPromoter(trena, "VRK2", 1000, 1000)
 
-hd.filter <- HumanDHSFilter(genome, pwmMatchPercentageThreshold = 85,
+hd.filter <- HumanDHSFilter(genomeName, pwmMatchPercentageThreshold = 85,
 geneInfoDatabase.uri = genome.db.uri, regions = tbl.regions)
 }
 \seealso{

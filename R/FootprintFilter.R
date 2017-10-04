@@ -112,10 +112,12 @@ setMethod("getCandidates", "FootprintFilter",
            #chromLoc <- parseChromLocString(region)
         for(r in 1:nrow(obj@regions)){
            chromLoc <- as.list(obj@regions[r,])
-           if(!obj@quiet) printf(" FootprintFilter::getCandidates, getFootprintsInRegion %s", region)
+           if(!obj@quiet) printf(" FootprintFilter::getCandidates, getFootprintsInRegion %s-%s",
+                                 chromLoc$start, chromLoc$end)
            tbl.fp <- try(with(chromLoc, getFootprintsInRegion(fp, chrom, start, end)))
            if(class(tbl.fp) == "try-error"){
-              warning("FootprintFinder error with region %s", region)
+               warning("FootprintFinder error with region %s-%s",
+                       chromLoc$start, chromLoc$end)
               closeDatabaseConnections(fp)
               return(NULL)
               }
