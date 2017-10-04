@@ -357,6 +357,9 @@ setMethod('createGeneModel', 'Trena',
             printf("tf candidate count, in mtx, in tbl.regulatory.regions: %d/%d", length(tfs),
                    length(unique.tfs.from.regulatory.regions))
 
+         if(length(tfs) == 0)
+            return(data.frame())
+
          solver <- EnsembleSolver(mtx, targetGene=targetGene, candidateRegulators=tfs, solverNames)
          tbl.model <- run(solver)
          tbl.tf.frequencies <- as.data.frame(table(tbl.regulatoryRegions$geneSymbol))
@@ -499,14 +502,14 @@ setMethod("getProximalPromoter", "Trena",
 
                   tbl.loc <- dbGetQuery(genome.db, query)
                   DBI::dbDisconnect(genome.db)
-                  
+
                   if(nrow(tbl.loc) == 0)
                     return(NA)
                   chrom <- tbl.loc$chr[1]
                   start.orig <- tbl.loc$start[1]
                   end.orig   <- tbl.loc$endpos[1]
                   strand     <- tbl.loc$strand[1]
-                  
+
 
                   if(strand == "-"){ # reverse (minus) strand.  TSS is at "end" position
                       start.loc <- end.orig - tssDownstream
