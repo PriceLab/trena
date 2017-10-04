@@ -9,8 +9,7 @@
 #' @family Filtering objects
 
 .CandidateFilter <- setClass("CandidateFilter",
-                    slots = c(quiet = "logical"
-			      )
+                    slots = c(quiet = "logical")
                     )
 #----------------------------------------------------------------------------------------------------
 printf <- function(...) print(noquote(sprintf(...)))

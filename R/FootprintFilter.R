@@ -20,7 +20,6 @@
                                         regions="data.frame",
                                         footprintFinder="FootprintFinder")
                              )
-
 #----------------------------------------------------------------------------------------------------
 printf <- function(...) print(noquote(sprintf(...)))
 #----------------------------------------------------------------------------------------------------
@@ -58,12 +57,12 @@ printf <- function(...) print(noquote(sprintf(...)))
 
 FootprintFilter <- function(genomeDB, footprintDB, regions=data.frame(), quiet=TRUE)
 {
-
-   .FootprintFilter(CandidateFilter(quiet = quiet),
-                    genomeDB=genomeDB,
-                    footprintDB=footprintDB,
-                    regions=regions)
-
+    
+    .FootprintFilter(CandidateFilter(quiet = quiet),
+                     genomeDB=genomeDB,
+                     footprintDB=footprintDB,
+                     regions=regions)
+    
 } # FootprintFilter, the constructor
 #----------------------------------------------------------------------------------------------------
 #' Get candidate genes using the footprint filter
@@ -102,28 +101,30 @@ FootprintFilter <- function(genomeDB, footprintDB, regions=data.frame(), quiet=T
 
 setMethod("getCandidates", "FootprintFilter",
 
-     function(obj){
-
-         # Retrieve the FootprintFinder object and find the footprints
-         fp <- FootprintFinder(obj@genomeDB, obj@footprintDB)
-         tbl.out <- data.frame()
-
-        for(r in 1:nrow(obj@regions)){
-           chromLoc <- as.list(obj@regions[r,])
-           if(!obj@quiet) printf(" FootprintFilter::getCandidates, getFootprintsInRegion %s-%s",
-                                 chromLoc$start, chromLoc$end)
-           tbl.fp <- try(with(chromLoc, getFootprintsInRegion(fp, chrom, start, end)))
-           if(class(tbl.fp) == "try-error"){
-               warning("FootprintFinder error with region %s-%s",
-                       chromLoc$start, chromLoc$end)
+          function(obj){
+              
+              # Retrieve the FootprintFinder object and find the footprints
+              fp <- FootprintFinder(obj@genomeDB, obj@footprintDB)
+              tbl.out <- data.frame()
+              
+              for(r in 1:nrow(obj@regions)){
+                  chromLoc <- as.list(obj@regions[r,])
+                  if(!obj@quiet) printf(" FootprintFilter::getCandidates, getFootprintsInRegion %s-%s",
+                                        chromLoc$start, chromLoc$end)
+                  tbl.fp <- try(with(chromLoc, getFootprintsInRegion(fp, chrom, start, end)))
+                  if(class(tbl.fp) == "try-error"){
+                      warning("FootprintFinder error with region %s-%s",
+                              chromLoc$start, chromLoc$end)
+                      closeDatabaseConnections(fp)
+                      return(NULL)
+                  }
+                  tbl.out <- rbind(tbl.out, tbl.fp)
+              } # for region
+              
               closeDatabaseConnections(fp)
-              return(NULL)
-              }
-           tbl.out <- rbind(tbl.out, tbl.fp)
-           } # for region
-
-        closeDatabaseConnections(fp)
-        tbl.out
-        }) # getCandidates
-
+              
+              # Rename the "name" column to "motifName"
+              names(tbl.out)[which(names(tbl.out) == "name")] <- "motifName"
+              return(tbl.out)
+          }) # getCandidates
 #----------------------------------------------------------------------------------------------------

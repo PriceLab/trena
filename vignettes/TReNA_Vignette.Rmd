@@ -87,17 +87,7 @@ The
 
 The most complex filter is the FootprintFilter, which leverages information from footprint databases in either SQLite or PostgreSQL. This input requires connection to 2 databases: 1) A genome database, which contains information on the location and function of genes; 2) A project database, which contains footprint regions from a specific project. As an illustration of the format and utility of these databases, we have included in `extdata` two SQLite databases demonstrating the required tables and information needed to use the FootprintFilter. Our databases are subsets of larger databases, corresponding to the *MEF2C* gene and a footprinting project in the brain using the Wellington method for determining footprints. 
 
-In addition to the databases, constructing a FootprintFilter object requires at least one of 2 different specs for determining the region to look in:
-
-* `geneCenteredSpec` - a list containing: 
-    1. `targetGene` - the gene of interest
-    2. `tssUpstream` - an integer indicating how many bases upstream of a transcription start site to include in the results
-    3. `tssDownstream` - an integer indicating how many bases downstream of a transcription start site to include in the results 
-* `regionsSpec` - a list of regions in the DNA where each element is formatted as "chromosome:start-end" 
-
-Note that you can specify both input types, though we anticipate that for most cases, you will only want one of these two types. As with the `VarianceFilter`, the `FootprintFilter` return a named list where one element is a vector containing the names of the canidate regulators. The other element is a table of metadata about footprints, including the motifs, their locations, and the transcription factors to which they link.
-
-For our examples, we'll first run using the `geneCenteredSpec` option:
+In addition to the databases, constructing a FootprintFilter object requires a data frame of regions to look in for footprints. When the `getCandidates` method is run, the `FootprintFilter` returns a dataframe containing the footprints in the supplied regions, including the names of motifs for those footprints.
 
 ```{r}
 
