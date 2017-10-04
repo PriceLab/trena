@@ -296,7 +296,6 @@ setMethod("getCandidates", "HumanDHSFilter",
 #' @param start The starting position
 #' @param end The ending position
 #' @param score.threshold A threshold for the score (default = 200)
-#' @param quiet A logical indicating whether the method should print output
 #'
 #' @seealso \code{\link{HumanDHSFilter}}
 #'
@@ -353,7 +352,7 @@ setMethod("getRegulatoryRegions", "HumanDHSFilter",
                       sprintf("and chromStart >= %d", start),
                       sprintf("and chromEnd <= %d", end),
                       collapse = " ")
-
+        
        if(!obj@quiet)
           printf("query: %s", query)
 

@@ -21,8 +21,6 @@
 \item{end}{The ending position}
 
 \item{score.threshold}{A threshold for the score (default = 200)}
-
-\item{quiet}{A logical indicating whether the method should print output}
 }
 \value{
 A data frame containing the regulatory regions for the filter, including the

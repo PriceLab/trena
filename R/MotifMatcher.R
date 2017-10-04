@@ -91,10 +91,26 @@ MotifMatcher <- function(genomeName,
 
 } # MotifMatcher constructor
 #----------------------------------------------------------------------------------------------------
+#' Show a MotifMatcher object
+#' 
+#' @rdname show.MotifMatcher
+#' @aliases show.MotifMatcher
+#'
+#' @param object An object of the class MotifMatcher
+#'
+#' @return A truncated view of the supplied object
+#'
+#' @examples
+#' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+#' target.gene <- "MEF2C"
+#' tfs <- setdiff(rownames(mtx.sub), target.gene)
+#' lassopv.solver <- LassoPVSolver(mtx.sub, target.gene, tfs)
+#' show(lassopv.solver)
+
 setMethod("show", "MotifMatcher",
 
           function(object){
-              s <- sprintf("MotifMatcher...")
+              s <- sprintf("MotifMatcher for genome %s", object@genome)
               cat(s, sep="\n")
           })
 #----------------------------------------------------------------------------------------------------

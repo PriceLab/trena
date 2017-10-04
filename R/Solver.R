@@ -18,6 +18,16 @@ printf <- function(...) print(noquote(sprintf(...)))
 #----------------------------------------------------------------------------------------------------
 setGeneric("getAssayData",    signature="obj", function(obj) standardGeneric ("getAssayData"))
 
+#' Run a  Solver object to select features
+#'
+#' @rdname run
+#' @aliases run
+#'
+#' @param obj An object of a Solver class
+#' 
+#' @return A data frame of candidate regulators and the relation to the target gene
+#'
+#' @export
 setGeneric("run",             signature="obj", function(obj) standardGeneric ("run"))
 
 setGeneric("rescalePredictorWeights",
