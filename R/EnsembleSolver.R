@@ -21,25 +21,6 @@
                             )
 
 #----------------------------------------------------------------------------------------------------
-#' Retrieve the solver names from an EnsembleSolver object
-#'
-#' @rdname getSolverNames
-#' @aliases getSolverNames
-#'
-#' @param obj An object of class Solver
-#'
-#' @return The vector of solver names associated with an EnsembleSolver object
-#'
-#' @examples
-#' # Create a Solver object using the included Alzheimer's data and retrieve the regulators
-#' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
-#' targetGene <- "MEF2C"
-#' candidateRegulators <- setdiff(rownames(mtx.sub), targetGene)
-#' solver <- EnsembleSolver(mtx.sub, targetGene, candidateRegulators,
-#' solverNames = c("lasso","randomForest"))
-#' solver.names <- getSolverNames(solver) 
-
-#' @export
 setGeneric("getSolverNames", signature = "obj", function(obj) standardGeneric("getSolverNames"))
 #----------------------------------------------------------------------------------------------------
 #' Create a Solver class object using an ensemble of solvers
@@ -164,6 +145,26 @@ setMethod('show', 'EnsembleSolver',
           })
 
 #----------------------------------------------------------------------------------------------------
+#' Retrieve the solver names from an EnsembleSolver object
+#'
+#' @rdname getSolverNames
+#' @aliases getSolverNames
+#'
+#' @param obj An object of class Solver
+#'
+#' @return The vector of solver names associated with an EnsembleSolver object
+#'
+#' @examples
+#' # Create a Solver object using the included Alzheimer's data and retrieve the regulators
+#' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+#' targetGene <- "MEF2C"
+#' candidateRegulators <- setdiff(rownames(mtx.sub), targetGene)
+#' solver <- EnsembleSolver(mtx.sub, targetGene, candidateRegulators,
+#' solverNames = c("lasso","randomForest"))
+#' solver.names <- getSolverNames(solver) 
+
+#' @export
+
 setMethod("getSolverNames", "EnsembleSolver",
 
    function (obj){

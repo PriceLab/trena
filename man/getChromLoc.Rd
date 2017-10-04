@@ -4,7 +4,7 @@
 \name{getChromLoc,FootprintFinder-method}
 \alias{getChromLoc,FootprintFinder-method}
 \alias{getChromLoc}
-\title{Get Chromasome Location}
+\title{Get Chromosome Location}
 \usage{
 \S4method{getChromLoc}{FootprintFinder}(obj, name, biotype = "protein_coding",
   moleculetype = "gene")
@@ -25,7 +25,7 @@ chr, start, endpos, strand
 }
 \description{
 Using the gtf table in the genome database contained in a FootprintFinder object, get the locations
-of chromasomes with the specified gene name, biological unit type, and molecule type
+of chromosomes with the specified gene name, biological unit type, and molecule type
 }
 \examples{
 db.address <- system.file(package="trena", "extdata")

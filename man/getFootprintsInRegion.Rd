@@ -22,7 +22,7 @@ A dataframe containing all footprints for the specified region
 }
 \description{
 Using the regions and hits tables inside the project database specified by the FootprintFinder
-object, return the location, chromasome, starting position, and ending positions of all footprints
+object, return the location, chromosome, starting position, and ending positions of all footprints
 for the specified region.
 }
 \examples{

@@ -16,75 +16,16 @@
 #----------------------------------------------------------------------------------------------------
 printf <- function(...) print(noquote(sprintf(...)))
 #----------------------------------------------------------------------------------------------------
-#' Retrieve the assay matrix of gene expression data from a Solver object
-#' 
-#' @rdname getAssayData
-#' @aliases getAssayData
-#' 
-#' @param obj An object of class Solver
-#'
-#' @export
-#' 
-#' @return The assay matrix of gene expression data associated with a Solver object
-#'
-#' @examples
-#' # Create a Solver object using the included Alzheimer's data and retrieve the matrix
-#' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
-#' targetGene <- "MEF2C"
-#' candidateRegulators <- setdiff(rownames(mtx.sub), targetGene)
-#' solver <- Solver(mtx.sub, targetGene, candidateRegulators)
-#' mtx <- getAssayData(solver)
-#' 
 setGeneric("getAssayData",    signature="obj", function(obj) standardGeneric ("getAssayData"))
 
-#' @export
 setGeneric("run",             signature="obj", function(obj) standardGeneric ("run"))
 
-#' @export
 setGeneric("rescalePredictorWeights",
            signature="obj", function(obj, rawValue.min, rawValue.max, rawValues) standardGeneric ("rescalePredictorWeights"))
 
-#' Retrieve the target gene from a Solver object
-#'
-#' @rdname getTarget
-#' @aliases getTarget
-#'
-#' @param obj An object of class Solver
-#'
-#' @return The target gene associated with a Solver object
-#'
-#' @examples
-#' # Create a Solver object using the included Alzheimer's data and retrieve the target gene
-#' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
-#' targetGene <- "MEF2C"
-#' candidateRegulators <- setdiff(rownames(mtx.sub), targetGene)
-#' solver <- Solver(mtx.sub, targetGene, candidateRegulators)
-#' target <- getTarget(solver) 
-
-#' @export
 setGeneric("getTarget", signature = "obj", function(obj) standardGeneric("getTarget"))
 
-#' Retrieve the candiate regulators from a Solver object
-#'
-#' @rdname getRegulators
-#' @aliases getRegulators
-#'
-#' @param obj An object of class Solver
-#'
-#' @return The candidate regulators associated with a Solver object
-#'
-#' @examples
-#' # Create a Solver object using the included Alzheimer's data and retrieve the regulators
-#' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
-#' targetGene <- "MEF2C"
-#' candidateRegulators <- setdiff(rownames(mtx.sub), targetGene)
-#' solver <- Solver(mtx.sub, targetGene, candidateRegulators)
-#' regs <- getRegulators(solver) 
-
-#' @export
 setGeneric("getRegulators", signature = "obj", function(obj) standardGeneric("getRegulators"))
-
-
 #----------------------------------------------------------------------------------------------------
 #' Define an object of class Solver
 #'
@@ -148,18 +89,75 @@ Solver <- function(mtx.assay=matrix(), targetGene, candidateRegulators, quiet=TR
     
 } # Solver, the constructor
 #----------------------------------------------------------------------------------------------------
+#' Retrieve the assay matrix of gene expression data from a Solver object
+#' 
+#' @rdname getAssayData
+#' @aliases getAssayData
+#' 
+#' @param obj An object of class Solver
+#'
+#' @export
+#' 
+#' @return The assay matrix of gene expression data associated with a Solver object
+#'
+#' @examples
+#' # Create a Solver object using the included Alzheimer's data and retrieve the matrix
+#' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+#' targetGene <- "MEF2C"
+#' candidateRegulators <- setdiff(rownames(mtx.sub), targetGene)
+#' solver <- Solver(mtx.sub, targetGene, candidateRegulators)
+#' mtx <- getAssayData(solver)
+
 setMethod("getAssayData", "Solver",
           
           function (obj){
               obj@mtx.assay
           })
 #----------------------------------------------------------------------------------------------------
+#' Retrieve the target gene from a Solver object
+#'
+#' @rdname getTarget
+#' @aliases getTarget
+#'
+#' @param obj An object of class Solver
+#'
+#' @return The target gene associated with a Solver object
+#'
+#' @examples
+#' # Create a Solver object using the included Alzheimer's data and retrieve the target gene
+#' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+#' targetGene <- "MEF2C"
+#' candidateRegulators <- setdiff(rownames(mtx.sub), targetGene)
+#' solver <- Solver(mtx.sub, targetGene, candidateRegulators)
+#' target <- getTarget(solver) 
+
+#' @export
+
 setMethod("getTarget", "Solver",
           
           function (obj){
               obj@targetGene
           })
 #----------------------------------------------------------------------------------------------------
+#' Retrieve the candiate regulators from a Solver object
+#'
+#' @rdname getRegulators
+#' @aliases getRegulators
+#'
+#' @param obj An object of class Solver
+#'
+#' @return The candidate regulators associated with a Solver object
+#'
+#' @examples
+#' # Create a Solver object using the included Alzheimer's data and retrieve the regulators
+#' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+#' targetGene <- "MEF2C"
+#' candidateRegulators <- setdiff(rownames(mtx.sub), targetGene)
+#' solver <- Solver(mtx.sub, targetGene, candidateRegulators)
+#' regs <- getRegulators(solver) 
+
+#' @export
+
 setMethod("getRegulators", "Solver",
           
           function (obj){

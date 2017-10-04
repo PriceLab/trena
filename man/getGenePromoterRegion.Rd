@@ -27,13 +27,13 @@
 }
 \value{
 A list containing 3 elements:
-1) chr : The name of the chromasome containing the promoter region for the specified gene
+1) chr : The name of the chromosome containing the promoter region for the specified gene
 2) start : The starting location of the promoter region for the specified gene
 3) end : The ending location of the promoter region for the specified gene
 }
 \description{
 Using the \code{\link{getChromLoc}} function in conjunction with the gtf table inside the genome
-database specified by the FootprintFinder object, get the chromasome, starting location,
+database specified by the FootprintFinder object, get the chromosome, starting location,
 and ending location for gene promoter region.
 }
 \examples{

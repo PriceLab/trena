@@ -16,109 +16,20 @@
                                          quiet="logical")
                           )
 #----------------------------------------------------------------------------------------------------
-#' Retrieve the motifs from the pfms slot
-#'
-#' Given a MotifMatcher object, return the motifs, which are stored in the pfms slot.
-#'
-#' @rdname getPfms
-#' @aliases getPfms
-#' 
-#' @param obj An object of class MotifMatcher
-#'
-#' @return The list of motif matrices stored in the pfms slot.
-#'
-#' @export
-#'
-#' @examples
-#'
-#' # Return the default matrix of JASPAR motifs
-#' library(MotifDb)
-#' motifMatcher <- MotifMatcher(genomeName="hg38", pfms = as.list(query(MotifDb, "sapiens")))
-#' motifs <- getPfms(motifMatcher)
-
 setGeneric("getPfms",            signature="obj",
            function(obj) standardGeneric ("getPfms"))
-
-#----------------------------------------------------------------------------------------------------
-#' Retrieve the Sequence for a Set of Regions
-#'
-#' Given a MotifMatcher object, a table of chromosomal regions, and an optional set of variants,
-#' return the sequences as a new column of the table.
-#'
-#' @rdname getSequence
-#' @aliases getSequence
-#' 
-#' @param obj An object of class MotifMatcher
-#' @param tbl.regions A data frame where each row contains a chromosomal region with the fields
-#' "chrom", "start", and "end".
-#' @param variants A character containing variants to use for the matching (default = NA_character_)
-#' The variants should either have the same number of entries as rows in the \code{tbl.regions},
-#' or they should not be supplied.
-#'
-#' @return The \code{tbl.regions} data frame with an added column containing the sequence for each
-#' entry
-#'
-#' @export
-#'
-#' @examples
-#' # Retrieve the sequences for the rs13384219 neighborhood
-#' library(MotifDb)
-#' motifMatcher <- MotifMatcher(genomeName="hg38", pfms = as.list(query(MotifDb, "sapiens")))
-#' tbl.regions <- data.frame(chrom="chr2", start=57907313, end=57907333, stringsAsFactors=FALSE)
-#' x <- findMatchesByChromosomalRegion(motifMatcher, tbl.regions, pwmMatchMinimumAsPercentage=92)
-#'
-#' # Retrieve the sequences, but now include a variant
-#' x.mut <- findMatchesByChromosomalRegion(motifMatcher, tbl.regions,
-#' pwmMatchMinimumAsPercentage=92, "rs13384219")
 
 setGeneric("getSequence",        signature="obj",
            function(obj,tbl.regions,variants=NA_character_)
                standardGeneric ("getSequence"))
 
-#----------------------------------------------------------------------------------------------------
-#' @export
 setGeneric(".parseVariantString", signature="obj",
            function(obj, variantString)
                standardGeneric (".parseVariantString"))
 
-#' Find Motif Matches by Chromosomal Region
-#'
-#' Given a MotifMatcher object, a table of chromosomal regions, and a minimum match percentage,
-#' pull out a list containing a data frame of the motifs in those regions and a character vector
-#' of their associated transcription factors.
-#'
-#' @rdname findMatchesByChromosomalRegion
-#' @aliases findMatchesByChromosomalRegion
-#' 
-#' @param obj An object of class MotifMatcher
-#' @param tbl.regions A data frame where each row contains a chromosomal region with the fields
-#' "chrom", "start", and "end".
-#' @param pwmMatchMinimumAsPercentage A percentage (0-100) used as a cutoff for what constitutes
-#' a motif match
-#' @param variants A character containing variants to use for the matching (default = NA_character_).
-#' The variants should either have the same number of entries as rows in the \code{tbl.regions},
-#' or they should not be supplied.
-#'
-#' @return A list containing a data frame of the motifs in the given regions and a character
-#' vector of their associated transcription factors
-#'
-#' @export
-#'
-#' @examples
-#' # Perform a simple match in the rs13384219 neighborhood
-#' library(MotifDb)
-#' motifMatcher <- MotifMatcher(genomeName="hg38", pfms = as.list(query(MotifDb, "sapiens")), quiet=FALSE)
-#' tbl.regions <- data.frame(chrom="chr2", start=57907313, end=57907333, stringsAsFactors=FALSE)
-#' x <- findMatchesByChromosomalRegion(motifMatcher, tbl.regions, pwmMatchMinimumAsPercentage=92)
-#'
-#' # Perform the same match, but now include a variant
-#' x.mut <- findMatchesByChromosomalRegion(motifMatcher, tbl.regions,
-#' pwmMatchMinimumAsPercentage=92, variants = "rs13384219")
-
 setGeneric("findMatchesByChromosomalRegion", signature="obj",
            function(obj, tbl.regions, pwmMatchMinimumAsPercentage, variants=NA_character_)
               standardGeneric ("findMatchesByChromosomalRegion"))
-
 #----------------------------------------------------------------------------------------------------
 #' @title Class MotifMatcher
 #' @name MotifMatcher-class
@@ -187,6 +98,40 @@ setMethod("show", "MotifMatcher",
               cat(s, sep="\n")
           })
 #----------------------------------------------------------------------------------------------------
+#' Find Motif Matches by Chromosomal Region
+#'
+#' Given a MotifMatcher object, a table of chromosomal regions, and a minimum match percentage,
+#' pull out a list containing a data frame of the motifs in those regions and a character vector
+#' of their associated transcription factors.
+#'
+#' @rdname findMatchesByChromosomalRegion
+#' @aliases findMatchesByChromosomalRegion
+#' 
+#' @param obj An object of class MotifMatcher
+#' @param tbl.regions A data frame where each row contains a chromosomal region with the fields
+#' "chrom", "start", and "end".
+#' @param pwmMatchMinimumAsPercentage A percentage (0-100) used as a cutoff for what constitutes
+#' a motif match
+#' @param variants A character containing variants to use for the matching (default = NA_character_).
+#' The variants should either have the same number of entries as rows in the \code{tbl.regions},
+#' or they should not be supplied.
+#'
+#' @return A list containing a data frame of the motifs in the given regions and a character
+#' vector of their associated transcription factors
+#'
+#' @export
+#'
+#' @examples
+#' # Perform a simple match in the rs13384219 neighborhood
+#' library(MotifDb)
+#' motifMatcher <- MotifMatcher(genomeName="hg38", pfms = as.list(query(MotifDb, "sapiens")), quiet=FALSE)
+#' tbl.regions <- data.frame(chrom="chr2", start=57907313, end=57907333, stringsAsFactors=FALSE)
+#' x <- findMatchesByChromosomalRegion(motifMatcher, tbl.regions, pwmMatchMinimumAsPercentage=92)
+#'
+#' # Perform the same match, but now include a variant
+#' x.mut <- findMatchesByChromosomalRegion(motifMatcher, tbl.regions,
+#' pwmMatchMinimumAsPercentage=92, variants = "rs13384219")
+
 setMethod("findMatchesByChromosomalRegion", "MotifMatcher",
 
           function(obj, tbl.regions, pwmMatchMinimumAsPercentage, variants=NA_character_){
@@ -251,6 +196,26 @@ setMethod("findMatchesByChromosomalRegion", "MotifMatcher",
              tbl.out
           })
 #----------------------------------------------------------------------------------------------------
+#' Retrieve the motifs from the pfms slot
+#'
+#' Given a MotifMatcher object, return the motifs, which are stored in the pfms slot.
+#'
+#' @rdname getPfms
+#' @aliases getPfms
+#' 
+#' @param obj An object of class MotifMatcher
+#'
+#' @return The list of motif matrices stored in the pfms slot.
+#'
+#' @export
+#'
+#' @examples
+#'
+#' # Return the default matrix of JASPAR motifs
+#' library(MotifDb)
+#' motifMatcher <- MotifMatcher(genomeName="hg38", pfms = as.list(query(MotifDb, "sapiens")))
+#' motifs <- getPfms(motifMatcher)
+
 setMethod("getPfms", "MotifMatcher",
 
           function(obj){
@@ -550,6 +515,37 @@ setMethod(".parseVariantString", "MotifMatcher",
     })
 
 #----------------------------------------------------------------------------------------------------
+#' Retrieve the Sequence for a Set of Regions
+#'
+#' Given a MotifMatcher object, a table of chromosomal regions, and an optional set of variants,
+#' return the sequences as a new column of the table.
+#'
+#' @rdname getSequence
+#' @aliases getSequence
+#' 
+#' @param obj An object of class MotifMatcher
+#' @param tbl.regions A data frame where each row contains a chromosomal region with the fields
+#' "chrom", "start", and "end".
+#' @param variants A character containing variants to use for the matching (default = NA_character_)
+#' The variants should either have the same number of entries as rows in the \code{tbl.regions},
+#' or they should not be supplied.
+#'
+#' @return The \code{tbl.regions} data frame with an added column containing the sequence for each
+#' entry
+#'
+#' @export
+#'
+#' @examples
+#' # Retrieve the sequences for the rs13384219 neighborhood
+#' library(MotifDb)
+#' motifMatcher <- MotifMatcher(genomeName="hg38", pfms = as.list(query(MotifDb, "sapiens")))
+#' tbl.regions <- data.frame(chrom="chr2", start=57907313, end=57907333, stringsAsFactors=FALSE)
+#' x <- findMatchesByChromosomalRegion(motifMatcher, tbl.regions, pwmMatchMinimumAsPercentage=92)
+#'
+#' # Retrieve the sequences, but now include a variant
+#' x.mut <- findMatchesByChromosomalRegion(motifMatcher, tbl.regions,
+#' pwmMatchMinimumAsPercentage=92, "rs13384219")
+
 setMethod("getSequence", "MotifMatcher",
 
    function(obj, tbl.regions, variants=NA_character_){
