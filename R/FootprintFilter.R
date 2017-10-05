@@ -56,8 +56,7 @@ printf <- function(...) print(noquote(sprintf(...)))
 #' regions = regions)
 
 FootprintFilter <- function(genomeDB, footprintDB, regions=data.frame(), quiet=TRUE)
-{
-    
+{    
     .FootprintFilter(CandidateFilter(quiet = quiet),
                      genomeDB=genomeDB,
                      footprintDB=footprintDB,

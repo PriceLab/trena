@@ -36,7 +36,7 @@ PearsonSolver <- function(mtx.assay = matrix(), targetGene, candidateRegulators,
     # Remove the targetGene from candidateRegulators
     if(any(grepl(targetGene, candidateRegulators)))        
         candidateRegulators <- candidateRegulators[-grep(targetGene, candidateRegulators)]    
-
+    
     # Check to make sure the matrix contains some of the candidates
     candidateRegulators <- intersect(candidateRegulators, rownames(mtx.assay))    
     stopifnot(length(candidateRegulators) > 0)
@@ -45,13 +45,13 @@ PearsonSolver <- function(mtx.assay = matrix(), targetGene, candidateRegulators,
                                  quiet=quiet,
                                  targetGene=targetGene,                                 
                                  candidateRegulators=candidateRegulators))                          
-
+    
     # Send a warning if there's a row of zeros
     if(!is.na(max(mtx.assay)) & any(rowSums(mtx.assay) == 0))
-       warning("One or more gene has zero expression; this may yield 'NA' results and warnings when using Pearson correlations")
-
+        warning("One or more gene has zero expression; this may yield 'NA' results and warnings when using Pearson correlations")
+    
     obj
-
+    
 } #PearsonSolver, the constructor
 #----------------------------------------------------------------------------------------------------
 #' Show the Pearson Solver
@@ -72,20 +72,20 @@ PearsonSolver <- function(mtx.assay = matrix(), targetGene, candidateRegulators,
 
 setMethod('show', 'PearsonSolver',
 
-    function(object) {
-       regulator.count <- length(getRegulators(object))
-       if(regulator.count > 10){
-          regulatorString <- paste(getRegulators(object)[1:10], collapse=",")
-          regulatorString <- sprintf("%s...", regulatorString);
-          }
-       else
-          regulatorString <- paste(getRegulators(object), collapse=",")
-
-       msg = sprintf("PearsonSolver with mtx.assay (%d, %d), targetGene %s, %d candidate regulators %s",
-                     nrow(getAssayData(object)), ncol(getAssayData(object)),
-                     getTarget(object), regulator.count, regulatorString)
-       cat (msg, '\n', sep='')
-    })
+          function(object) {
+              regulator.count <- length(getRegulators(object))
+              if(regulator.count > 10){
+                  regulatorString <- paste(getRegulators(object)[1:10], collapse=",")
+                  regulatorString <- sprintf("%s...", regulatorString);
+              }
+              else
+                  regulatorString <- paste(getRegulators(object), collapse=",")
+              
+              msg = sprintf("PearsonSolver with mtx.assay (%d, %d), targetGene %s, %d candidate regulators %s",
+                            nrow(getAssayData(object)), ncol(getAssayData(object)),
+                            getTarget(object), regulator.count, regulatorString)
+              cat (msg, '\n', sep='')
+          })
 #----------------------------------------------------------------------------------------------------
 #' Run the Pearson Solver
 #'
@@ -115,7 +115,7 @@ setMethod('show', 'PearsonSolver',
 setMethod("run", "PearsonSolver",
 
           function (obj){
-
+              
               mtx <- getAssayData(obj)
               target.gene <- getTarget(obj)
               tfs <- getRegulators(obj)                                         
@@ -125,7 +125,7 @@ setMethod("run", "PearsonSolver",
               stopifnot(all(tfs %in% rownames(mtx)))
               # If given no tfs, return nothing
               if (length(tfs)==0) return(NULL)
-
+              
               # Don't handle tf self-regulation, so take target gene out of tfs
               deleters <- grep(target.gene, tfs)
               if(length(deleters) > 0){
@@ -133,17 +133,17 @@ setMethod("run", "PearsonSolver",
               }
               # If target gene was the only tf, then return nothing
               if(length(tfs)==0) return(NULL)
-
+              
               x = t(mtx[tfs,,drop=FALSE])
               y = as.vector(t(mtx[target.gene,])) # Make target gene levels into a vector
-
+              
               # Calculate Pearson correlation coefficients
               fit <- stats::cor( x = x, y = y)
-
+              
               # Return the coefficients as a data frame 
               tbl <- data.frame(row.names = rownames(fit)[order(abs(fit), decreasing = TRUE)],
                                 coefficient = fit[order(abs(fit), decreasing = TRUE)])
-
+              
               return(tbl)
           })
 #----------------------------------------------------------------------------------------------------

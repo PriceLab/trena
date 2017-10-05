@@ -7,53 +7,35 @@
 #' @slot genome.db The address of a genome database for use in filtering
 #' @slot project.db The address of a project database for use in filtering
 #' @slot quiet A logical argument denoting whether the FootprintFinder object should behave quietly
-#'
 
 #----------------------------------------------------------------------------------------------------
 .FootprintFinder <- setClass("FootprintFinder",
                              slots = c(genome.db="DBIConnection",
                                        project.db="DBIConnection",
                                        quiet="logical")
-                            )
-
+                             )
 #----------------------------------------------------------------------------------------------------
 printf <- function(...) print(noquote(sprintf(...)))
 #----------------------------------------------------------------------------------------------------
-# a FootprintFinder needs, at present, this sort of information
-#
-#   1) a complete table of genome features, for which our current model is ensembl's
-#   Homo_sapiens.GRCh38.84.chr.gtf
-#   2) a footprint table, the output from cory's pipeline
-#   3) a motif/TF map, with scores & etc
-#
-#----------------------------------------------------------------------------------------------------
-#' @export
 setGeneric("getChromLoc", signature="obj",
            function(obj, name, biotype="protein_coding",moleculetype="gene")
                standardGeneric("getChromLoc"))
-#' @export
 setGeneric("getGenePromoterRegion", signature="obj",
            function(obj,  gene, size.upstream=1000, size.downstream=0,
                     biotype="protein_coding", moleculetype="gene")
                standardGeneric("getGenePromoterRegion"))
-#' @export
 setGeneric("getFootprintsForGene", signature="obj",
            function(obj,  gene, size.upstream=1000, size.downstream=0,
                     biotype="protein_coding", moleculetype="gene")
                standardGeneric("getFootprintsForGene"))
-#' @export
 setGeneric("getFootprintsInRegion", signature="obj",
            function(obj, chromosome, start, end) standardGeneric("getFootprintsInRegion"))
-#' @export
 setGeneric("getGtfGeneBioTypes", signature="obj",
            function(obj) standardGeneric("getGtfGeneBioTypes"))
-#' @export
 setGeneric("getGtfMoleculeTypes", signature="obj",
            function(obj) standardGeneric("getGtfMoleculeTypes"))
-#' @export
 setGeneric("closeDatabaseConnections", signature="obj",
            function(obj) standardGeneric("closeDatabaseConnections"))
-#' @export
 setGeneric("getPromoterRegionsAllGenes",signature="obj",
            function(obj ,size.upstream=10000 , size.downstream=10000 , use_gene_ids = TRUE )
                standardGeneric("getPromoterRegionsAllGenes"))
@@ -89,7 +71,7 @@ FootprintFinder <- function(genome.database.uri, project.database.uri, quiet=TRU
     genome.db.info <- parseDatabaseUri(genome.database.uri)
     project.db.info <- parseDatabaseUri(project.database.uri)
     stopifnot(genome.db.info$brand %in% c("postgres","sqlite"))
-        
+    
     # open the genome database
     if(genome.db.info$brand == "postgres"){
         host <- genome.db.info$host
@@ -109,7 +91,7 @@ FootprintFinder <- function(genome.database.uri, project.database.uri, quiet=TRU
             printf("%s: %d rows", sprintf("%s/motifsgenes", genome.database.uri), row.count)            
         }
     } # if postgres
-
+    
     # open the project database
     if(project.db.info$brand == "postgres"){
         host <- project.db.info$host
@@ -143,7 +125,7 @@ FootprintFinder <- function(genome.database.uri, project.database.uri, quiet=TRU
             printf("%s: %d rows", sprintf("%s/motifsgenes", genome.database.uri), row.count)            
         }
     } # if sqlite
-
+    
     # open the project database
     if(project.db.info$brand == "sqlite"){
         dbname <- paste(project.db.info$host, project.db.info$name, sep = "/")
@@ -157,7 +139,7 @@ FootprintFinder <- function(genome.database.uri, project.database.uri, quiet=TRU
             printf("%s: %d rows", sprintf("%s/regions", project.database.uri), row.count)
         }
     } # if sqlite
-
+    
     .FootprintFinder(genome.db=genome.db, project.db=project.db, quiet=quiet)
     
 } # FootprintFinder, the constructor
@@ -172,12 +154,14 @@ FootprintFinder <- function(genome.database.uri, project.database.uri, quiet=TRU
 #'
 #' @param obj An object of class FootprintFinder
 #'
+#' @export
+#'
 #' @family FootprintFinder methods
 #'
 #' @return Closes the specified database connection
 
 setMethod("closeDatabaseConnections", "FootprintFinder",
-
+          
           function(obj){
               if(!obj@quiet) printf("-- FootprintFinder::closeDataConnections")
               if("DBIConnection" %in% is(obj@genome.db)){
@@ -216,7 +200,7 @@ setMethod("closeDatabaseConnections", "FootprintFinder",
 #' biotypes <- getGtfGeneBioTypes(fp)
 
 setMethod("getGtfGeneBioTypes", "FootprintFinder",
-
+          
           function(obj){
               sort(DBI::dbGetQuery(obj@genome.db, "select distinct gene_biotype from gtf")[,1])
           })
@@ -282,7 +266,7 @@ setMethod("getGtfMoleculeTypes", "FootprintFinder",
 #' chrom.locs <- getChromLoc(fp, name = "MEF2C")
 
 setMethod("getChromLoc", "FootprintFinder",
-
+          
           function(obj, name, biotype="protein_coding", moleculetype="gene"){
               query <- paste("select gene_id, gene_name, chr, start, endpos, strand from gtf where ",
                              sprintf("(gene_name='%s' or gene_id='%s') ", name, name),
@@ -327,20 +311,20 @@ setMethod("getChromLoc", "FootprintFinder",
 #' prom.region <- getGenePromoterRegion(fp, gene = "MEF2C")
 
 setMethod("getGenePromoterRegion", "FootprintFinder",
-
+          
           function(obj, gene, size.upstream=1000, size.downstream=0, biotype="protein_coding", moleculetype="gene"){
-
+              
               tbl.loc <- getChromLoc(obj, gene, biotype=biotype, moleculetype=moleculetype)
               if(nrow(tbl.loc) < 1){
                   warning(sprintf("no chromosomal location for %s (%s, %s)", gene, biotype, moleculetype))
                   return(NA)
               }
-
+              
               chrom <- tbl.loc$chr[1]
               start.orig <- tbl.loc$start[1]
               end.orig   <- tbl.loc$endpos[1]
               strand     <- tbl.loc$strand[1]
-
+              
               if(strand == "-"){ # reverse (minus) strand.  TSS is at "end" position
                   start.loc <- end.orig - size.downstream
                   end.loc   <- end.orig + size.upstream
@@ -425,7 +409,7 @@ setMethod("getFootprintsForGene", "FootprintFinder",
 #' start = 88903305, end = 88903319 )
 
 setMethod("getFootprintsInRegion", "FootprintFinder",
-
+          
           function(obj, chromosome, start, end){
               query.p0 <- "select loc, chrom, start, endpos from regions"
               query.p1 <- sprintf("where chrom='%s' and start >= %d and endpos <= %d", chromosome, start, end)

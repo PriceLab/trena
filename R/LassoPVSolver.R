@@ -7,7 +7,7 @@
 #' 
 #' @name LassoPVSolver-class
 
-.LassoPVSolver <- setClass ("LassoPVSolver", contains="Solver")
+.LassoPVSolver <- setClass("LassoPVSolver", contains="Solver")
 #------------------------------------------------------------------------------------------------------------------------
 #' Create a Solver class object using the LASSO P-Value solver
 #'
@@ -36,7 +36,7 @@ LassoPVSolver <- function(mtx.assay=matrix(), targetGene, candidateRegulators, q
     # Remove the targetGene from candidateRegulators
     if(any(grepl(targetGene, candidateRegulators)))        
         candidateRegulators <- candidateRegulators[-grep(targetGene, candidateRegulators)]    
-
+    
     # Check to make sure the matrix contains some of the candidates
     candidateRegulators <- intersect(candidateRegulators, rownames(mtx.assay))    
     stopifnot(length(candidateRegulators) > 0)
@@ -45,13 +45,13 @@ LassoPVSolver <- function(mtx.assay=matrix(), targetGene, candidateRegulators, q
                                  quiet=quiet,
                                  targetGene = targetGene,
                                  candidateRegulators = candidateRegulators))
-
+    
     # Send a warning if there's a row of zeros
     if(!is.na(max(mtx.assay)) & any(rowSums(mtx.assay) == 0))
-       warning("One or more gene has zero expression; this may cause problems when using P-Value LASSO. You may want to try 'lasso' or 'ridge' instead.")
-
+        warning("One or more gene has zero expression; this may cause problems when using P-Value LASSO. You may want to try 'lasso' or 'ridge' instead.")
+    
     obj
-
+    
 } # LassoPVSolver, the constructor
 #----------------------------------------------------------------------------------------------------
 #' Show the Lasso PV Solver
@@ -71,21 +71,21 @@ LassoPVSolver <- function(mtx.assay=matrix(), targetGene, candidateRegulators, q
 #' show(lassopv.solver)
 
 setMethod('show', 'LassoPVSolver',
-
-    function(object) {
-       regulator.count <- length(getRegulators(object))
-       if(regulator.count > 10){
-          regulatorString <- paste(getRegulators(object)[1:10], collapse=",")
-          regulatorString <- sprintf("%s...", regulatorString);
-          }
-       else
-          regulatorString <- paste(getRegulators(object), collapse=",")
-
-       msg = sprintf("LassoPVSolver with mtx.assay (%d, %d), targetGene %s, %d candidate regulators %s",
-                     nrow(getAssayData(object)), ncol(getAssayData(object)),
-                     getTarget(object), regulator.count, regulatorString)
-       cat (msg, '\n', sep='')
-    })
+          
+          function(object) {
+              regulator.count <- length(getRegulators(object))
+              if(regulator.count > 10){
+                  regulatorString <- paste(getRegulators(object)[1:10], collapse=",")
+                  regulatorString <- sprintf("%s...", regulatorString);
+              }
+              else
+                  regulatorString <- paste(getRegulators(object), collapse=",")
+              
+              msg = sprintf("LassoPVSolver with mtx.assay (%d, %d), targetGene %s, %d candidate regulators %s",
+                            nrow(getAssayData(object)), ncol(getAssayData(object)),
+                            getTarget(object), regulator.count, regulatorString)
+              cat (msg, '\n', sep='')
+          })
 #----------------------------------------------------------------------------------------------------
 #' Run the LASSO P-Value Solver
 #'
@@ -135,11 +135,11 @@ setMethod("run", "LassoPVSolver",
               stopifnot(all(tfs %in% rownames(mtx)))              
               features <- t(mtx[tfs,,drop=FALSE ])              
               target <- as.numeric(mtx[target.gene,])
-
+              
               # Run LASSO P-Value and return the P-values, ordered by increasing value
               fit <- lassopv::lassopv(features, target)
               fit <- fit[order(fit, decreasing=FALSE)]
-
+              
               # Add pearson correlations and make a data frame              
               correlations.of.betas.to.targetGene <- unlist(lapply(names(fit),
                                                                    function(x) stats::cor(mtx[x,], mtx[target.gene,])))
@@ -147,5 +147,5 @@ setMethod("run", "LassoPVSolver",
                                 p.values = fit,
                                 gene.cor=correlations.of.betas.to.targetGene)
               return(tbl)
-})
+          })
 #----------------------------------------------------------------------------------------------------

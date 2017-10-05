@@ -7,7 +7,7 @@
 #' @name SpearmanSolver-class
 #' 
 
-.SpearmanSolver <- setClass ("SpearmanSolver", contains = "Solver")
+.SpearmanSolver <- setClass("SpearmanSolver", contains = "Solver")
 #----------------------------------------------------------------------------------------------------
 #' Create a Solver class object using Spearman correlation coefficients as the solver
 #'
@@ -37,8 +37,6 @@ SpearmanSolver <- function(mtx.assay = matrix(), targetGene, candidateRegulators
     if(any(grepl(targetGene, candidateRegulators)))        
         candidateRegulators <- candidateRegulators[-grep(targetGene, candidateRegulators)]
     
-
-
     # Check to make sure the matrix contains some of the candidates
     candidateRegulators <- intersect(candidateRegulators, rownames(mtx.assay))    
     stopifnot(length(candidateRegulators) > 0)
@@ -47,11 +45,11 @@ SpearmanSolver <- function(mtx.assay = matrix(), targetGene, candidateRegulators
                                   quiet=quiet,                          
                                   targetGene=targetGene,                          
                                   candidateRegulators=candidateRegulators))
-
+    
     # Send a warning if there's a row of zeros
     if(!is.na(max(mtx.assay)) & any(rowSums(mtx.assay) == 0))
-       warning("One or more gene has zero expression; this may yield 'NA' results and warnings when using Spearman correlations")
-
+        warning("One or more gene has zero expression; this may yield 'NA' results and warnings when using Spearman correlations")
+    
     obj
 
 } #SpearmanSolver, the constructor
@@ -73,21 +71,21 @@ SpearmanSolver <- function(mtx.assay = matrix(), targetGene, candidateRegulators
 #' show(spearman.solver)
 
 setMethod('show', 'SpearmanSolver',
-
-    function(object) {
-       regulator.count <- length(getRegulators(object))
-       if(regulator.count > 10){
-          regulatorString <- paste(getRegulators(object)[1:10], collapse=",")
-          regulatorString <- sprintf("%s...", regulatorString);
-          }
-       else
-          regulatorString <- paste(getRegulators(object), collapse=",")
-
-       msg = sprintf("SpearmanSolver with mtx.assay (%d, %d), targetGene %s, %d candidate regulators %s",
-                     nrow(getAssayData(object)), ncol(getAssayData(object)),
-                     getTarget(object), regulator.count, regulatorString)
-       cat (msg, '\n', sep='')
-    })
+          
+          function(object) {
+              regulator.count <- length(getRegulators(object))
+              if(regulator.count > 10){
+                  regulatorString <- paste(getRegulators(object)[1:10], collapse=",")
+                  regulatorString <- sprintf("%s...", regulatorString);
+              }
+              else
+                  regulatorString <- paste(getRegulators(object), collapse=",")
+              
+              msg = sprintf("SpearmanSolver with mtx.assay (%d, %d), targetGene %s, %d candidate regulators %s",
+                            nrow(getAssayData(object)), ncol(getAssayData(object)),
+                            getTarget(object), regulator.count, regulatorString)
+              cat (msg, '\n', sep='')
+          })
 #----------------------------------------------------------------------------------------------------
 #' Run the Spearman Solver
 #'
@@ -115,9 +113,9 @@ setMethod('show', 'SpearmanSolver',
 #' tbl <- run(spearman.solver)
 
 setMethod("run", "SpearmanSolver",
-
+          
           function (obj){
-
+              
               mtx <- getAssayData(obj)
               target.gene <- getTarget(obj)
               tfs <- getRegulators(obj)                                             
@@ -128,7 +126,7 @@ setMethod("run", "SpearmanSolver",
               
               # If given no tfs, return nothing
               if (length(tfs)==0) return(NULL)
-
+              
               # Don't handle tf self-regulation, so take target gene out of tfs
               deleters <- grep(target.gene, tfs)
               if(length(deleters) > 0){
@@ -136,18 +134,17 @@ setMethod("run", "SpearmanSolver",
               }
               # If target gene was the only tf, then return nothing
               if(length(tfs)==0) return(NULL)
-
+              
               x = t(mtx[tfs,,drop=FALSE])
               y = as.vector(t(mtx[target.gene,])) # Make target gene levels into a vector
-
+              
               # Calculate Spearman correlation coefficients
               fit <- stats::cor( x = x, y = y, method = "spearman")
-
-              # Return the coefficients as a data frame in order of coefficient size
-
+              
+              # Return the coefficients as a data frame in order of coefficient size              
               tbl <- data.frame(row.names = rownames(fit)[order(abs(fit), decreasing = TRUE)],
                                 coefficient = fit[order(abs(fit), decreasing = TRUE)])
-
+              
               return(tbl)
           })
 #----------------------------------------------------------------------------------------------------

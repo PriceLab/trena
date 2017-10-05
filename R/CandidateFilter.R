@@ -9,8 +9,8 @@
 #' @family Filtering objects
 
 .CandidateFilter <- setClass("CandidateFilter",
-                    slots = c(quiet = "logical")
-                    )
+                             slots = c(quiet = "logical")
+                             )
 #----------------------------------------------------------------------------------------------------
 printf <- function(...) print(noquote(sprintf(...)))
 #----------------------------------------------------------------------------------------------------
@@ -26,7 +26,6 @@ printf <- function(...) print(noquote(sprintf(...)))
 #' @family getCandidate Methods
 #' @export
 setGeneric("getCandidates", signature="obj", function(obj) standardGeneric("getCandidates"))
-
 #----------------------------------------------------------------------------------------------------
 #' CandidateFilter
 #'
@@ -52,6 +51,6 @@ setGeneric("getCandidates", signature="obj", function(obj) standardGeneric("getC
 CandidateFilter <- function(quiet = TRUE)
 {
     .CandidateFilter(quiet = quiet)
-
+    
 } # CandidateFilter, the constructor
 #----------------------------------------------------------------------------------------------------

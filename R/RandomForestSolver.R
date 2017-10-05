@@ -7,10 +7,10 @@
 #' @name RandomForestSolver-class
 #' @rdname RandomForestSolver-class
 
-.RandomForestSolver <- setClass ("RandomForestSolver",
-                                 contains="Solver",
-                                 slots=c(regulatorWeights="numeric")                                 
-                                 )
+.RandomForestSolver <- setClass("RandomForestSolver",
+                                contains="Solver",
+                                slots=c(regulatorWeights="numeric")                                 
+                                )
 #----------------------------------------------------------------------------------------------------
 #' Create a Solver class object using the Random Forest solver
 #'
@@ -40,24 +40,24 @@ RandomForestSolver <- function(mtx.assay=matrix(), targetGene, candidateRegulato
                                regulatorWeights=rep(1, length(candidateRegulators)),
                                quiet=TRUE)
 {
-   if(any(grepl(targetGene, candidateRegulators)))
-      candidateRegulators <- candidateRegulators[-grep(targetGene, candidateRegulators)]
-
-   candidateRegulators <- intersect(candidateRegulators, rownames(mtx.assay))
-   stopifnot(length(candidateRegulators) > 0)
-
-   obj <- .RandomForestSolver(Solver(mtx.assay=mtx.assay,
-                                     quiet=quiet,
-                                     targetGene=targetGene,
-                                     candidateRegulators=candidateRegulators),
-                              regulatorWeights=regulatorWeights)
-   
-   # Send a warning if there's a row of zeros
-   if(!is.na(max(mtx.assay)) & any(rowSums(mtx.assay) == 0))
-       warning("One or more gene has zero expression; this may yield warnings when using Random Forest.")
-   
-   obj
-   
+    if(any(grepl(targetGene, candidateRegulators)))
+        candidateRegulators <- candidateRegulators[-grep(targetGene, candidateRegulators)]
+    
+    candidateRegulators <- intersect(candidateRegulators, rownames(mtx.assay))
+    stopifnot(length(candidateRegulators) > 0)
+    
+    obj <- .RandomForestSolver(Solver(mtx.assay=mtx.assay,
+                                      quiet=quiet,
+                                      targetGene=targetGene,
+                                      candidateRegulators=candidateRegulators),
+                               regulatorWeights=regulatorWeights)
+    
+    # Send a warning if there's a row of zeros
+    if(!is.na(max(mtx.assay)) & any(rowSums(mtx.assay) == 0))
+        warning("One or more gene has zero expression; this may yield warnings when using Random Forest.")
+    
+    obj
+    
 } # RandomForestSolver, the constructor
 #----------------------------------------------------------------------------------------------------
 #' Show the Random Forest Solver
@@ -77,21 +77,21 @@ RandomForestSolver <- function(mtx.assay=matrix(), targetGene, candidateRegulato
 #' show(rf.solver)
 
 setMethod('show', 'RandomForestSolver',
-
-    function(object) {
-       regulator.count <- length(getRegulators(object))
-       if(regulator.count > 10){
-          regulatorString <- paste(getRegulators(object)[1:10], collapse=",")
-          regulatorString <- sprintf("%s...", regulatorString);
-          }
-       else
-          regulatorString <- paste(getRegulators(object), collapse=",")
-
-       msg = sprintf("RandomForestSolver with mtx.assay (%d, %d), targetGene %s, %d candidate regulators %s",
-                     nrow(getAssayData(object)), ncol(getAssayData(object)),
-                     getTarget(object), regulator.count, regulatorString)
-       cat (msg, '\n', sep='')
-    })
+          
+          function(object) {
+              regulator.count <- length(getRegulators(object))
+              if(regulator.count > 10){
+                  regulatorString <- paste(getRegulators(object)[1:10], collapse=",")
+                  regulatorString <- sprintf("%s...", regulatorString);
+              }
+              else
+                  regulatorString <- paste(getRegulators(object), collapse=",")
+              
+              msg = sprintf("RandomForestSolver with mtx.assay (%d, %d), targetGene %s, %d candidate regulators %s",
+                            nrow(getAssayData(object)), ncol(getAssayData(object)),
+                            getTarget(object), regulator.count, regulatorString)
+              cat (msg, '\n', sep='')
+          })
 #----------------------------------------------------------------------------------------------------
 #' Run the Random Forest Solver
 #'
@@ -122,27 +122,27 @@ setMethod('show', 'RandomForestSolver',
 
 setMethod("run", "RandomForestSolver",
 
-  function (obj){
-
-      mtx <- getAssayData(obj)
-      target.gene <- getTarget(obj)
-      tfs <- getRegulators(obj)    
-      
-      stopifnot(target.gene %in% rownames(mtx))           
-      stopifnot(all(tfs %in% rownames(mtx)))      
-      if(length(tfs)==0) return(NULL)      
-      
-      x <- t(mtx[tfs,,drop=FALSE])      
-      y <- as.vector(t(mtx[target.gene,])) # Change y to a vector to avoid RF warning      
-      
-      fit <- randomForest( x = x, y = y )
-      edges = as.data.frame(fit$importance)
-      pred.values = stats::predict(fit)
-      #r2 = stats::cor(pred.values , mtx[target.gene,])^2
-      gene.cor <- sapply(rownames(edges), function(tf) stats::cor(mtx[tf,], mtx[target.gene,]))
-      edges$gene.cor <- gene.cor
-      edges <- edges[order(edges$IncNodePurity, decreasing=TRUE),]
-      #return(list(edges = edges , r2 = r2))
-      return(edges)
-     })
+          function (obj){
+              
+              mtx <- getAssayData(obj)
+              target.gene <- getTarget(obj)
+              tfs <- getRegulators(obj)    
+              
+              stopifnot(target.gene %in% rownames(mtx))           
+              stopifnot(all(tfs %in% rownames(mtx)))      
+              if(length(tfs)==0) return(NULL)      
+              
+              x <- t(mtx[tfs,,drop=FALSE])      
+              y <- as.vector(t(mtx[target.gene,])) # Change y to a vector to avoid RF warning      
+              
+              fit <- randomForest( x = x, y = y )
+              edges = as.data.frame(fit$importance)
+              pred.values = stats::predict(fit)
+              #r2 = stats::cor(pred.values , mtx[target.gene,])^2
+              gene.cor <- sapply(rownames(edges), function(tf) stats::cor(mtx[tf,], mtx[target.gene,]))
+              edges$gene.cor <- gene.cor
+              edges <- edges[order(edges$IncNodePurity, decreasing=TRUE),]
+              #return(list(edges = edges , r2 = r2))
+              return(edges)
+          })
 #----------------------------------------------------------------------------------------------------

@@ -7,10 +7,10 @@
 #' @include Solver.R
 #' @name BayesSpikeSolver-class
 
-.BayesSpikeSolver <- setClass ("BayesSpikeSolver",
-                               contains="Solver",
-                               slots = c(nOrderings = "numeric")
-                               )
+.BayesSpikeSolver <- setClass("BayesSpikeSolver",
+                              contains="Solver",
+                              slots = c(nOrderings = "numeric")
+                              )
 #----------------------------------------------------------------------------------------------------
 #' Create a Solver class object using the Bayes Spike Solver
 #' 
@@ -41,22 +41,22 @@ BayesSpikeSolver <- function(mtx.assay=matrix(), targetGene, candidateRegulators
 {
     if(any(grepl(targetGene, candidateRegulators)))        
         candidateRegulators <- candidateRegulators[-grep(targetGene, candidateRegulators)]    
-
+    
     candidateRegulators <- intersect(candidateRegulators, rownames(mtx.assay))    
     stopifnot(length(candidateRegulators) > 0)    
-   
+    
     obj <- .BayesSpikeSolver(Solver(mtx.assay=mtx.assay,                             
                                     targetGene = targetGene,
                                     candidateRegulators = candidateRegulators,
                                     quiet = quiet),
                              nOrderings = nOrderings)
-
+    
     # Send a warning if there's a row of zeros
     if(!is.na(max(mtx.assay)) & any(rowSums(mtx.assay) == 0))
-       warning("One or more gene has zero expression; this may cause difficulty when using Bayes Spike. You may want to try 'lasso' or 'ridge' instead.")
-
+        warning("One or more gene has zero expression; this may cause difficulty when using Bayes Spike. You may want to try 'lasso' or 'ridge' instead.")
+    
     obj
-
+    
 } # BayesSpikeSolver, the constructor
 #----------------------------------------------------------------------------------------------------
 #' Show the Bayes Spike Solver
@@ -76,21 +76,21 @@ BayesSpikeSolver <- function(mtx.assay=matrix(), targetGene, candidateRegulators
 #' show(bayes.solver)
 
 setMethod('show', 'BayesSpikeSolver',
-
-    function(object) {
-       regulator.count <- length(getRegulators(object))
-       if(regulator.count > 10){
-          regulatorString <- paste(getRegulators(object)[1:10], collapse=",")
-          regulatorString <- sprintf("%s...", regulatorString);
-          }
-       else
-          regulatorString <- paste(getRegulators(object), collapse=",")
-
-       msg = sprintf("BayesSpikeSolver with mtx.assay (%d, %d), targetGene %s, %d candidate regulators %s, %d orderings",
-                     nrow(getAssayData(object)), ncol(getAssayData(object)),
-                     getTarget(object), regulator.count, regulatorString, object@nOrderings)
-       cat (msg, '\n', sep='')
-    })
+          
+          function(object) {
+              regulator.count <- length(getRegulators(object))
+              if(regulator.count > 10){
+                  regulatorString <- paste(getRegulators(object)[1:10], collapse=",")
+                  regulatorString <- sprintf("%s...", regulatorString);
+              }
+              else
+                  regulatorString <- paste(getRegulators(object), collapse=",")
+              
+              msg = sprintf("BayesSpikeSolver with mtx.assay (%d, %d), targetGene %s, %d candidate regulators %s, %d orderings",
+                            nrow(getAssayData(object)), ncol(getAssayData(object)),
+                            getTarget(object), regulator.count, regulatorString, object@nOrderings)
+              cat (msg, '\n', sep='')
+          })
 #----------------------------------------------------------------------------------------------------
 #' Run the Bayes Spike Solver
 #'
@@ -124,34 +124,33 @@ setMethod('show', 'BayesSpikeSolver',
 
 setMethod("run", "BayesSpikeSolver",
 
-  function (obj){
-
-      mtx <- getAssayData(obj)    
-      target.gene <- getTarget(obj)
-      tfs <- getRegulators(obj)
-      stopifnot(target.gene %in% rownames(mtx))      
-      stopifnot(all(tfs %in% rownames(mtx)))
-                     
-      # we don't try to handle tf self-regulation      
-      deleters <- grep(target.gene, tfs)      
-      if(length(deleters) > 0){          
-          tfs <- tfs[-deleters]          
-           message(sprintf("BayesSpikeSolver removing target.gene from candidate regulators: %s", target.gene))          
-      }      
-          
-      features <- t(mtx[tfs, ])      
-      target <- as.numeric(mtx[target.gene,])      
-      result <- vbsr(target, features, family='normal', n_orderings = obj@nOrderings)
-
-      # Add Pearson coefficient and add a "score"
-      tbl.out <- data.frame(beta=result$beta, pval=result$pval, z=result$z, post=result$post)      
-      rownames(tbl.out) <- tfs      
-      tbl.out$score <- -log10(tbl.out$pval)      
-      tbl.out <- tbl.out[order(tbl.out$score, decreasing=TRUE),]
-      gene.cor <- sapply(rownames(tbl.out), function(tf) stats::cor(mtx[tf,], mtx[target.gene,]))  
-      tbl.out$gene.cor <- as.numeric(gene.cor)      
-      tbl.out
-      
-  })
+          function (obj){
+              
+              mtx <- getAssayData(obj)    
+              target.gene <- getTarget(obj)
+              tfs <- getRegulators(obj)
+              stopifnot(target.gene %in% rownames(mtx))      
+              stopifnot(all(tfs %in% rownames(mtx)))
+              
+              # we don't try to handle tf self-regulation      
+              deleters <- grep(target.gene, tfs)      
+              if(length(deleters) > 0){          
+                  tfs <- tfs[-deleters]          
+                  message(sprintf("BayesSpikeSolver removing target.gene from candidate regulators: %s", target.gene))          
+              }      
+              
+              features <- t(mtx[tfs, ])      
+              target <- as.numeric(mtx[target.gene,])      
+              result <- vbsr(target, features, family='normal', n_orderings = obj@nOrderings)
+              
+              # Add Pearson coefficient and add a "score"
+              tbl.out <- data.frame(beta=result$beta, pval=result$pval, z=result$z, post=result$post)      
+              rownames(tbl.out) <- tfs      
+              tbl.out$score <- -log10(tbl.out$pval)      
+              tbl.out <- tbl.out[order(tbl.out$score, decreasing=TRUE),]
+              gene.cor <- sapply(rownames(tbl.out), function(tf) stats::cor(mtx[tf,], mtx[target.gene,]))  
+              tbl.out$gene.cor <- as.numeric(gene.cor)      
+              tbl.out
+              
+          })
 #----------------------------------------------------------------------------------------------------
-

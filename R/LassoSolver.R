@@ -6,13 +6,13 @@
 #' 
 #' @name LassoSolver-class
 
-.LassoSolver <- setClass ("LassoSolver",
-                          contains="Solver",
-                          slots = c(regulatorWeights="numeric",
-                                    alpha = "numeric",
-                                    lambda = "numeric",
-                                    keep.metrics = "logical")
-                          )
+.LassoSolver <- setClass("LassoSolver",
+                         contains="Solver",
+                         slots = c(regulatorWeights="numeric",
+                                   alpha = "numeric",
+                                   lambda = "numeric",
+                                   keep.metrics = "logical")
+                         )
 #----------------------------------------------------------------------------------------------------
 #' Create a Solver class object using the LASSO solver
 #'
@@ -50,23 +50,22 @@ LassoSolver <- function(mtx.assay=matrix(), targetGene, candidateRegulators,
                         alpha = 0.9, lambda = numeric(0),
                         keep.metrics = FALSE, quiet=TRUE)
 {
-   if(any(grepl(targetGene, candidateRegulators)))
-      candidateRegulators <- candidateRegulators[-grep(targetGene, candidateRegulators)]
-
-   candidateRegulators <- intersect(candidateRegulators, rownames(mtx.assay))
-   stopifnot(length(candidateRegulators) > 0)
-
-   obj <- .LassoSolver(Solver(mtx.assay=mtx.assay,
-                              quiet=quiet,
-                              targetGene=targetGene,
-                              candidateRegulators=candidateRegulators),
-                       regulatorWeights=regulatorWeights,
-                       alpha = alpha,
-                       lambda = lambda,
-                       keep.metrics = keep.metrics
-                       )
-    obj
-
+    if(any(grepl(targetGene, candidateRegulators)))
+        candidateRegulators <- candidateRegulators[-grep(targetGene, candidateRegulators)]
+    
+    candidateRegulators <- intersect(candidateRegulators, rownames(mtx.assay))
+    stopifnot(length(candidateRegulators) > 0)
+    
+    obj <- .LassoSolver(Solver(mtx.assay=mtx.assay,
+                               quiet=quiet,
+                               targetGene=targetGene,
+                               candidateRegulators=candidateRegulators),
+                        regulatorWeights=regulatorWeights,
+                        alpha = alpha,
+                        lambda = lambda,
+                        keep.metrics = keep.metrics
+                        )
+    obj    
 } # LassoSolver, the constructor
 #----------------------------------------------------------------------------------------------------
 #' Show the Lasso Solver
@@ -86,21 +85,21 @@ LassoSolver <- function(mtx.assay=matrix(), targetGene, candidateRegulators,
 #' show(lasso.solver)
 
 setMethod('show', 'LassoSolver',
-
-    function(object) {
-       regulator.count <- length(getRegulators(object))
-       if(regulator.count > 10){
-          regulatorString <- paste(getRegulators(object)[1:10], collapse=",")
-          regulatorString <- sprintf("%s...", regulatorString);
-          }
-       else
-          regulatorString <- paste(getRegulators(object), collapse=",")
-
-       msg = sprintf("LassoSolver with mtx.assay (%d, %d), targetGene %s, %d candidate regulators %s, alpha = %f",
-                     nrow(getAssayData(object)), ncol(getAssayData(object)),
-                     getTarget(object), regulator.count, regulatorString, object@alpha)
-       cat (msg, '\n', sep='')
-    })
+          
+          function(object) {
+              regulator.count <- length(getRegulators(object))
+              if(regulator.count > 10){
+                  regulatorString <- paste(getRegulators(object)[1:10], collapse=",")
+                  regulatorString <- sprintf("%s...", regulatorString);
+              }
+              else
+                  regulatorString <- paste(getRegulators(object), collapse=",")
+              
+              msg = sprintf("LassoSolver with mtx.assay (%d, %d), targetGene %s, %d candidate regulators %s, alpha = %f",
+                            nrow(getAssayData(object)), ncol(getAssayData(object)),
+                            getTarget(object), regulator.count, regulatorString, object@alpha)
+              cat (msg, '\n', sep='')
+          })
 #----------------------------------------------------------------------------------------------------
 #' Run the LASSO Solver
 #'
@@ -128,19 +127,18 @@ setMethod('show', 'LassoSolver',
 #' tbl <- run(lasso.solver)
 
 setMethod("run", "LassoSolver",
-
-  function (obj){
-
-      mtx <- getAssayData(obj)
-      target.gene <- getTarget(obj)
-      tfs <- getRegulators(obj)
-                
-      mtx.beta <- .elasticNetSolver(obj, target.gene, tfs,
-                                    obj@regulatorWeights,
-                                    obj@alpha,
-                                    obj@lambda,
-                                    obj@keep.metrics)
-      return(mtx.beta)
-     })
+          
+          function (obj){
+              
+              mtx <- getAssayData(obj)
+              target.gene <- getTarget(obj)
+              tfs <- getRegulators(obj)
+              
+              mtx.beta <- .elasticNetSolver(obj, target.gene, tfs,
+                                            obj@regulatorWeights,
+                                            obj@alpha,
+                                            obj@lambda,
+                                            obj@keep.metrics)
+              return(mtx.beta)
+          })
 #----------------------------------------------------------------------------------------------------
-

@@ -13,10 +13,10 @@
 #' @aliases GeneOntologyFilter
 #----------------------------------------------------------------------------------------------------
 .GeneOntologyFilter <- setClass("GeneOntologyFilter",
-                            contains="CandidateFilter",
-                            slots=c(organismDatabase="OrgDb",
-                                    GOTerm="character",
-                                    quiet="logical"))
+                                contains="CandidateFilter",
+                                slots=c(organismDatabase="OrgDb",
+                                        GOTerm="character",
+                                        quiet="logical"))
 #----------------------------------------------------------------------------------------------------
 printf <- function(...) print(noquote(sprintf(...)))
 #----------------------------------------------------------------------------------------------------
@@ -54,7 +54,7 @@ GeneOntologyFilter <- function(organismDatabase=org.Hs.eg.db::org.Hs.eg.db,
     data.file <- system.file(package="trena", "extdata", "human.regulatory.genes.RData")
     load(data.file)
     .GeneOntologyFilter(organismDatabase=organismDatabase, GOTerm=GOTerm, quiet=quiet)
-
+    
 } # GeneOntologyFilter, the constructor
 #----------------------------------------------------------------------------------------------------
 #' Get candidate genes using a gene ontology filter
@@ -81,12 +81,11 @@ GeneOntologyFilter <- function(organismDatabase=org.Hs.eg.db::org.Hs.eg.db,
 
 setMethod("getCandidates", "GeneOntologyFilter",
 
-    function(obj){
-       suppressMessages(
-           regulatory.genes <- AnnotationDbi::select(obj@organismDatabase, keys=obj@GOTerm,
-                                      keytype="GO", columns=c("SYMBOL", "GO"))$SYMBOL
-          )
-       list(tbl=data.frame(), tfs=regulatory.genes)
-       }) # getCandidates
-
+          function(obj){
+              suppressMessages(
+                  regulatory.genes <- AnnotationDbi::select(obj@organismDatabase, keys=obj@GOTerm,
+                                                            keytype="GO", columns=c("SYMBOL", "GO"))$SYMBOL
+              )
+              list(tbl=data.frame(), tfs=regulatory.genes)
+          }) # getCandidates
 #----------------------------------------------------------------------------------------------------

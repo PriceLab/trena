@@ -101,5 +101,5 @@ setMethod("getCandidates", "VarianceFilter",
 
               return(list(tfs = tfs, tf.vars = tf.vars))
           }
-)
+          )
 #----------------------------------------------------------------------------------------------------

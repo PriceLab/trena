@@ -7,9 +7,9 @@
 
 .Trena <- setClass ("Trena",
                     representation = representation(
-                       genomeName="character",
-                       quiet="logical")
-                        )
+                        genomeName="character",
+                        quiet="logical")
+                    )
 #----------------------------------------------------------------------------------------------------
 setGeneric('getRegulatoryChromosomalRegions',  signature='obj',
            function(obj, chromosome, chromStart, chromEnd, regulatoryRegionSources, targetGene, targetGeneTSS,
@@ -26,7 +26,7 @@ setGeneric('assessSnp', signature='obj', function(obj, pfms, variant, shoulder, 
     standardGeneric('assessSnp'))
 
 setGeneric('getProximalPromoter', signature='obj', function(obj, geneSymbol, tssUpstream, tssDownstream)
-              standardGeneric('getProximalPromoter'))
+    standardGeneric('getProximalPromoter'))
 #----------------------------------------------------------------------------------------------------
 # a temporary hack: some constants
 genome.db.uri <- "postgres://bddsrds.globusgenomics.org/hg38"   # has gtf and motifsgenes tables
@@ -59,11 +59,11 @@ genome.db.uri <- "postgres://bddsrds.globusgenomics.org/hg38"   # has gtf and mo
 
 Trena = function(genomeName, quiet=TRUE)
 {
-   stopifnot(genomeName %in% c("hg38", "mm10"))
+    stopifnot(genomeName %in% c("hg38", "mm10"))
 
-   obj <- .Trena(genomeName=genomeName, quiet=quiet)
+    obj <- .Trena(genomeName=genomeName, quiet=quiet)
 
-   obj
+    obj
 
 } # constructor
 #----------------------------------------------------------------------------------------------------
@@ -85,9 +85,9 @@ Trena = function(genomeName, quiet=TRUE)
 
 setMethod('getRegulatoryTableColumnNames', 'Trena',
 
-      function(obj){
-         c("chrom", "motifStart", "motifEnd", "motifName", "strand", "score", "length", "distance.from.tss", "id")
-         })
+          function(obj){
+              c("chrom", "motifStart", "motifEnd", "motifName", "strand", "score", "length", "distance.from.tss", "id")
+          })
 
 #----------------------------------------------------------------------------------------------------
 #' Retrieve the column names in the gene model table for a Trena object
@@ -108,9 +108,9 @@ setMethod('getRegulatoryTableColumnNames', 'Trena',
 
 setMethod('getGeneModelTableColumnNames', 'Trena',
 
-      function(obj){
-         c("tf", "randomForest", "pearson", "spearman", "betaLasso", "pcaMax", "concordance")
-         })
+          function(obj){
+              c("tf", "randomForest", "pearson", "spearman", "betaLasso", "pcaMax", "concordance")
+          })
 
 #----------------------------------------------------------------------------------------------------
 .callFootprintFilter <- function(obj, source, chromosome, chromStart, chromEnd, targetGene, targetGeneTSS)
@@ -121,9 +121,9 @@ setMethod('getGeneModelTableColumnNames', 'Trena',
     tbl.fp <- getCandidates(fpFilter)
 
     if(nrow(tbl.fp) == 0){
-       warning("no footprints found in %s:%d-%d, targetGene is %s", chromosome, chromStart, chromEnd, targetGene);
-       return(tbl.fp)
-       }
+        warning("no footprints found in %s:%d-%d, targetGene is %s", chromosome, chromStart, chromEnd, targetGene);
+        return(tbl.fp)
+    }
 
     tbl.fp <- tbl.fp[, c("chrom", "start", "endpos", "motifName", "length", "strand", "score1", "score2", "score3")]
     colnames(tbl.fp) <- c("chrom", "motifStart", "motifEnd", "motifName", "length", "strand", "score1", "score", "score3")
@@ -133,7 +133,7 @@ setMethod('getGeneModelTableColumnNames', 'Trena',
     direction[which(distance < 0)] <- "downstream"
     tbl.fp$distance.from.tss <- distance
     tbl.fp$id <- sprintf("%s.fp.%s.%06d.%s", targetGene, direction, abs(distance), tbl.fp$motifName)
-      # a final rearrangement of columns, to match our standard
+    # a final rearrangement of columns, to match our standard
     tbl.fp <- tbl.fp[, getRegulatoryTableColumnNames(obj)]
 
     tbl.fp
@@ -155,7 +155,7 @@ setMethod('getGeneModelTableColumnNames', 'Trena',
 
     tbl.dhs <- getCandidates(dhsFilter)
     if(nrow(tbl.dhs) == 0)
-      return(tbl.dhs)
+        return(tbl.dhs)
 
     tbl.dhs$length <- nchar(tbl.dhs$match)
     distance <- tbl.dhs$motifStart - targetGeneTSS
@@ -218,41 +218,41 @@ setMethod('getGeneModelTableColumnNames', 'Trena',
 
 setMethod('getRegulatoryChromosomalRegions', 'Trena',
 
-    function(obj, chromosome, chromStart, chromEnd, regulatoryRegionSources, targetGene, targetGeneTSS,
-             combine=FALSE){
+          function(obj, chromosome, chromStart, chromEnd, regulatoryRegionSources, targetGene, targetGeneTSS,
+                   combine=FALSE){
 
-         tbl.combined <- data.frame()
-         result <- list()
-           # some bookeeeping to permit duplicate sources, useful only in testing
-         source.count <- 0
-         all.source.names <- regulatoryRegionSources
+              tbl.combined <- data.frame()
+              result <- list()
+              # some bookeeeping to permit duplicate sources, useful only in testing
+              source.count <- 0
+              all.source.names <- regulatoryRegionSources
 
-         encodeDHS.source.index <- grep("encodeHumanDHS", regulatoryRegionSources)
+              encodeDHS.source.index <- grep("encodeHumanDHS", regulatoryRegionSources)
 
-         if(length(encodeDHS.source.index)){
-            source.count <- source.count + 1
-            regulatoryRegionSources <- regulatoryRegionSources[-encodeDHS.source.index]
-            if(!obj@quiet) printf("about to callHumanDHSFilter");
-            tbl.dhs <- .callHumanDHSFilter(obj, chromosome, chromStart, chromEnd, targetGene, targetGeneTSS)
-            result[[source.count]] <- tbl.dhs
-            if(combine)
-               tbl.combined <- rbind(tbl.combined, tbl.dhs)
-            } # if encode DSH source requested
+              if(length(encodeDHS.source.index)){
+                  source.count <- source.count + 1
+                  regulatoryRegionSources <- regulatoryRegionSources[-encodeDHS.source.index]
+                  if(!obj@quiet) printf("about to callHumanDHSFilter");
+                  tbl.dhs <- .callHumanDHSFilter(obj, chromosome, chromStart, chromEnd, targetGene, targetGeneTSS)
+                  result[[source.count]] <- tbl.dhs
+                  if(combine)
+                      tbl.combined <- rbind(tbl.combined, tbl.dhs)
+              } # if encode DSH source requested
 
 
-         for(source in regulatoryRegionSources){
-            source.count <- source.count + 1
-            if(!obj@quiet) printf("about to call footprintFilter with source = '%s'", source);
-            tbl.fp <- .callFootprintFilter(obj, source, chromosome, chromStart, chromEnd, targetGene, targetGeneTSS)
-            if(combine)
-               tbl.combined <- rbind(tbl.combined, tbl.fp)
-            result[[source.count]] <- tbl.fp
-            } # for source
-         names(result) <- all.source.names
-         if(combine)
-            result[["all"]] <- tbl.combined
-         result
-         }) # getRegulatoryChromosomalRegions
+              for(source in regulatoryRegionSources){
+                  source.count <- source.count + 1
+                  if(!obj@quiet) printf("about to call footprintFilter with source = '%s'", source);
+                  tbl.fp <- .callFootprintFilter(obj, source, chromosome, chromStart, chromEnd, targetGene, targetGeneTSS)
+                  if(combine)
+                      tbl.combined <- rbind(tbl.combined, tbl.fp)
+                  result[[source.count]] <- tbl.fp
+              } # for source
+              names(result) <- all.source.names
+              if(combine)
+                  result[["all"]] <- tbl.combined
+              result
+          }) # getRegulatoryChromosomalRegions
 #----------------------------------------------------------------------------------------------------
 #' Create a model for a target gene using a Trena object
 #'
@@ -292,26 +292,26 @@ setMethod('getRegulatoryChromosomalRegions', 'Trena',
 
 setMethod('createGeneModel', 'Trena',
 
-      function(obj, targetGene, solverNames, tbl.regulatoryRegions, mtx){
+          function(obj, targetGene, solverNames, tbl.regulatoryRegions, mtx){
 
-         stopifnot("geneSymbol" %in% colnames(tbl.regulatoryRegions))
-         unique.tfs.from.regulatory.regions <- unique(tbl.regulatoryRegions$geneSymbol)
-         tfs <- intersect(unique.tfs.from.regulatory.regions, rownames(mtx))
-         if(!obj@quiet)
-            printf("tf candidate count, in mtx, in tbl.regulatory.regions: %d/%d", length(tfs),
-                   length(unique.tfs.from.regulatory.regions))
+              stopifnot("geneSymbol" %in% colnames(tbl.regulatoryRegions))
+              unique.tfs.from.regulatory.regions <- unique(tbl.regulatoryRegions$geneSymbol)
+              tfs <- intersect(unique.tfs.from.regulatory.regions, rownames(mtx))
+              if(!obj@quiet)
+                  printf("tf candidate count, in mtx, in tbl.regulatory.regions: %d/%d", length(tfs),
+                         length(unique.tfs.from.regulatory.regions))
 
-         if(length(tfs) == 0)
-            return(data.frame())
+              if(length(tfs) == 0)
+                  return(data.frame())
 
-         solver <- EnsembleSolver(mtx, targetGene=targetGene, candidateRegulators=tfs, solverNames)
-         tbl.model <- run(solver)
-         tbl.tf.frequencies <- as.data.frame(table(tbl.regulatoryRegions$geneSymbol))
-         colnames(tbl.tf.frequencies) <- c("gene", "binding.sites")
-         tbl.model <- merge(tbl.model, tbl.tf.frequencies, by="gene")
-         tbl.model <- tbl.model[order(tbl.model$pcaMax, decreasing=TRUE),]
-         tbl.model
-      }) # createGeneModel
+              solver <- EnsembleSolver(mtx, targetGene=targetGene, candidateRegulators=tfs, solverNames)
+              tbl.model <- run(solver)
+              tbl.tf.frequencies <- as.data.frame(table(tbl.regulatoryRegions$geneSymbol))
+              colnames(tbl.tf.frequencies) <- c("gene", "binding.sites")
+              tbl.model <- merge(tbl.model, tbl.tf.frequencies, by="gene")
+              tbl.model <- tbl.model[order(tbl.model$pcaMax, decreasing=TRUE),]
+              tbl.model
+          }) # createGeneModel
 #----------------------------------------------------------------------------------------------------
 #' Assess the effect of a SNP using a Trena object
 #'
@@ -345,110 +345,110 @@ setMethod('createGeneModel', 'Trena',
 
 setMethod('assessSnp', 'Trena',
 
-     function(obj, pfms, variant, shoulder, pwmMatchMinimumAsPercentage, relaxedMatchDelta=25){
+          function(obj, pfms, variant, shoulder, pwmMatchMinimumAsPercentage, relaxedMatchDelta=25){
 
-        motifMatcher <- MotifMatcher(genomeName=obj@genomeName, pfms=pfms, quiet=obj@quiet)
-        tbl.variant <- try(.parseVariantString(motifMatcher, variant), silent=TRUE)
-        if(is(tbl.variant, "try-error")){
-           printf("error, unrecognized variant name: '%s'", variant)
-           return(data.frame())
-           }
-        tbl.regions <- data.frame(chrom=tbl.variant$chrom,
-                                  start=tbl.variant$loc-shoulder,
-                                  end=tbl.variant$loc+shoulder,
-                                  stringsAsFactors=FALSE)
+              motifMatcher <- MotifMatcher(genomeName=obj@genomeName, pfms=pfms, quiet=obj@quiet)
+              tbl.variant <- try(.parseVariantString(motifMatcher, variant), silent=TRUE)
+              if(is(tbl.variant, "try-error")){
+                  printf("error, unrecognized variant name: '%s'", variant)
+                  return(data.frame())
+              }
+              tbl.regions <- data.frame(chrom=tbl.variant$chrom,
+                                        start=tbl.variant$loc-shoulder,
+                                        end=tbl.variant$loc+shoulder,
+                                        stringsAsFactors=FALSE)
 
-        tbl.wt  <- findMatchesByChromosomalRegion(motifMatcher, tbl.regions,
-                                                  pwmMatchMinimumAsPercentage=pwmMatchMinimumAsPercentage)
-        if(nrow(tbl.wt) == 0){
-           warning(sprintf("no motifs found in reference sequence in neighborhood of %s with shoulder %d",
-                           variant, shoulder))
-           return(data.frame())
-           }
+              tbl.wt  <- findMatchesByChromosomalRegion(motifMatcher, tbl.regions,
+                                                        pwmMatchMinimumAsPercentage=pwmMatchMinimumAsPercentage)
+              if(nrow(tbl.wt) == 0){
+                  warning(sprintf("no motifs found in reference sequence in neighborhood of %s with shoulder %d",
+                                  variant, shoulder))
+                  return(data.frame())
+              }
 
-       tbl.mut <- findMatchesByChromosomalRegion(motifMatcher, tbl.regions,
-                                                 pwmMatchMinimumAsPercentage=pwmMatchMinimumAsPercentage,
-                                                 variant=variant)
-       if(nrow(tbl.mut) == 0){
-          warning(sprintf("no motifs altered by %s with shoulder %d", variant, shoulder))
-          return(data.frame())
-          }
+              tbl.mut <- findMatchesByChromosomalRegion(motifMatcher, tbl.regions,
+                                                        pwmMatchMinimumAsPercentage=pwmMatchMinimumAsPercentage,
+                                                        variant=variant)
+              if(nrow(tbl.mut) == 0){
+                  warning(sprintf("no motifs altered by %s with shoulder %d", variant, shoulder))
+                  return(data.frame())
+              }
 
-        tbl.wt$signature <- sprintf("%s;%s;%s", tbl.wt$motifName, tbl.wt$motifStart, tbl.wt$strand)
-        tbl.mut$signature <- sprintf("%s;%s;%s", tbl.mut$motifName, tbl.mut$motifStart, tbl.mut$strand)
+              tbl.wt$signature <- sprintf("%s;%s;%s", tbl.wt$motifName, tbl.wt$motifStart, tbl.wt$strand)
+              tbl.mut$signature <- sprintf("%s;%s;%s", tbl.mut$motifName, tbl.mut$motifStart, tbl.mut$strand)
 
-            # comine wt and mut tables, reorder columns and rows for easier comprehension
-        tbl <- rbind(tbl.wt[, c(1,12,2,3,4,5,6,7,8,13)], tbl.mut[, c(1,12,2,3,4,5,6,7,8,13)])
-        tbl <- tbl[order(tbl$motifName, tbl$motifRelativeScore, decreasing=TRUE),]
-        #tbl$signature <- sprintf("%s;%s;%s", tbl$motifName, tbl$motifStart, tbl$strand)
-        tbl <- tbl[,c(1,2,3:10)]
+              # comine wt and mut tables, reorder columns and rows for easier comprehension
+              tbl <- rbind(tbl.wt[, c(1,12,2,3,4,5,6,7,8,13)], tbl.mut[, c(1,12,2,3,4,5,6,7,8,13)])
+              tbl <- tbl[order(tbl$motifName, tbl$motifRelativeScore, decreasing=TRUE),]
+              #tbl$signature <- sprintf("%s;%s;%s", tbl$motifName, tbl$motifStart, tbl$strand)
+              tbl <- tbl[,c(1,2,3:10)]
 
-            # now look for less stringent matches.  these will be matched up with the
-            # wt and mut motifs which do not yet have partners, thus enabling us to
-            # provide a wt->mut motifScore.delta for each
-        relaxedMatchPercentage <- pwmMatchMinimumAsPercentage-relaxedMatchDelta
-        tbl.wt.relaxed <- findMatchesByChromosomalRegion(motifMatcher, tbl.regions, relaxedMatchPercentage)
-        tbl.wt.relaxed$signature <- sprintf("%s;%s;%s", tbl.wt.relaxed$motifName, tbl.wt.relaxed$motifStart, tbl.wt.relaxed$strand)
-        tbl.mut.relaxed <- findMatchesByChromosomalRegion(motifMatcher, tbl.regions, relaxedMatchPercentage, variant=variant)
-        tbl.mut.relaxed$signature <- sprintf("%s;%s;%s", tbl.mut.relaxed$motifName, tbl.mut.relaxed$motifStart, tbl.mut.relaxed$strand)
+              # now look for less stringent matches.  these will be matched up with the
+              # wt and mut motifs which do not yet have partners, thus enabling us to
+              # provide a wt->mut motifScore.delta for each
+              relaxedMatchPercentage <- pwmMatchMinimumAsPercentage-relaxedMatchDelta
+              tbl.wt.relaxed <- findMatchesByChromosomalRegion(motifMatcher, tbl.regions, relaxedMatchPercentage)
+              tbl.wt.relaxed$signature <- sprintf("%s;%s;%s", tbl.wt.relaxed$motifName, tbl.wt.relaxed$motifStart, tbl.wt.relaxed$strand)
+              tbl.mut.relaxed <- findMatchesByChromosomalRegion(motifMatcher, tbl.regions, relaxedMatchPercentage, variant=variant)
+              tbl.mut.relaxed$signature <- sprintf("%s;%s;%s", tbl.mut.relaxed$motifName, tbl.mut.relaxed$motifStart, tbl.mut.relaxed$strand)
 
-        signatures.in.both <- intersect(subset(tbl, status=="mut")$signature, subset(tbl, status=="wt")$signature)
-        signatures.only.in.wt <- setdiff(subset(tbl, status=="wt")$signature, subset(tbl, status=="mut")$signature)
-        signatures.only.in.mut <- setdiff(subset(tbl, status=="mut")$signature, subset(tbl, status=="wt")$signature)
+              signatures.in.both <- intersect(subset(tbl, status=="mut")$signature, subset(tbl, status=="wt")$signature)
+              signatures.only.in.wt <- setdiff(subset(tbl, status=="wt")$signature, subset(tbl, status=="mut")$signature)
+              signatures.only.in.mut <- setdiff(subset(tbl, status=="mut")$signature, subset(tbl, status=="wt")$signature)
 
-        tbl$assessed <- rep("failed", nrow(tbl))
+              tbl$assessed <- rep("failed", nrow(tbl))
 
-        if(length(signatures.in.both) > 0) {
-           indices <- sort(unlist(lapply(signatures.in.both, function(sig) grep(sig, tbl$signature))))
-           tbl$assessed[indices] <- "in.both"
-           }
+              if(length(signatures.in.both) > 0) {
+                  indices <- sort(unlist(lapply(signatures.in.both, function(sig) grep(sig, tbl$signature))))
+                  tbl$assessed[indices] <- "in.both"
+              }
 
-        if(length(signatures.only.in.wt) > 0) {
-           indices <- sort(unlist(lapply(signatures.only.in.wt, function(sig) grep(sig, tbl$signature))))
-           tbl$assessed[indices] <- "wt.only"
-           }
+              if(length(signatures.only.in.wt) > 0) {
+                  indices <- sort(unlist(lapply(signatures.only.in.wt, function(sig) grep(sig, tbl$signature))))
+                  tbl$assessed[indices] <- "wt.only"
+              }
 
-        if(length(signatures.only.in.mut) > 0) {
-           indices <- sort(unlist(lapply(signatures.only.in.mut, function(sig) grep(sig, tbl$signature))))
-           tbl$assessed[indices] <- "mut.only"
-           }
+              if(length(signatures.only.in.mut) > 0) {
+                  indices <- sort(unlist(lapply(signatures.only.in.mut, function(sig) grep(sig, tbl$signature))))
+                  tbl$assessed[indices] <- "mut.only"
+              }
 
-        tbl$delta <- 0
+              tbl$delta <- 0
 
-           # find the mut scores for each of the "wt.only" entries, subtract from the wt score
-        tbl.wt.only  <- subset(tbl, assessed=="wt.only", select=c(signature, motifRelativeScore))
-        if(nrow(tbl.wt.only) > 0){
-           sigs <- tbl.wt.only$signature
-           tbl.mut.scores <- subset(tbl.mut.relaxed, signature %in% sigs, select=c(signature, motifRelativeScore))
-           deltas <- unlist(lapply(sigs, function(sig){wt.score  <- subset(tbl.wt.only, signature==sig)$motifRelativeScore;
-                                                mut.score <- subset(tbl.mut.scores, signature==sig)$motifRelativeScore;
-                                                delta <- wt.score - mut.score
-                                                }))
-           tbl$delta[match(sigs, tbl$signature)] <- deltas
-           } # if some wt.only entries
+              # find the mut scores for each of the "wt.only" entries, subtract from the wt score
+              tbl.wt.only  <- subset(tbl, assessed=="wt.only", select=c(signature, motifRelativeScore))
+              if(nrow(tbl.wt.only) > 0){
+                  sigs <- tbl.wt.only$signature
+                  tbl.mut.scores <- subset(tbl.mut.relaxed, signature %in% sigs, select=c(signature, motifRelativeScore))
+                  deltas <- unlist(lapply(sigs, function(sig){wt.score  <- subset(tbl.wt.only, signature==sig)$motifRelativeScore;
+                      mut.score <- subset(tbl.mut.scores, signature==sig)$motifRelativeScore;
+                      delta <- wt.score - mut.score
+                  }))
+                  tbl$delta[match(sigs, tbl$signature)] <- deltas
+              } # if some wt.only entries
 
-           # find the wt scores for each of the "mut.only" entries, subtract from the mut score
+              # find the wt scores for each of the "mut.only" entries, subtract from the mut score
 
-        tbl.mut.only  <- subset(tbl, assessed=="mut.only", select=c(signature, motifRelativeScore))
-        if(nrow(tbl.mut.only) > 0){
-           sigs <- tbl.mut.only$signature
-              # find the wt scores for these muts, looking in the relaxedMatchPercentage match table
-           tbl.wt.scores <- subset(tbl.wt.relaxed, signature %in% sigs, select=c(signature, motifRelativeScore))
-           deltas <- unlist(lapply(sigs, function(sig){mut.score  <- subset(tbl.mut.only, signature==sig)$motifRelativeScore;
-                                                       wt.score <- subset(tbl.wt.scores, signature==sig)$motifRelativeScore;
-                                                       delta <- wt.score - mut.score
-                                                       }))
-           tbl$delta[match(sigs, tbl$signature)] <- deltas
-           } # tbl.mut.only > 0
+              tbl.mut.only  <- subset(tbl, assessed=="mut.only", select=c(signature, motifRelativeScore))
+              if(nrow(tbl.mut.only) > 0){
+                  sigs <- tbl.mut.only$signature
+                  # find the wt scores for these muts, looking in the relaxedMatchPercentage match table
+                  tbl.wt.scores <- subset(tbl.wt.relaxed, signature %in% sigs, select=c(signature, motifRelativeScore))
+                  deltas <- unlist(lapply(sigs, function(sig){mut.score  <- subset(tbl.mut.only, signature==sig)$motifRelativeScore;
+                      wt.score <- subset(tbl.wt.scores, signature==sig)$motifRelativeScore;
+                      delta <- wt.score - mut.score
+                  }))
+                  tbl$delta[match(sigs, tbl$signature)] <- deltas
+              } # tbl.mut.only > 0
 
-        coi <-  c("motifName", "status", "assessed", "motifRelativeScore", "delta",
-                  "signature", "chrom", "motifStart", "motifEnd", "strand", "match")
+              coi <-  c("motifName", "status", "assessed", "motifRelativeScore", "delta",
+                        "signature", "chrom", "motifStart", "motifEnd", "strand", "match")
 
-        stopifnot(all(coi %in% colnames(tbl)))
-        tbl <- tbl[, coi]
-        tbl$variant <- variant
-        tbl
-        }) # assessSnp
+              stopifnot(all(coi %in% colnames(tbl)))
+              tbl <- tbl[, coi]
+              tbl$variant <- variant
+              tbl
+          }) # assessSnp
 #----------------------------------------------------------------------------------------------------
 #' Grab the region of the proximal promoter for a given gene symbol
 #'
@@ -488,10 +488,10 @@ setMethod("getProximalPromoter", "Trena",
                   driver <- RPostgreSQL::PostgreSQL()
 
                   genome.db <- DBI::dbConnect(driver,
-                                    user = "trena",
-                                    password = "trena",
-                                    dbname = dbname,
-                                    host = host)
+                                              user = "trena",
+                                              password = "trena",
+                                              dbname = dbname,
+                                              host = host)
 
                   query <- sprintf("select * from gtf where moleculetype='gene' and gene_biotype='protein_coding' and gene_name='%s'",
                                    geneSymbol)
@@ -500,7 +500,7 @@ setMethod("getProximalPromoter", "Trena",
                   DBI::dbDisconnect(genome.db)
 
                   if(nrow(tbl.loc) == 0)
-                    return(NA)
+                      return(NA)
                   chrom <- tbl.loc$chr[1]
                   start.orig <- tbl.loc$start[1]
                   end.orig   <- tbl.loc$endpos[1]
@@ -527,8 +527,8 @@ setMethod("getProximalPromoter", "Trena",
                                                               "strand"),
                                                  filters="mgi_symbol", value=geneSymbol, mart=mm10.mart)
 
-                 if(nrow(tbl.geneInfo) == 0)
-                    return(NA)
+                  if(nrow(tbl.geneInfo) == 0)
+                      return(NA)
 
                   # make sure all transcripts are on the same strand
                   strand <- unique(tbl.geneInfo$strand)

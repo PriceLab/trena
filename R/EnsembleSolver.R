@@ -19,7 +19,6 @@
                                       nOrderings.bayes = "numeric"
                                       )
                             )
-
 #----------------------------------------------------------------------------------------------------
 setGeneric("getSolverNames", signature = "obj", function(obj) standardGeneric("getSolverNames"))
 #----------------------------------------------------------------------------------------------------
@@ -127,7 +126,7 @@ EnsembleSolver <- function(mtx.assay=matrix(), targetGene, candidateRegulators,
 #' show(ensemble.solver)
 
 setMethod('show', 'EnsembleSolver',
-
+          
           function(object) {
               regulator.count <- length(getRegulators(object))
               if(regulator.count > 10){
@@ -143,7 +142,6 @@ setMethod('show', 'EnsembleSolver',
                             paste(object@solverNames,collapse = ", "))
               cat (msg, '\n', sep='')
           })
-
 #----------------------------------------------------------------------------------------------------
 #' Retrieve the solver names from an EnsembleSolver object
 #'
@@ -166,10 +164,10 @@ setMethod('show', 'EnsembleSolver',
 #' @export
 
 setMethod("getSolverNames", "EnsembleSolver",
-
-   function (obj){
-      obj@solverNames
-      })
+          
+          function (obj){
+              obj@solverNames
+          })
 #----------------------------------------------------------------------------------------------------
 #' Run the Ensemble Solver
 #'
@@ -228,19 +226,19 @@ setMethod("run", "EnsembleSolver",
               # Create a list of solvers and a list for solutions
               out.list <- list()
               solver.list <- tolower(getSolverNames(obj))
-
+              
               # Intersect with the accepted solvers
               accepted.solvers <- c("bayesspike", "lassopv", "lasso", "pearson",
                                     "ridge", "randomforest", "spearman", "sqrtlasso")
               not.accepted <- setdiff(solver.list, accepted.solvers)
               solver.list <- intersect(solver.list, accepted.solvers)
-
+              
               # If there's no valid solvers, exit with an error
               if(length(solver.list) == 0){
                   stop("No valid solvers supplied;
                        Run getAvailableSolvers() to see all available solvers")
               }
-
+              
               # If there's any invalid solvers, throw a warning
               if(length(not.accepted) > 0){
                   not.accepted <- paste(not.accepted,collapse = ", ")
@@ -248,11 +246,11 @@ setMethod("run", "EnsembleSolver",
                                        Run getAvailableSolvers() to see all available solvers",
                                       not.accepted)
                   warning(warn.msg)
-                  }
-
+              }
+              
               # If there's only 1 solver, catch it, send a warning, and run THAT solver
               if(length(solver.list) == 1){
-
+                  
                   # Capture the correct solver
                   solver <- switch(solver.list,                                   
                                    "lasso" = LassoSolver(mtx, target.gene, tfs,
@@ -267,12 +265,12 @@ setMethod("run", "EnsembleSolver",
                                    "lassopv" = LassoPVSolver(mtx, target.gene, tfs),
                                    "ridge" = RidgeSolver(mtx, target.gene, tfs,
                                                          alpha = obj@alpha.ridge, lambda = obj@lambda.ridge))
-
+                  
                   # Send a specific warning message
                   warn.message <- sprintf("Only one solver(%s) was provided. Running %s instead",
                                           solver.list, class(solver)[1])
                   warning(warn.message)
-
+                  
                   # Run the solver
                   tbl.single <- run(solver)
                   
