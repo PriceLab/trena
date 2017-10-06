@@ -13,15 +13,13 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Overview of TReNA
 
-TReNA is a package for inferring relationships between target genes and their transcription factors. By using TReNA, we can generate hypotheses aroung regulation of gene expression and enable the construction of gene network models. In the most basic sense, TReNA accepts a matrix of gene expression data (that must include the expression levels of transcription factors) and provides two operations using the data. First, it filters putitive transcriptional regulators based on user-specified criteria, such as presence of motifs or footprints. Second, given a target gene and list of transcription factors as predictors, it uses a user-specified solver to perform feature selection. Thus, the standard TReNA workflow is the following:
+TReNA is a package for inferring relationships between target genes and their candidate regulators. By using TReNA, we can generate hypotheses around regulation of gene expression and enable the construction of gene network models. In the most basic sense, TReNA provides two operations using the data. First, it filters putitive transcriptional regulators based on user-specified criteria, such as presence of motifs or footprints. Second, given a matrix of gene expression data (that must include the expression levels of transcription factors), a target gene, and list of candidate regulators as predictors, it uses a user-specified solver to perform feature selection. Thus, the standard TReNA workflow is the following:
 
 1. Select an expression matrix (RNA-seq or microarray) of interest.
-2. Create a `CandidateFilter` object based on your desired filtering criteria.
-3. Call the `getCandidates` method on your `CandidateFilter` to determine your set of candidate regulators.
-4. Create a `Solver` object based on your desired feature selection method using the expression matrix, a target gene of interest, and your candidate regulators. 
-5. Call the `run` method on your `Solver` to perform feature selection, identifying putative transcriptional regulators for the target gene.
+2. Use one of the built-in filtering methods to determine your set of candidate regulators.
+4. Use one of the built-in solver methods to perform feature selection, identifying putative transcriptional regulators for the target gene.
 
-The filtering steps (Step 2-3), while technically optional, can constrain the solution space and reduce computational time by reducing the number of predictors supplied to the solver. Rather than supplying hundreds of transcription factors that can obscure meaningful relationships between genes, filters allow the user to screen out less likely candidates, leaving only the most likely affectors. 
+The filtering step, while technically optional, can constrain the solution space and reduce computational time by reducing the number of predictors supplied to the solver. Rather than supplying hundreds of transcription factors that can obscure meaningful relationships between genes, filters allow the user to screen out less likely candidates, leaving only the most likely affectors. 
 
 Starting off, we'll load the TReNA library.
 
@@ -57,6 +55,10 @@ hist(mtx.voom, main = "VOOM-Transformed Expression Matrix Data")
 ```
 
 In general, we recommend a transformation of this nature to adjust skewed data. The `voom` transformation or something similar (e.g. `asinh()`) adjusts the mean-variance relationship and can greatly change the results we see. Moving forward, we will use this transformed data set in the rest of our analyses. 
+
+## Basic Interface: The `Trena` Class
+
+The most straightforward way to filter candidates and perform feature selection is by constructing a `Trena` object. 
 
 ## Filtering Candidate Regulators
 
