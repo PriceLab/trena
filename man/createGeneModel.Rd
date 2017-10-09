@@ -34,7 +34,7 @@ mef2c.tss <- 88904257
 loc.start <- mef2c.tss - 1000
 loc.end   <- mef2c.tss + 1000
 
-database.filename <- system.file(package="trena", "extdata", "project.sub.db")
+database.filename <- system.file(package="trena", "extdata", "mef2c.neigborhood.hg38.footprints.db")
 database.uri <- sprintf("sqlite://\%s", database.filename)
 sources <- c(database.uri)
 load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))

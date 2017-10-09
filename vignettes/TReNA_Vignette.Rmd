@@ -95,8 +95,8 @@ In addition to the databases, constructing a FootprintFilter object requires a d
 
 # Sp
 db.address <- system.file(package="trena", "extdata")
-genome.db.uri <- paste("sqlite:/",db.address,"genome.sub.db", sep = "/")
-project.db.uri <- paste("sqlite:/",db.address,"project.sub.db", sep = "/")
+genome.db.uri <- paste("sqlite:/",db.address,"mef2c.neighborhood.hg38.gtfAnnotation.db", sep = "/")
+project.db.uri <- paste("sqlite:/",db.address,"mef2c.neigborhood.hg38.footprints.db", sep = "/")
 
 # Create the specs for the gene region and retrieve it
 target.gene <- "MEF2C"

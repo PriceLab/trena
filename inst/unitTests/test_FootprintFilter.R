@@ -16,8 +16,8 @@ test_FootprintFilter.byRegion <- function()
     printf("--- test_FootprintFilter.byRegion")
     
     db.address <- system.file(package="trena", "extdata")
-    genome.db.uri    <- paste("sqlite:/", db.address, "genome.sub.db",  sep = "/")
-    footprint.db.uri <- paste("sqlite:/", db.address, "project.sub.db", sep = "/")
+    genome.db.uri    <- paste("sqlite:/", db.address, "mef2c.neighborhood.hg38.gtfAnnotation.db",  sep = "/")
+    footprint.db.uri <- paste("sqlite:/", db.address, "mef2c.neigborhood.hg38.footprints.db", sep = "/")
     #target.gene <- "MEF2C"
     
     mef2c.tss <- 88904257   # minus strand
@@ -52,8 +52,8 @@ test_FootprintFilter.byTwoRegions <- function()
     printf("--- test_FootprintFilter.byTwoRegions")
     
     db.address <- system.file(package="trena", "extdata")
-    genome.db.uri    <- paste("sqlite:/", db.address, "genome.sub.db",  sep = "/")
-    footprint.db.uri <- paste("sqlite:/", db.address, "project.sub.db", sep = "/")
+    genome.db.uri    <- paste("sqlite:/", db.address, "mef2c.neighborhood.hg38.gtfAnnotation.db",  sep = "/")
+    footprint.db.uri <- paste("sqlite:/", db.address, "mef2c.neigborhood.hg38.footprints.db", sep = "/")
     
     mef2c.tss <- 88904257   # minus strand
     

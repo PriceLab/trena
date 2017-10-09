@@ -32,8 +32,8 @@ that match footprint motifs for a supplied target gene.
 \examples{
 load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
 db.address <- system.file(package="trena", "extdata")
-genome.db.uri <- paste("sqlite:/",db.address,"genome.sub.db", sep = "/")
-project.db.uri <- paste("sqlite:/",db.address,"project.sub.db", sep = "/")
+genome.db.uri <- paste("sqlite:/",db.address,"mef2c.neighborhood.hg38.gtfAnnotation.db", sep = "/")
+project.db.uri <- paste("sqlite:/",db.address,"mef2c.neigborhood.hg38.footprints.db", sep = "/")
 target.gene <- "MEF2C"
 size.upstream <- 1000
 size.downstream <- 1000

@@ -45,7 +45,7 @@ targetGene <- "VRK2"
 promoter.length <- 1000
 genomeName <- "hg38"
 db.address <- system.file(package="trena", "extdata")
-genome.db.uri    <- paste("sqlite:/", db.address, "vrk2.genome.db",  sep = "/")
+genome.db.uri    <- paste("sqlite:/", db.address, "vrk2.neighborhood.hg38.gtfAnnotation.db",  sep = "/")
 
 # Grab regions for VRK2 using shoulder size of 1000
 trena <- Trena(genomeName)

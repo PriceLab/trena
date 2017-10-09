@@ -24,8 +24,8 @@ Get candidate genes using the footprint filter
 # in the included Alzheimer's dataset, using the Trena object to get regions
 target.gene <- "MEF2C"
 db.address <- system.file(package="trena", "extdata")
-genome.db.uri <- paste("sqlite:/",db.address,"genome.sub.db", sep = "/")
-project.db.uri <- paste("sqlite:/",db.address,"project.sub.db", sep = "/")
+genome.db.uri <- paste("sqlite:/",db.address,"mef2c.neighborhood.hg38.gtfAnnotation.db", sep = "/")
+project.db.uri <- paste("sqlite:/",db.address,"mef2c.neigborhood.hg38.footprints.db", sep = "/")
 size.upstream <- 1000
 size.downstream <- 1000
 

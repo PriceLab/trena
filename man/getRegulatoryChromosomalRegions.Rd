@@ -37,7 +37,7 @@ Get the regulatory chromosomal regions for a Trena object
 }
 \examples{
 # Get regulatory regions for MEF2C from a footprint database
-database.filename <- system.file(package="trena", "extdata", "project.sub.db")
+database.filename <- system.file(package="trena", "extdata", "mef2c.neigborhood.hg38.footprints.db")
 database.uri <- sprintf("sqlite://\%s", database.filename)
 sources <- c(database.uri)
 

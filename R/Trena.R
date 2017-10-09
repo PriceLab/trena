@@ -195,7 +195,7 @@ setMethod('getGeneModelTableColumnNames', 'Trena',
 #'
 #' @examples
 #' # Get regulatory regions for MEF2C from a footprint database
-#' database.filename <- system.file(package="trena", "extdata", "project.sub.db")
+#' database.filename <- system.file(package="trena", "extdata", "mef2c.neigborhood.hg38.footprints.db")
 #' database.uri <- sprintf("sqlite://%s", database.filename)
 #' sources <- c(database.uri)
 #'
@@ -277,7 +277,7 @@ setMethod('getRegulatoryChromosomalRegions', 'Trena',
 #' loc.start <- mef2c.tss - 1000
 #' loc.end   <- mef2c.tss + 1000
 #'
-#' database.filename <- system.file(package="trena", "extdata", "project.sub.db")
+#' database.filename <- system.file(package="trena", "extdata", "mef2c.neigborhood.hg38.footprints.db")
 #' database.uri <- sprintf("sqlite://%s", database.filename)
 #' sources <- c(database.uri)
 #' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))

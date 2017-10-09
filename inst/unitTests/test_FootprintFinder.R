@@ -22,18 +22,18 @@ test_parseDatabaseUri <- function()
 {
    printf("--- test_parseDatabaseUri")
    db.address <- system.file(package="trena", "extdata")
-   genome.db.uri <- paste("sqlite:/",db.address,"genome.sub.db", sep = "/")
-   project.db.uri <- paste("sqlite:/",db.address,"project.sub.db", sep = "/")
+   genome.db.uri <- paste("sqlite:/",db.address,"mef2c.neighborhood.hg38.gtfAnnotation.db", sep = "/")
+   project.db.uri <- paste("sqlite:/",db.address,"mef2c.neigborhood.hg38.footprints.db", sep = "/")
 
    x <- trena:::parseDatabaseUri(genome.db.uri)
    checkEquals(x$brand, "sqlite")
    checkEquals(x$host,  db.address)
-   checkEquals(x$name,  "genome.sub.db")
+   checkEquals(x$name,  "mef2c.neighborhood.hg38.gtfAnnotation.db")
 
    x <- trena:::parseDatabaseUri(project.db.uri)
    checkEquals(x$brand, "sqlite")
    checkEquals(x$host,  db.address)
-   checkEquals(x$name,  "project.sub.db")
+   checkEquals(x$name,  "mef2c.neigborhood.hg38.footprints.db")
 
 } # test_parseDatabaseUri
 #----------------------------------------------------------------------------------------------------
@@ -42,8 +42,8 @@ test_constructor <- function()
    printf("--- test_constructor")
 
    db.address <- system.file(package="trena", "extdata")
-   genome.db.uri <- paste("sqlite:/",db.address,"genome.sub.db", sep = "/")
-   project.db.uri <- paste("sqlite:/",db.address,"project.sub.db", sep = "/")
+   genome.db.uri <- paste("sqlite:/",db.address,"mef2c.neighborhood.hg38.gtfAnnotation.db", sep = "/")
+   project.db.uri <- paste("sqlite:/",db.address,"mef2c.neigborhood.hg38.footprints.db", sep = "/")
 
    fp <- FootprintFinder(genome.db.uri, project.db.uri, quiet=TRUE)
    closeDatabaseConnections(fp)
@@ -55,8 +55,8 @@ test_getGtfGeneBioTypes <- function()
    printf("--- test_getGtfGeneBioTypes")
 
    db.address <- system.file(package="trena", "extdata")
-   genome.db.uri <- paste("sqlite:/",db.address,"genome.sub.db", sep = "/")
-   project.db.uri <- paste("sqlite:/",db.address,"project.sub.db", sep = "/")
+   genome.db.uri <- paste("sqlite:/",db.address,"mef2c.neighborhood.hg38.gtfAnnotation.db", sep = "/")
+   project.db.uri <- paste("sqlite:/",db.address,"mef2c.neigborhood.hg38.footprints.db", sep = "/")
 
    fp <- FootprintFinder(genome.db.uri, project.db.uri, quiet=TRUE)
    types <- getGtfGeneBioTypes(fp)
@@ -73,8 +73,8 @@ test_getGtfMoleculeTypes <- function()
    printf("--- test_getGtfMoleculeTypes")
 
    db.address <- system.file(package="trena", "extdata")
-   genome.db.uri <- paste("sqlite:/",db.address,"genome.sub.db", sep = "/")
-   project.db.uri <- paste("sqlite:/",db.address,"project.sub.db", sep = "/")
+   genome.db.uri <- paste("sqlite:/",db.address,"mef2c.neighborhood.hg38.gtfAnnotation.db", sep = "/")
+   project.db.uri <- paste("sqlite:/",db.address,"mef2c.neigborhood.hg38.footprints.db", sep = "/")
 
    fp <- FootprintFinder(genome.db.uri, project.db.uri, quiet=TRUE)
    types <- getGtfMoleculeTypes(fp)
@@ -93,8 +93,8 @@ test_getChromLoc <- function()
    printf("--- test_getChromLoc")
 
    db.address <- system.file(package="trena", "extdata")
-   genome.db.uri <- paste("sqlite:/",db.address,"genome.sub.db", sep = "/")
-   project.db.uri <- paste("sqlite:/",db.address,"project.sub.db", sep = "/")
+   genome.db.uri <- paste("sqlite:/",db.address,"mef2c.neighborhood.hg38.gtfAnnotation.db", sep = "/")
+   project.db.uri <- paste("sqlite:/",db.address,"mef2c.neigborhood.hg38.footprints.db", sep = "/")
 
    fp <- FootprintFinder(genome.db.uri, project.db.uri, quiet=TRUE)
    tbl.loc <- getChromLoc(fp, "MEF2C", biotype="protein_coding", moleculetype="gene")
@@ -124,8 +124,8 @@ test_getGenePromoterRegion <- function()
    printf("--- test_getGenePromoterRegion")
 
    db.address <- system.file(package="trena", "extdata")
-   genome.db.uri <- paste("sqlite:/",db.address,"genome.sub.db", sep = "/")
-   project.db.uri <- paste("sqlite:/",db.address,"project.sub.db", sep = "/")
+   genome.db.uri <- paste("sqlite:/",db.address,"mef2c.neighborhood.hg38.gtfAnnotation.db", sep = "/")
+   project.db.uri <- paste("sqlite:/",db.address,"mef2c.neigborhood.hg38.footprints.db", sep = "/")
 
    fp <- FootprintFinder(genome.db.uri, project.db.uri, quiet=TRUE)
 
@@ -184,8 +184,8 @@ test_getFootprintsForGene <- function()
    printf("--- test_getFootprintsForGene")
 
    db.address <- system.file(package="trena", "extdata")
-   genome.db.uri <- paste("sqlite:/",db.address,"genome.sub.db", sep = "/")
-   project.db.uri <- paste("sqlite:/",db.address,"project.sub.db", sep = "/")
+   genome.db.uri <- paste("sqlite:/",db.address,"mef2c.neighborhood.hg38.gtfAnnotation.db", sep = "/")
+   project.db.uri <- paste("sqlite:/",db.address,"mef2c.neigborhood.hg38.footprints.db", sep = "/")
 
    fp <- FootprintFinder(genome.db.uri, project.db.uri, quiet=TRUE)
 
@@ -219,8 +219,8 @@ test_getFootprintsInRegion <- function()
    printf("--- test_getFootprintsInRegion")
 
    db.address <- system.file(package="trena", "extdata")
-   genome.db.uri <- paste("sqlite:/",db.address,"genome.sub.db", sep = "/")
-   project.db.uri <- paste("sqlite:/",db.address,"project.sub.db", sep = "/")
+   genome.db.uri <- paste("sqlite:/",db.address,"mef2c.neighborhood.hg38.gtfAnnotation.db", sep = "/")
+   project.db.uri <- paste("sqlite:/",db.address,"mef2c.neigborhood.hg38.footprints.db", sep = "/")
 
    fp <- FootprintFinder(genome.db.uri, project.db.uri, quiet=TRUE)
 
@@ -244,8 +244,8 @@ test_getFootprintsInRegionWithVariants <- function()
    printf("--- test_getFootprintsInRegionWithVariants")
 
    db.address <- system.file(package="trena", "extdata")
-   genome.db.uri <- paste("sqlite:/",db.address,"genome.sub.db", sep = "/")
-   project.db.uri <- paste("sqlite:/",db.address,"project.sub.db", sep = "/")
+   genome.db.uri <- paste("sqlite:/",db.address,"mef2c.neighborhood.hg38.gtfAnnotation.db", sep = "/")
+   project.db.uri <- paste("sqlite:/",db.address,"mef2c.neigborhood.hg38.footprints.db", sep = "/")
 
    fp <- FootprintFinder(genome.db.uri, project.db.uri, quiet=TRUE)
 

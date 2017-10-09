@@ -29,7 +29,7 @@ create.vrk2.candidateFilterSpec <- function(promoter.length=1000)
    tss <- 57907651
    promoter.length <- promoter.length
    db.address <- system.file(package="trena", "extdata")
-   genome.db.uri    <- paste("sqlite:/", db.address, "vrk2.genome.db",  sep = "/")
+   genome.db.uri    <- paste("sqlite:/", db.address, "vrk2.neighborhood.hg38.gtfAnnotation.db",  sep = "/")
    tbl.regions <- data.frame(chrom="chr2", start=57906700, end=57906870, stringsAsFactors=FALSE)
 
    candidateFilterSpec <- list(filterType="EncodeDNaseClusters",
@@ -53,7 +53,7 @@ create.vrk2.candidateFilterSpec.twoRegions <- function()
    tss <- 57907651
    promoter.length <- 1000
    db.address <- system.file(package="trena", "extdata")
-   genome.db.uri    <- paste("sqlite:/", db.address, "vrk2.genome.db",  sep = "/")
+   genome.db.uri    <- paste("sqlite:/", db.address, "vrk2.neighborhood.hg38.gtfAnnotation.db",  sep = "/")
 
    tbl.regions <- data.frame(chrom=c("chr2", "chr2"),
                              start=c(57906700, 57907740),
@@ -287,7 +287,7 @@ test_getCandidates.emptyRegion <- function()
     printf("--- test_getCandidates.emptyRegion")
 
     db.address <- system.file(package="trena", "extdata")
-    genome.db.uri <- paste("sqlite:/", db.address, "vrk2.genome.db",  sep = "/")
+    genome.db.uri <- paste("sqlite:/", db.address, "vrk2.neighborhood.hg38.gtfAnnotation.db",  sep = "/")
 
     hdf <-  HumanDHSFilter("hg38",
                            encodeTableName="wgEncodeRegDnaseClustered",

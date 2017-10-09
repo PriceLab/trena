@@ -54,7 +54,7 @@ test_getRegulatoryRegions_oneFootprintSource <- function()
     chromosome <- "chr5"
     mef2c.tss <- 88904257   # minus strand
     
-    database.filename <- system.file(package="trena", "extdata", "project.sub.db")
+    database.filename <- system.file(package="trena", "extdata", "mef2c.neigborhood.hg38.footprints.db")
     database.uri <- sprintf("sqlite://%s", database.filename)
     sources <- c(database.uri)
     
@@ -133,7 +133,7 @@ test_getRegulatoryRegions_twoFootprintSources <- function()
     chromosome <- "chr5"
     mef2c.tss <- 88904257   # minus strand
     
-    database.filename <- system.file(package="trena", "extdata", "project.sub.db")
+    database.filename <- system.file(package="trena", "extdata", "mef2c.neigborhood.hg38.footprints.db")
     database.uri <- sprintf("sqlite://%s", database.filename)
     sources <- c(database.uri,  database.uri)
     

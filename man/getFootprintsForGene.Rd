@@ -35,8 +35,8 @@ retrieve a dataframe containing the footprints for a specified gene
 }
 \examples{
 db.address <- system.file(package="trena", "extdata")
-genome.db.uri <- paste("sqlite:/",db.address,"genome.sub.db", sep = "/")
-project.db.uri <- paste("sqlite:/",db.address,"project.sub.db", sep = "/")
+genome.db.uri <- paste("sqlite:/",db.address,"mef2c.neighborhood.hg38.gtfAnnotation.db", sep = "/")
+project.db.uri <- paste("sqlite:/",db.address,"mef2c.neigborhood.hg38.footprints.db", sep = "/")
 fp <- FootprintFinder(genome.db.uri, project.db.uri)
 
 footprints <- getFootprintsForGene(fp, gene = "MEF2C")

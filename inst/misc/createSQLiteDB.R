@@ -52,8 +52,8 @@ dbDisconnect(genome.db)
 dbDisconnect(project.db)
 
 # Create the SQLite connections and write the tables
-genome.con <- dbConnect(SQLite(), dbname = "genome.sub.db")
-project.con <- dbConnect(SQLite(), dbname = "project.sub.db")
+genome.con <- dbConnect(SQLite(), dbname = "mef2c.neighborhood.hg38.gtfAnnotation.db")
+project.con <- dbConnect(SQLite(), dbname = "mef2c.neigborhood.hg38.footprints.db")
 
 dbWriteTable(genome.con, "motifsgenes", tbl.genome.motifsgenes, overwrite = TRUE)
 dbWriteTable(genome.con, "gtf", tbl.genome.gtf, overwrite = TRUE)
@@ -115,8 +115,8 @@ dbDisconnect(genome.db)
 dbDisconnect(project.db)
 
 # Create the SQLite connections and write the tables
-genome.con <- dbConnect(SQLite(), dbname = "vrk2.genome.db")
-project.con <- dbConnect(SQLite(), dbname = "vrk2.project.db")
+genome.con <- dbConnect(SQLite(), dbname = "vrk2.neighborhood.hg38.gtfAnnotation.db")
+project.con <- dbConnect(SQLite(), dbname = "vrk2.neighborhood.hg38.footprints.db")
 
 dbWriteTable(genome.con, "motifsgenes", tbl.genome.motifsgenes, overwrite = TRUE)
 dbWriteTable(genome.con, "gtf", tbl.genome.gtf, overwrite = TRUE)

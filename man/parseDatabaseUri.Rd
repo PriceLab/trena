@@ -22,9 +22,9 @@ information and return them as a named list.
 # Parse a URI for a local PostgreSQL database called "gtf"
 parsed.URI <- parseDatabaseUri("postgres://localhost/gtf")
 
-# Parse a URI for the included SQLite database "vrk2.genome.db" in the local documents folder
+# Parse a URI for the included SQLite database "vrk2.neighborhood.hg38.gtfAnnotation.db" in the local documents folder
 db.address <- system.file(package="trena", "extdata")
-genome.db.uri    <- paste("sqlite:/", db.address, "vrk2.genome.db",  sep = "/")
+genome.db.uri    <- paste("sqlite:/", db.address, "vrk2.neighborhood.hg38.gtfAnnotation.db",  sep = "/")
 parsed.URI <- parseDatabaseUri(genome.db.uri)
 
 }
