@@ -33,12 +33,11 @@ Assess the effect of a SNP using a Trena object
 trena <- Trena("hg38")
 
 library(MotifDb)
-jaspar.human.pfms <- as.list(query(query(MotifDb, "jaspar2016"), "sapiens"))
+jaspar.human.pfms <- as.list(query(query(MotifDb, "jaspar2016"), "sapiens"))[21:40]
 
 variant <- "rs3875089" # chr18:26865469  T->C
 
 tbl <- assessSnp(trena, jaspar.human.pfms, variant, shoulder = 3,
 pwmMatchMinimumAsPercentage = 65)
-
 
 }

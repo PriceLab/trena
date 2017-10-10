@@ -200,7 +200,7 @@ setMethod("getSolverNames", "EnsembleSolver",
 #' # Load included Alzheimer's data, create an Ensemble object with default solvers, and solve
 #' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
 #' target.gene <- "MEF2C"
-#' tfs <- setdiff(rownames(mtx.sub), target.gene)
+#' tfs <- setdiff(rownames(mtx.sub), target.gene)[1:30]
 #' ensemble.solver <- EnsembleSolver(mtx.sub, target.gene, tfs)
 #' tbl <- run(ensemble.solver)
 #'
@@ -211,7 +211,7 @@ setMethod("getSolverNames", "EnsembleSolver",
 #'
 #' # Solve the original problem with default cutoff and solver parameters, but use only 4 solvers
 #' ensemble.solver <- EnsembleSolver(mtx.sub, target.gene, tfs,
-#' solverNames = c("lasso", "randomForest", "pearson", "bayesSpike"))
+#' solverNames = c("lasso", "pearson", "ridge"))
 #' tbl <- run(ensemble.solver)
 
 setMethod("run", "EnsembleSolver",
