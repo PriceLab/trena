@@ -232,7 +232,7 @@ setMethod('getRegulatoryChromosomalRegions', 'Trena',
               if(length(encodeDHS.source.index)){
                   source.count <- source.count + 1
                   regulatoryRegionSources <- regulatoryRegionSources[-encodeDHS.source.index]
-                  if(!obj@quiet) printf("about to callHumanDHSFilter");
+                  printf("calling HumanDHSFilter, span: %d",  1 + chromEnd - chromStart);
                   tbl.dhs <- .callHumanDHSFilter(obj, chromosome, chromStart, chromEnd, targetGene, targetGeneTSS)
                   result[[source.count]] <- tbl.dhs
                   if(combine)
@@ -242,7 +242,7 @@ setMethod('getRegulatoryChromosomalRegions', 'Trena',
 
               for(source in regulatoryRegionSources){
                   source.count <- source.count + 1
-                  if(!obj@quiet) printf("about to call footprintFilter with source = '%s'", source);
+                  printf("calling footprintFilter with source = '%s', span: %d", source, 1 + chromEnd - chromStart);
                   tbl.fp <- .callFootprintFilter(obj, source, chromosome, chromStart, chromEnd, targetGene, targetGeneTSS)
                   if(combine)
                       tbl.combined <- rbind(tbl.combined, tbl.fp)
@@ -253,6 +253,7 @@ setMethod('getRegulatoryChromosomalRegions', 'Trena',
                   result[["all"]] <- tbl.combined
               result
           }) # getRegulatoryChromosomalRegions
+
 #----------------------------------------------------------------------------------------------------
 #' Create a model for a target gene using a Trena object
 #'
