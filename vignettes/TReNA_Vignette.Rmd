@@ -75,7 +75,7 @@ In order to get a list of transcription factor candidates, you must construct th
 
 The `VarianceFilter` requires the specification of the expression matrix and a target gene, plus it allows you to optionally specify a variance size range. It finds the variance of all genes in the assay matrix, then returns all transcription factors with variance within the variance size range of the target gene. For instance, we can create a VarianceFilter and use it to find all transcription factors with variance within 50% of the target gene's variance. This will return a named list with both the names of the transcription factors and their variances.
 
-```{r}
+```{r }
 variance.filter <- VarianceFilter(mtx.assay = mtx.voom, targetGene = "MEF2C", varSize = 0.5)
 tf.list <- getCandidates(variance.filter)
 str(tf.list)
@@ -119,25 +119,12 @@ A FootprintFilter will only retrieve footprints and their motifs; to associate t
 ```{r message = FALSE, warning= FALSE}
 library(MotifDb)
 
-names(tbl)[8] <- "motifName"
-
 tbl.tfs <- associateTranscriptionFactors(MotifDb, tbl, source="MotifDb", expand.rows=TRUE)
 str(tbl.tfs)
 
 ```
 
-
-The FootprintFilter makes use of another class in the package, the FootprintFinder. This class provides an interface to PostgreSQL and SQLite databases of a specific 2-table schema and has a family of methods for accessing footprint data. To demonstrate some of this functionality, we will use the FootprintFinder to extract footprints from a particular region. In the previous example, we used an SQLite database included in the package; essentially a small snapshot of a larger dataset. More usefully, there are now publically available databases of footprints for use at [bddsrds.globusgenomics.org](). For this exmple, we will access footprints for brain tissue obtained using the HINT method for a seed size of 20 bp; other methods, issues, and alignments are also available. We can access this information as follows (this example will take a bit longer):
-
-```{r}
-genome.db.uri    <- "postgres://bddsrds.globusgenomics.org/hg38"  # has gtf table
-footprint.db.uri <- "postgres://bddsrds.globusgenomics.org/brain_hint_20"  # has hits and regions tables
-fpf <- FootprintFinder(genome.db.uri, footprint.db.uri, quiet=FALSE)
-tbl.fp <- getFootprintsInRegion(fpf, "chr5", 88822685, 89011824)
-str(tbl.fp)
-```
-
-In general, you shouldn't have much need to use a `FootprintFinder` object directly for TReNA; rather, the `FootprintFilter` object should suffice. 
+The FootprintFilter supports use of either PostgreSQL and SQLite databases in a specific 2-table schema. In the previous example, we used an SQLite database included in the package; essentially a small snapshot of a larger dataset. More usefully, there are now publically available databases of footprints for use at `bddsrds.globusgenomics.org`. For an updated table of these databases, please refer to [trena.org](https://github.com/PriceLab/TReNA).
 
 ## Feature Selection: the `Solver` Object
 

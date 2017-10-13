@@ -319,8 +319,7 @@ test_getProximalPromoterHuman <- function()
     checkEquals(regions$end, tss + tssDownstream)
     
     # check with bogus gene symbol
-    checkTrue(is.na(getProximalPromoter(trena, "bogus", tssUpstream, tssDownstream)))
-    
+    checkTrue(is.na(getProximalPromoter(trena, "bogus", tssUpstream, tssDownstream)))    
     
 } # test_getProximalPromoterHuman
 #----------------------------------------------------------------------------------------------------

@@ -470,6 +470,7 @@ setMethod("run", "EnsembleSolver",
               # Else, just keep the old table and throw a warning
               
               if(class(tbl.augmented) == "try-error"){
+                  #browser()
                   warning("Signal strength of individual solvers is insufficient for adding
 composite scores. Try increasing your sample size")
                   tbl.all$pcaMax <- NA
