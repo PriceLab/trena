@@ -39,12 +39,12 @@ all.hits <- sapply(all.dbs, findApproxHits, host = "bddsrds.globusgenomics.org")
 
 # Assemble a data frame
 df <- data_frame(Name = all.dbs,
-                 Hits.in.millions = formatC(all.hits/1e6, digits = 1, format = "f"),
+                 Footprints.in.millions = formatC(all.hits/1e6, digits = 1, format = "f"),
                  Tissue = gsub("(.*)_(hint|wellington).*","\\1",Name),
                  Method = gsub(".*_(hint|wellington).*","\\1",Name),
                  Seed = gsub(".*_(16|20)$", "\\1", Name))
 
-df <- arrange(df, Tissue, Method, Hits.in.millions)
+df <- arrange(df, Tissue, Method, Footprints.in.millions)
 
 # https://cran.r-project.org/web/packages/htmlTable/vignettes/general.html
 
