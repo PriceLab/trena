@@ -151,7 +151,10 @@ setMethod('getGeneModelTableColumnNames', 'Trena',
                                 regions=data.frame(chrom=chromosome,
                                                    start=chromStart,
                                                    end=chromEnd,
-                                                   stringsAsFactors=FALSE))
+                                                   stringsAsFactors=FALSE),
+                                pfms = as.list(query(query(MotifDb, "sapiens"),
+                                                     "jaspar2016"))
+                                )
 
     tbl.dhs <- getCandidates(dhsFilter)
     if(nrow(tbl.dhs) == 0)

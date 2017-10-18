@@ -38,6 +38,7 @@ create.vrk2.candidateFilterSpec <- function(promoter.length=1000)
                                pwmMatchPercentageThreshold=85L,
                                geneInfoDB=genome.db.uri,
                                regions=tbl.regions,
+                               pfms = as.list(query(query(MotifDb, "sapiens"),"jaspar2016")),
                                variants=NA_character_)
 
    candidateFilterSpec
@@ -66,6 +67,7 @@ create.vrk2.candidateFilterSpec.twoRegions <- function()
                   pwmMatchPercentageThreshold=85L,
                   geneInfoDB= genome.db.uri,
                   regions=tbl.regions,
+                  pfms = as.list(query(query(MotifDb, "sapiens"),"jaspar2016")),
                   variants=NA_character_)
 
    cfSpec
@@ -102,6 +104,7 @@ test_basicConstructor <- function(reuse=FALSE)
                               encodeTableName=encodeTableName,
                               pwmMatchPercentageThreshold=85L,
                               geneInfoDatabase.uri=geneInfoDB,
+                              pfms = as.list(query(query(MotifDb, "sapiens"),"jaspar2016")),
                               regions=candidateFilterSpec$regions))
 
    checkTrue(all(c("HumanDHSFilter", "CandidateFilter") %in% is(hdf)))
@@ -115,6 +118,7 @@ test_basicConstructor <- function(reuse=FALSE)
                               encodeTableName=encodeTableName,
                               pwmMatchPercentageThreshold=85L,
                               geneInfoDatabase.uri=geneInfoDB,
+                              pfms = as.list(query(query(MotifDb, "sapiens"),"jaspar2016")),
                               regions=regions)),
                     silent = TRUE)
    if(reuse)
@@ -132,10 +136,11 @@ test_getEncodeRegulatoryTableNames <- function()
                               encodeTableName=encodeTableName,
                               pwmMatchPercentageThreshold=85L,
                               geneInfoDatabase.uri=geneInfoDB,
+                              pfms = as.list(query(query(MotifDb, "sapiens"),"jaspar2016")),
                               regions=regions))
 
     names <- getEncodeRegulatoryTableNames(hdf)
-    checkTrue(length(names) > 90)   # 96 on (13 apr 2017)
+    checkTrue(length(names) > 90)   # 96 on (18 oct 2017)
 
 } # test_getEncodeRegulatoryTableNames
 #----------------------------------------------------------------------------------------------------
@@ -152,13 +157,10 @@ test_checkSampleOfEncodeTables <- function(quiet=TRUE)
                               pwmMatchPercentageThreshold=85L,
                               geneInfoDatabase.uri=geneInfoDB,
                               regions=regions,
+                              pfms = as.list(query(query(MotifDb, "sapiens"),"jaspar2016")),
                               quiet=TRUE))
 
    tableNames <- getEncodeRegulatoryTableNames(hdf)
-
-   chrom <- "chr5"
-   start <- 8800000
-   end   <- 8850000
 
    #  rs13384219 at chr2:57907073-57907573
    chrom <- "chr2"
@@ -294,6 +296,7 @@ test_getCandidates.emptyRegion <- function()
                            pwmMatchPercentageThreshold=80L,
                            geneInfoDatabase.uri=genome.db.uri,
                            regions=data.frame(chrom="chr18", start=26850560, end=26850565, stringsAsFactors=FALSE),
+                           pfms = as.list(query(query(MotifDb, "sapiens"),"jaspar2016")),
                            quiet=TRUE)
    tbl <- getCandidates(hdf)
    checkEquals(nrow(tbl), 0)
@@ -310,6 +313,7 @@ test_getCandidates.vrk2.twoRegions <- function()
                                       pwmMatchPercentageThreshold=97L,
                                       geneInfoDatabase.uri=geneInfoDB,
                                       region=regions,
+                                      pfms = as.list(query(query(MotifDb, "sapiens"),"jaspar2016")),
                                       quiet=TRUE))
 
    tbl <- getCandidates(hdf)
@@ -370,6 +374,7 @@ test_getCandidates.vrk2.rs13384219.variant <- function()
                                          geneInfoDatabase.uri=geneInfoDB,
                                          regions=regions,
                                          variants=NA_character_,
+                                         pfms = as.list(query(query(MotifDb, "sapiens"),"jaspar2016")),
                                          quiet=TRUE))
 
    hdf.var <- with(cfSpec, HumanDHSFilter(genomeName,
@@ -378,6 +383,7 @@ test_getCandidates.vrk2.rs13384219.variant <- function()
                                           geneInfoDatabase.uri=geneInfoDB,
                                           regions=regions,
                                           variants=variants,
+                                          pfms = as.list(query(query(MotifDb, "sapiens"),"jaspar2016")),
                                           quiet=TRUE))
 
    tbl.wt <- getCandidates(hdf.wt)

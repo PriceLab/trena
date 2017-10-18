@@ -10,7 +10,7 @@
 \usage{
 HumanDHSFilter(genomeName, encodeTableName = "wgEncodeRegDnaseClustered",
   pwmMatchPercentageThreshold, geneInfoDatabase.uri, regions,
-  variants = NA_character_, quiet = TRUE)
+  variants = NA_character_, pfms, quiet = TRUE)
 }
 \arguments{
 \item{genomeName}{A character string indicating the reference genome; currently, the only
@@ -25,6 +25,9 @@ accepted strings are "hg38" and "hg19", both of which are human genomes.}
 \item{regions}{A data frame containing the regions of interest}
 
 \item{variants}{A character vector containing a list of variants}
+
+\item{pfms}{A list of position frequency matrices, often converted from a MotifList object
+created by a MotifDb query}
 
 \item{quiet}{A logical denoting whether or not the solver should print output}
 }
@@ -52,7 +55,8 @@ trena <- Trena(genomeName)
 tbl.regions <- getProximalPromoter(trena, "VRK2", 1000, 1000)
 
 hd.filter <- HumanDHSFilter(genomeName, pwmMatchPercentageThreshold = 85,
-geneInfoDatabase.uri = genome.db.uri, regions = tbl.regions)
+geneInfoDatabase.uri = genome.db.uri, regions = tbl.regions,
+pfms = as.list(query(query(MotifDb, "sapiens"),"jaspar2016")))
 }
 \seealso{
 \code{\link{getCandidates-HumanDHSFilter}},

@@ -46,7 +46,7 @@ test_ampAD.mef2c.154tfs.278samples.sqrtlasso <- function()
    # Check for empirical values
    tbl <- tbl[order(abs(tbl$beta), decreasing=TRUE),, drop = FALSE]
    actual.genes <- sort(rownames(subset(tbl, abs(beta) > 0.2)))   
-   checkTrue('ATF2' %in% actual.genes))
+   checkTrue('ATF2' %in% actual.genes)
    checkTrue(max(tbl$beta) < 1.5)
    checkTrue(min(tbl$beta) > -0.3)
    
@@ -96,7 +96,7 @@ test_nCores.sqrtlasso <- function()
    # Check for empirical values
    tbl <- tbl[order(abs(tbl$beta), decreasing=TRUE),, drop = FALSE]
    actual.genes <- sort(rownames(subset(tbl, abs(beta) > 0.2)))   
-   checkTrue('ATF2' %in% actual.genes))
+   checkTrue('ATF2' %in% actual.genes)
    checkTrue(max(tbl$beta) < 1.5)
    checkTrue(min(tbl$beta) > -0.3)
    

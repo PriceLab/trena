@@ -43,6 +43,8 @@ setGeneric("getRegulatoryRegions", signature="obj",
 #' @param geneInfoDatabase.uri An address for a gene database
 #' @param regions A data frame containing the regions of interest
 #' @param variants A character vector containing a list of variants
+#' @param pfms A list of position frequency matrices, often converted from a MotifList object
+#' created by a MotifDb query
 #' @param quiet A logical denoting whether or not the solver should print output
 #'
 #' @return A CandidateFilter class object that filters using Human DHS data
@@ -68,22 +70,18 @@ setGeneric("getRegulatoryRegions", signature="obj",
 #' tbl.regions <- getProximalPromoter(trena, "VRK2", 1000, 1000)
 #'
 #' hd.filter <- HumanDHSFilter(genomeName, pwmMatchPercentageThreshold = 85,
-#' geneInfoDatabase.uri = genome.db.uri, regions = tbl.regions)
+#' geneInfoDatabase.uri = genome.db.uri, regions = tbl.regions,
+#' pfms = as.list(query(query(MotifDb, "sapiens"),"jaspar2016")))
 
 HumanDHSFilter <- function(genomeName,
                            encodeTableName="wgEncodeRegDnaseClustered",
                            pwmMatchPercentageThreshold,
                            geneInfoDatabase.uri,
-                           regions,
+                           regions,                           
                            variants=NA_character_,
+                           pfms,
                            quiet=TRUE)
-{
-    uri <- "http://jaspar.genereg.net/html/DOWNLOAD/JASPAR_CORE/pfm/nonredundant/pfm_vertebrates.txt"
-    x <- .readRawJasparMatrices(uri)
-    # normalize, so that a frequency sum of 1.0 is true across the 4 possible bases at each position
-    pfms <- lapply(x, function(e) apply(e$matrix, 2, function(col) col/sum(col)))
-    names(pfms) <- as.character(lapply(x, function(e) e$title))
-    
+{   
     if(genomeName == "hg38"){
         # library(BSgenome.Hsapiens.UCSC.hg38) ## Remove the library reference
         reference.genome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
@@ -131,13 +129,14 @@ HumanDHSFilter <- function(genomeName,
 #' genomeName <- "hg38"
 #' db.address <- system.file(package="trena", "extdata")
 #' genome.db.uri    <- paste("sqlite:/", db.address, "vrk2.neighborhood.hg38.gtfAnnotation.db",  sep = "/")
+#' jaspar.human <- as.list(query(query(MotifDb, "sapiens"),"jaspar2016"))
 #'
 #' # Grab regions for VRK2 using shoulder size of 1000
 #' trena <- Trena(genomeName)
 #' tbl.regions <- getProximalPromoter(trena, "VRK2", 1000, 1000)
 #'
 #' hd.filter <- HumanDHSFilter(genomeName, pwmMatchPercentageThreshold = 85,
-#' geneInfoDatabase.uri = genome.db.uri, regions = tbl.regions)
+#' geneInfoDatabase.uri = genome.db.uri, regions = tbl.regions, pfms = jaspar.human)
 #'
 #' getEncodeRegulatoryTableNames(hd.filter) 
 
@@ -184,13 +183,14 @@ setMethod("getEncodeRegulatoryTableNames", "HumanDHSFilter",
 #' genomeName <- "hg38"
 #' db.address <- system.file(package="trena", "extdata")
 #' genome.db.uri    <- paste("sqlite:/", db.address, "vrk2.neighborhood.hg38.gtfAnnotation.db",  sep = "/")
+#' jaspar.human <- as.list(query(query(MotifDb, "sapiens"),"jaspar2016"))
 #'
 #' # Grab regions for VRK2 using shoulder size of 1000
 #' trena <- Trena(genomeName)
 #' tbl.regions <- getProximalPromoter(trena, "VRK2", 1000, 1000)
 #'
 #' hd.filter <- HumanDHSFilter(genomeName, pwmMatchPercentageThreshold = 85,
-#' geneInfoDatabase.uri = genome.db.uri, regions = tbl.regions)
+#' geneInfoDatabase.uri = genome.db.uri, regions = tbl.regions, pfms = jaspar.human)
 #'
 #' show(hd.filter)
 
@@ -225,13 +225,14 @@ setMethod("show", "HumanDHSFilter",
 #' genomeName <- "hg38"
 #' db.address <- system.file(package="trena", "extdata")
 #' genome.db.uri    <- paste("sqlite:/", db.address, "vrk2.neighborhood.hg38.gtfAnnotation.db",  sep = "/")
+#' jaspar.human <- as.list(query(query(MotifDb, "sapiens"),"jaspar2016"))
 #'
 #' # Grab regions for VRK2 using shoulder size of 1000
 #' trena <- Trena(genomeName)
 #' tbl.regions <- getProximalPromoter(trena, "VRK2", 1000, 1000)
 #'
 #' hd.filter <- HumanDHSFilter(genomeName, pwmMatchPercentageThreshold = 85,
-#' geneInfoDatabase.uri = genome.db.uri, regions = tbl.regions)
+#' geneInfoDatabase.uri = genome.db.uri, regions = tbl.regions, pfms = jaspar.human)
 #'
 #' getCandidates(hd.filter)
 
@@ -311,13 +312,14 @@ setMethod("getCandidates", "HumanDHSFilter",
 #' genomeName <- "hg38"
 #' db.address <- system.file(package="trena", "extdata")
 #' genome.db.uri    <- paste("sqlite:/", db.address, "vrk2.neighborhood.hg38.gtfAnnotation.db",  sep = "/")
+#' jaspar.human <- as.list(query(query(MotifDb, "sapiens"),"jaspar2016"))
 #'
 #' # Grab regions for VRK2 using shoulder size of 1000
 #' trena <- Trena(genomeName)
 #' tbl.regions <- getProximalPromoter(trena, "VRK2", 1000, 1000)
 #'
 #' hd.filter <- HumanDHSFilter(genomeName, pwmMatchPercentageThreshold = 85,
-#' geneInfoDatabase.uri = genome.db.uri, regions = tbl.regions)
+#' geneInfoDatabase.uri = genome.db.uri, regions = tbl.regions, pfms = jaspar.human)
 #'
 #' chrom <- "chr2"
 #' rs13384219.loc <- 57907323

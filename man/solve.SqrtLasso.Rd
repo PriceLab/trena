@@ -27,14 +27,11 @@ target gene's expression level.
 load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
 target.gene <- "MEF2C"
 
-# Designate just 10 predictors and run the solver
-tfs <- setdiff(rownames(mtx.sub), target.gene)[1:10]
+# Designate just 5 predictors and run the solver
+tfs <- setdiff(rownames(mtx.sub), target.gene)[1:5]
 sqrt.solver <- SqrtLassoSolver(mtx.sub, target.gene, tfs)
 tbl <- run(sqrt.solver)
 
-# Solve the same problem but use 8 cores
-sqrt.solver <- SqrtLassoSolver(mtx.sub, target.gene, tfs, nCores = 8)
-tbl <- run(sqrt.solver)
 }
 \seealso{
 \code{\link{slim}}, \code{\link{SqrtLassoSolver}}
