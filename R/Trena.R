@@ -338,7 +338,7 @@ setMethod('createGeneModel', 'Trena',
 #' trena <- Trena("hg38")
 #'
 #' library(MotifDb)
-#' jaspar.human.pfms <- as.list(query(query(MotifDb, "jaspar2016"), "sapiens"))[21:40]
+#' jaspar.human.pfms <- as.list(query(query(MotifDb, "jaspar2016"), "sapiens"))[21:25]
 #'
 #' variant <- "rs3875089" # chr18:26865469  T->C
 #'
