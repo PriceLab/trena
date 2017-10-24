@@ -43,8 +43,7 @@
     if( length(tfs) == 1 ) {
         fit = stats::lm( target ~ features )
         mtx.beta = stats::coef(fit)
-        cor.target.feature = stats::cor( target , features )[1,1]
-        mtx.beta = data.frame( beta = mtx.beta[2] , intercept = mtx.beta[1] , gene.cor = cor.target.feature )
+        mtx.beta = data.frame( beta = mtx.beta[2] , intercept = mtx.beta[1])
         rownames(mtx.beta) = tfs
         if( keep.metrics == FALSE ) return( mtx.beta )
         if( keep.metrics == TRUE ) return( list( mtx.beta = mtx.beta , lambda = NA , r2 = cor.target.feature^2 ) )
@@ -115,10 +114,7 @@
     intercept <- mtx.beta[1,1]    
     mtx.beta <- mtx.beta[-1, , drop=FALSE]    
     mtx.beta <- cbind(mtx.beta, intercept=rep(intercept, nrow(mtx.beta)))    
-    correlations.of.betas.to.targetGene <- unlist(lapply(rownames(mtx.beta), function(x) stats::cor(mtx[x,], mtx[target.gene,])))
-    
 
-    mtx.beta <- as.matrix(cbind( mtx.beta, gene.cor=correlations.of.betas.to.targetGene))
     #if(!obj@quiet)
     #   graphics::plot(fit.nolambda, xvar='lambda', label=TRUE)
 
@@ -127,16 +123,16 @@
         mtx.beta <- mtx.beta[ordered.indices,]
     }
 
-    mtx.beta = as.data.frame(mtx.beta)
+    mtx.beta <- as.data.frame(mtx.beta)
 
     if( keep.metrics == TRUE ) {
-        pred.values = stats::predict( fit , newx = features , s = lambda , type = "link" )
-        r2 = (stats::cor( target , pred.values )[1,1])^2
+        pred.values <- stats::predict( fit , newx = features , s = lambda , type = "link" )
+        r2 <- (stats::cor( target , pred.values )[1,1])^2
         return( list( mtx.beta = mtx.beta , lambda = lambda , r2 = r2 ) )
     }
 
     if( keep.metrics == FALSE )
-        return(as.data.frame(mtx.beta))
+        return(mtx.beta)
 }
 # ElasticNetSolver 
 #----------------------------------------------------------------------------------------------------

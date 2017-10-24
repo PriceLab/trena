@@ -116,7 +116,7 @@ test_fitDummyData <- function()
    # we expect an intercept and a coef for tfs gene.02 and gene.03  
    # which predict the value of the target.gene
    checkTrue(all(c(tf1,tf2) %in% rownames(tbl.betas)))
-   checkEquals(colnames(tbl.betas), c("beta", "intercept", "gene.cor"))
+   checkEquals(colnames(tbl.betas), c("beta", "intercept"))
    intercept <- tbl.betas[1, "intercept"]
    coef.tf1  <- tbl.betas[tf1, "beta"]
    coef.tf2  <- tbl.betas[tf2, "beta"]

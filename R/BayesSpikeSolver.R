@@ -148,8 +148,6 @@ setMethod("run", "BayesSpikeSolver",
               rownames(tbl.out) <- tfs      
               tbl.out$score <- -log10(tbl.out$pval)      
               tbl.out <- tbl.out[order(tbl.out$score, decreasing=TRUE),]
-              gene.cor <- sapply(rownames(tbl.out), function(tf) stats::cor(mtx[tf,], mtx[target.gene,]))  
-              tbl.out$gene.cor <- as.numeric(gene.cor)      
               tbl.out
               
           })

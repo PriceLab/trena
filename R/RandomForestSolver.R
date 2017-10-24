@@ -105,7 +105,8 @@ setMethod('show', 'RandomForestSolver',
 #' 
 #' @param obj An object of class TReNA with "randomForest" as the solver string
 #'
-#' @return A list containing various parameters of the Random Forest fit.
+#' @return A data frame containing the IncNodePurity for each candidate regulator. This coefficient
+#' estimates the relationship between the candidates and the target gene. 
 #'
 #' @seealso \code{\link{randomForest}}, \code{\link{RandomForestSolver}}
 #'
@@ -136,13 +137,12 @@ setMethod("run", "RandomForestSolver",
               y <- as.vector(t(mtx[target.gene,])) # Change y to a vector to avoid RF warning      
               
               fit <- randomForest( x = x, y = y )
-              edges = as.data.frame(fit$importance)
-              pred.values = stats::predict(fit)
-              #r2 = stats::cor(pred.values , mtx[target.gene,])^2
-              gene.cor <- sapply(rownames(edges), function(tf) stats::cor(mtx[tf,], mtx[target.gene,]))
-              edges$gene.cor <- gene.cor
-              edges <- edges[order(edges$IncNodePurity, decreasing=TRUE),]
-              #return(list(edges = edges , r2 = r2))
-              return(edges)
+
+              # Grab output and sort it
+              edges <- fit$importance             
+              edges <- edges[order(edges, decreasing=TRUE),]
+
+              return(data.frame(row.names = names(edges),
+                                IncNodePurity = edges))
           })
 #----------------------------------------------------------------------------------------------------

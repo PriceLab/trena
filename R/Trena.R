@@ -311,7 +311,7 @@ setMethod('createGeneModel', 'Trena',
               solver <- EnsembleSolver(mtx, targetGene=targetGene, candidateRegulators=tfs, solverNames)
               tbl.model <- run(solver)
               tbl.tf.frequencies <- as.data.frame(table(tbl.regulatoryRegions$geneSymbol))
-              colnames(tbl.tf.frequencies) <- c("gene", "binding.sites")
+              colnames(tbl.tf.frequencies) <- c("gene", "bindingSites")
               tbl.model <- merge(tbl.model, tbl.tf.frequencies, by="gene")
               tbl.model <- tbl.model[order(tbl.model$pcaMax, decreasing=TRUE),]
               tbl.model

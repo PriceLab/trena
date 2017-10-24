@@ -13,7 +13,8 @@
 \item{obj}{An object of class TReNA with "randomForest" as the solver string}
 }
 \value{
-A list containing various parameters of the Random Forest fit.
+A data frame containing the IncNodePurity for each candidate regulator. This coefficient
+estimates the relationship between the candidates and the target gene.
 }
 \description{
 Given a TReNA object with RandomForest as the solver, use the \code{\link{randomForest}} function

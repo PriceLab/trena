@@ -195,8 +195,8 @@ test_createGeneModel <- function()
 
     checkTrue(is.data.frame(tbl.geneModel))
 
-    expected.colnames <- c("gene", "beta.lasso", "lasso.p.value", "pearson.coeff", "rf.score", "beta.ridge",
-                           "spearman.coeff", "concordance", "pcaMax", "binding.sites")
+    expected.colnames <- c("gene", "betaLasso", "lassoPValue", "pearsonCoeff", "rfScore", "betaRidge",
+                           "spearmanCoeff", "concordance", "pcaMax", "bindingSites")
     checkTrue(all(expected.colnames %in% colnames(tbl.geneModel)))
     checkTrue(nrow(tbl.geneModel) == 3)
     checkTrue("FOXC1" %in% tbl.geneModel$gene)

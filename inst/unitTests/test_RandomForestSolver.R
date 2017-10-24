@@ -38,8 +38,8 @@ test_RandomForestSolverFewCandidates <- function()
     solver <- RandomForestSolver(mtx, targetGene="MEF2C", candidateRegulators=candidate.tfs)
     tbl <- run(solver)
  
-    checkEquals(dim(tbl), c(3, 2))
-    checkEquals(colnames(tbl), c("IncNodePurity", "gene.cor"))
+    checkEquals(nrow(tbl), 3)
+    checkEquals(colnames(tbl), "IncNodePurity")
     checkEquals(rownames(tbl), c("ATF7", "NR3C2", "PRRX1"))
 
 } # test_RandomForestSolverFewCandidates

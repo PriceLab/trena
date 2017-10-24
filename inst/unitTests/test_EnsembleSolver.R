@@ -198,7 +198,7 @@ test_invalidSolvers <- function(){
     options(warn = 1)
     set.seed(11451)
     tbl <- suppressWarnings(run(solver))
-    checkEquals(names(tbl), c("gene", "beta.lasso", "beta.ridge", "concordance", "pcaMax"))
+    checkEquals(names(tbl), c("gene", "betaLasso", "betaRidge", "concordance", "pcaMax"))
     checkTrue(max(tbl$pcaMax) > 22.5)
     checkTrue(max(tbl$concordance) > 0.7)
     checkTrue(!("parson" %in% names(tbl)))

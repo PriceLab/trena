@@ -42,7 +42,7 @@ test_ampAD.mef2c.154tfs.278samples.lassopv <- function()
    tbl <- run(lassopv.solver)
 
    # Check for significant P-values; make sure they match the empirical value
-   sig.genes <- tbl$p.values[tbl$p.values < 0.01]
+   sig.genes <- tbl$pValues[tbl$pValues < 0.01]
    checkEquals(length(sig.genes),30)
    checkTrue(max(-log10(sig.genes)) > 54)
    

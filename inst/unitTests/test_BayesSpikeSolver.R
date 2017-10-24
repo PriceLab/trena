@@ -47,7 +47,6 @@ test_ampAD.mef2c.154tfs.278samples.bayesSpike <- function()
 
    # Check number of results and correlation of results
    checkTrue(nrow(tbl.trimmed) == 12)
-   checkTrue(cor(tbl.trimmed$beta, tbl.trimmed$gene.cor) > 0.8)
 
 } # test_ampAD.mef2c.154tfs.278samples.bayesSpike
 #----------------------------------------------------------------------------------------------------
@@ -72,9 +71,8 @@ test_nOrderings <- function()
    #big.abs.betas <- betas[abs(betas) > 1]
    #checkTrue(length(big.abs.betas) > 20)
 
-   # Check number of results and correlation of results
+   # Check number of results
    checkTrue(nrow(tbl.trimmed) == 10)
-   checkTrue(cor(tbl.trimmed$beta, tbl.trimmed$gene.cor) > 0.75)
 
 } # test_nOrderings
 #----------------------------------------------------------------------------------------------------

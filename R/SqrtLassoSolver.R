@@ -167,8 +167,7 @@ setMethod("run", "SqrtLassoSolver",
               if( length(tfs) == 1 ) {                  
                   fit = stats::lm( target ~ features )                  
                   mtx.beta = stats::coef(fit)                  
-                  cor.target.feature = stats::cor( target , features )[1,1]                 
-                  mtx.beta = data.frame( beta = mtx.beta[2] , intercept = mtx.beta[1] , gene.cor = cor.target.feature )                  
+                  mtx.beta = data.frame( beta = mtx.beta[2] , intercept = mtx.beta[1] )
                   rownames(mtx.beta) = tfs                  
                   return( mtx.beta )                  
               }
@@ -237,16 +236,13 @@ setMethod("run", "SqrtLassoSolver",
               # put the intercept, admittedly with much redundancy, into its own column
               mtx.beta <- cbind(mtx.beta, intercept=rep(fit$intercept, nrow(mtx.beta)))
               
-              correlations.of.betas.to.targetGene <- unlist(lapply(rownames(mtx.beta),
-                                                                   function(x) stats::cor(mtx[x,], mtx[target.gene,])))
-              
-              mtx.beta <- as.matrix(cbind( mtx.beta, gene.cor=correlations.of.betas.to.targetGene))
+              mtx.beta <- as.data.frame(mtx.beta)
               
               if( nrow(mtx.beta) > 1 ) {
                   ordered.indices <- order(abs(mtx.beta[, "beta"]), decreasing=TRUE)
                   mtx.beta <- mtx.beta[ordered.indices,]
               }
               
-              return(as.data.frame(mtx.beta))
+              return(mtx.beta)
           })
 #----------------------------------------------------------------------------------------------------

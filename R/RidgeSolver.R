@@ -127,7 +127,7 @@ setMethod('show', 'RidgeSolver',
 #' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
 #' target.gene <- "MEF2C"
 #' tfs <- setdiff(rownames(mtx.sub), target.gene)
-#' ridge.solver <- LassoSolver(mtx.sub, target.gene, tfs)
+#' ridge.solver <- RidgeSolver(mtx.sub, target.gene, tfs)
 #' tbl <- run(ridge.solver)
 
 setMethod("run", "RidgeSolver",

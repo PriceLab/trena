@@ -140,12 +140,9 @@ setMethod("run", "LassoPVSolver",
               fit <- lassopv::lassopv(features, target)
               fit <- fit[order(fit, decreasing=FALSE)]
               
-              # Add pearson correlations and make a data frame              
-              correlations.of.betas.to.targetGene <- unlist(lapply(names(fit),
-                                                                   function(x) stats::cor(mtx[x,], mtx[target.gene,])))
+              # Make a data frame              
               tbl <- data.frame(row.names = names(fit),
-                                p.values = fit,
-                                gene.cor=correlations.of.betas.to.targetGene)
+                                pValues = fit)                                
               return(tbl)
           })
 #----------------------------------------------------------------------------------------------------
