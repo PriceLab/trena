@@ -485,9 +485,8 @@ setMethod(".parseVariantString", "MotifMatcher",
                       variantString <- tokens[1]
                       explicitly.specified.alternate.allele <- tokens[2]
                   }
-                  #require(SNPlocs.Hsapiens.dbSNP144.GRCh38)
                   snp.info <- as.data.frame(BSgenome::snpsById(
-                      SNPlocs.Hsapiens.dbSNP144.GRCh38::SNPlocs.Hsapiens.dbSNP144.GRCh38, variantString))[1,]
+                      SNPlocs.Hsapiens.dbSNP150.GRCh38::SNPlocs.Hsapiens.dbSNP150.GRCh38, variantString))[1,]
                   chrom <- as.character(snp.info$seqnames)
                   if(!grepl("ch", chrom))
                       chrom <- sprintf("chr%s", chrom)
