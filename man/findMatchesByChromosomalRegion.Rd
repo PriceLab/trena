@@ -32,6 +32,7 @@ pull out a list containing a data frame of the motifs in those regions and a cha
 of their associated transcription factors.
 }
 \examples{
+\dontrun{
 # Perform a simple match in the rs13384219 neighborhood
 library(MotifDb)
 motifMatcher <- MotifMatcher(genomeName="hg38",
@@ -42,4 +43,5 @@ x <- findMatchesByChromosomalRegion(motifMatcher, tbl.regions, pwmMatchMinimumAs
 # Perform the same match, but now include a variant
 x.mut <- findMatchesByChromosomalRegion(motifMatcher, tbl.regions,
 pwmMatchMinimumAsPercentage=92, variants = "rs13384219")
+}
 }

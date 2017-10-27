@@ -24,6 +24,9 @@ setGeneric('createGeneModel', signature='obj', function(obj, targetGene,  solver
 
 setGeneric('getProximalPromoter', signature='obj', function(obj, geneSymbol, tssUpstream, tssDownstream)
     standardGeneric('getProximalPromoter'))
+
+setGeneric('assessSnp', signature='obj', function(obj, pfms, variant, shoulder, pwmMatchMinimumAsPercentage, relaxedMatchDelta=25)
+    standardGeneric('assessSnp'))
 #----------------------------------------------------------------------------------------------------
 # a temporary hack: some constants
 genome.db.uri <- "postgres://bddsrds.globusgenomics.org/hg38"   # has gtf and motifsgenes tables
@@ -382,4 +385,141 @@ setMethod("getProximalPromoter", "Trena",
           return (data.frame(chrom=chrom, start=start.loc, end=end.loc, stringsAsFactors=FALSE))
 
           })# getProximalPromoter
+#----------------------------------------------------------------------------------------------------
+#' Assess the effect of a SNP using a Trena object
+#'
+#' @rdname assessSnp
+#' @aliases assessSnp
+#'
+#' @param obj An object of class Trena
+#' @param pfms A set of motif matrices, generally retrieved using MotifDb
+#' @param variant A variant of interest
+#' @param shoulder A distance from the TSS to use as a window
+#' @param pwmMatchMinimumAsPercentage A minimum match percentage for the  motifs
+#' @param relaxedMatchDelta A numeric indicating the degree of the match (default = 25)
+#'
+#' @return A data frame containing the gene model
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' # Create a Trena object for human, assign a variant, then assess the effects of the variant
+#' trena <- Trena("hg38")
+#'
+#' library(MotifDb)
+#' jaspar.human.pfms <- as.list(query(query(MotifDb, "jaspar2016"), "sapiens"))[21:25]
+#'
+#' variant <- "rs3875089" # chr18:26865469  T->C
+#'
+#' tbl <- assessSnp(trena, jaspar.human.pfms, variant, shoulder = 3,
+#' pwmMatchMinimumAsPercentage = 65)
+#' }
+
+setMethod('assessSnp', 'Trena',
+
+          function(obj, pfms, variant, shoulder, pwmMatchMinimumAsPercentage, relaxedMatchDelta=25){
+
+              motifMatcher <- MotifMatcher(genomeName=obj@genomeName, pfms=pfms, quiet=obj@quiet)
+              tbl.variant <- try(.parseVariantString(motifMatcher, variant), silent=TRUE)
+              if(is(tbl.variant, "try-error")){
+                  printf("error, unrecognized variant name: '%s'", variant)
+                  return(data.frame())
+              }
+              tbl.regions <- data.frame(chrom=tbl.variant$chrom,
+                                        start=tbl.variant$loc-shoulder,
+                                        end=tbl.variant$loc+shoulder,
+                                        stringsAsFactors=FALSE)
+
+              tbl.wt  <- findMatchesByChromosomalRegion(motifMatcher, tbl.regions,
+                                                        pwmMatchMinimumAsPercentage=pwmMatchMinimumAsPercentage)
+              if(nrow(tbl.wt) == 0){
+                  warning(sprintf("no motifs found in reference sequence in neighborhood of %s with shoulder %d",
+                                  variant, shoulder))
+                  return(data.frame())
+              }
+
+              tbl.mut <- findMatchesByChromosomalRegion(motifMatcher, tbl.regions,
+                                                        pwmMatchMinimumAsPercentage=pwmMatchMinimumAsPercentage,
+                                                        variant=variant)
+              if(nrow(tbl.mut) == 0){
+                  warning(sprintf("no motifs altered by %s with shoulder %d", variant, shoulder))
+                  return(data.frame())
+              }
+
+              tbl.wt$signature <- sprintf("%s;%s;%s", tbl.wt$motifName, tbl.wt$motifStart, tbl.wt$strand)
+              tbl.mut$signature <- sprintf("%s;%s;%s", tbl.mut$motifName, tbl.mut$motifStart, tbl.mut$strand)
+
+              # comine wt and mut tables, reorder columns and rows for easier comprehension
+              tbl <- rbind(tbl.wt[, c(1,12,2,3,4,5,6,7,8,13)], tbl.mut[, c(1,12,2,3,4,5,6,7,8,13)])
+              tbl <- tbl[order(tbl$motifName, tbl$motifRelativeScore, decreasing=TRUE),]
+              #tbl$signature <- sprintf("%s;%s;%s", tbl$motifName, tbl$motifStart, tbl$strand)
+              tbl <- tbl[,c(1,2,3:10)]
+
+              # now look for less stringent matches.  these will be matched up with the
+              # wt and mut motifs which do not yet have partners, thus enabling us to
+              # provide a wt->mut motifScore.delta for each
+              relaxedMatchPercentage <- pwmMatchMinimumAsPercentage-relaxedMatchDelta
+              tbl.wt.relaxed <- findMatchesByChromosomalRegion(motifMatcher, tbl.regions, relaxedMatchPercentage)
+              tbl.wt.relaxed$signature <- sprintf("%s;%s;%s", tbl.wt.relaxed$motifName, tbl.wt.relaxed$motifStart, tbl.wt.relaxed$strand)
+              tbl.mut.relaxed <- findMatchesByChromosomalRegion(motifMatcher, tbl.regions, relaxedMatchPercentage, variant=variant)
+              tbl.mut.relaxed$signature <- sprintf("%s;%s;%s", tbl.mut.relaxed$motifName, tbl.mut.relaxed$motifStart, tbl.mut.relaxed$strand)
+
+              signatures.in.both <- intersect(subset(tbl, status=="mut")$signature, subset(tbl, status=="wt")$signature)
+              signatures.only.in.wt <- setdiff(subset(tbl, status=="wt")$signature, subset(tbl, status=="mut")$signature)
+              signatures.only.in.mut <- setdiff(subset(tbl, status=="mut")$signature, subset(tbl, status=="wt")$signature)
+
+              tbl$assessed <- rep("failed", nrow(tbl))
+
+              if(length(signatures.in.both) > 0) {
+                  indices <- sort(unlist(lapply(signatures.in.both, function(sig) grep(sig, tbl$signature))))
+                  tbl$assessed[indices] <- "in.both"
+              }
+
+              if(length(signatures.only.in.wt) > 0) {
+                  indices <- sort(unlist(lapply(signatures.only.in.wt, function(sig) grep(sig, tbl$signature))))
+                  tbl$assessed[indices] <- "wt.only"
+              }
+
+              if(length(signatures.only.in.mut) > 0) {
+                  indices <- sort(unlist(lapply(signatures.only.in.mut, function(sig) grep(sig, tbl$signature))))
+                  tbl$assessed[indices] <- "mut.only"
+              }
+
+              tbl$delta <- 0
+
+              # find the mut scores for each of the "wt.only" entries, subtract from the wt score
+              tbl.wt.only  <- subset(tbl, assessed=="wt.only", select=c(signature, motifRelativeScore))
+              if(nrow(tbl.wt.only) > 0){
+                  sigs <- tbl.wt.only$signature
+                  tbl.mut.scores <- subset(tbl.mut.relaxed, signature %in% sigs, select=c(signature, motifRelativeScore))
+                  deltas <- unlist(lapply(sigs, function(sig){wt.score  <- subset(tbl.wt.only, signature==sig)$motifRelativeScore;
+                      mut.score <- subset(tbl.mut.scores, signature==sig)$motifRelativeScore;
+                      delta <- wt.score - mut.score
+                  }))
+                  tbl$delta[match(sigs, tbl$signature)] <- deltas
+              } # if some wt.only entries
+
+              # find the wt scores for each of the "mut.only" entries, subtract from the mut score
+
+              tbl.mut.only  <- subset(tbl, assessed=="mut.only", select=c(signature, motifRelativeScore))
+              if(nrow(tbl.mut.only) > 0){
+                  sigs <- tbl.mut.only$signature
+                  # find the wt scores for these muts, looking in the relaxedMatchPercentage match table
+                  tbl.wt.scores <- subset(tbl.wt.relaxed, signature %in% sigs, select=c(signature, motifRelativeScore))
+                  deltas <- unlist(lapply(sigs, function(sig){mut.score  <- subset(tbl.mut.only, signature==sig)$motifRelativeScore;
+                      wt.score <- subset(tbl.wt.scores, signature==sig)$motifRelativeScore;
+                      delta <- wt.score - mut.score
+                  }))
+                  tbl$delta[match(sigs, tbl$signature)] <- deltas
+              } # tbl.mut.only > 0
+
+              coi <-  c("motifName", "status", "assessed", "motifRelativeScore", "delta",
+                        "signature", "chrom", "motifStart", "motifEnd", "strand", "match")
+
+              stopifnot(all(coi %in% colnames(tbl)))
+              tbl <- tbl[, coi]
+              tbl$variant <- variant
+              tbl
+          }) # assessSnp
 #----------------------------------------------------------------------------------------------------

@@ -30,7 +30,7 @@ chromosome, start, and end positions, plus the count and score of each region.
 Get a tabel of regulatory regions for a Human DHS filter
 }
 \examples{
-
+\dontrun{
 # Make a filter for "transcription, DNA-templated" and use it to filter candidates
 load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
 targetGene <- "VRK2"
@@ -55,6 +55,7 @@ end <- rs13384219.loc + 10
 tableNames <- getEncodeRegulatoryTableNames(hd.filter)
 
 getRegulatoryRegions(hd.filter, tableNames[1], chrom, start, end)
+}
 }
 \seealso{
 \code{\link{HumanDHSFilter}}

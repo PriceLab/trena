@@ -58,7 +58,8 @@ exportMethods(
     getRegulatoryTableColumnNames,
     getGeneModelTableColumnNames,
     createGeneModel,
-    getSolverNames
+    getSolverNames,
+    assessSnp
 )
 
 import(
