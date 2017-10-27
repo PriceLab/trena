@@ -118,7 +118,7 @@ test_getChromLoc <- function()
    closeDatabaseConnections(fp)
 
 } # test_getChromLoc
-#------------------------------------------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------------
 test_getGenePromoterRegion <- function()
 {
    printf("--- test_getGenePromoterRegion")
@@ -361,5 +361,5 @@ explore_variantsInFootprints <- function()
 #    doComparativeFimo(chrom, loc, wt, mut, 10, quiet=FALSE) # noMotif
 #
 #
-#------------------------------------------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------------
 if(!interactive()) runTests()

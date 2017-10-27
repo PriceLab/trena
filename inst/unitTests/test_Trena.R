@@ -23,7 +23,6 @@ runTests <- function()
     test_getRegulatoryRegions_twoFootprintSources()
 
     test_createGeneModel()
-    test_assessSnp()
 
     test_getProximalPromoterHuman()
     test_getProximalPromoterMouse()
@@ -204,95 +203,6 @@ test_createGeneModel <- function()
     checkEquals(openPostgresConnections(), 0)
 
 } # test_createGeneModel
-#------------------------------------------------------------------------------------------------------------------------
-test_assessSnp <- function()
-{
-    printf("--- test_assessSnp")
-
-    trena <- Trena("hg38")
-    jaspar.human.pfms <- as.list(query(query(MotifDb, "jaspar2016"), "sapiens"))
-
-    # first check for bogus variant name
-    bogus.variant <- "rsBogus"
-    checkEquals(assessSnp(trena, jaspar.human.pfms, bogus.variant, shoulder=5, pwmMatchMinimumAsPercentage=65),
-                data.frame())
-
-    variant <- "rs3875089"   # chr18:26865469  T->C
-
-    # a shoulder of 3 gives us a search region of chr18:26865466-26865472
-    shoulder <- 3
-    # a 65% match is relaxed enough to get these results, good fodder for testing. tbl.wt then tbl.mut
-
-    #                           motifName chrom motifStart motifEnd strand motifScore motifRelativeScore
-    #   Hsapiens-jaspar2016-ETS1-MA0098.1 chr18   26865467 26865472      +   3.825000          0.8843931
-    #   Hsapiens-jaspar2016-SPI1-MA0080.1 chr18   26865467 26865472      -   3.684211          0.7865169
-    #  Hsapiens-jaspar2016-GATA2-MA0036.1 chr18   26865467 26865471      -   3.509434          0.9489796
-    #  Hsapiens-jaspar2016-GATA3-MA0037.1 chr18   26865466 26865471      -   3.047619          0.6808511
-    #  Hsapiens-jaspar2016-GATA2-MA0036.1 chr18   26865466 26865470      +   2.547170          0.6887755
-    #
-    #                            motifName chrom motifStart motifEnd strand motifScore motifRelativeScore
-    # Hsapiens-jaspar2016-ZNF354C-MA0130.1 chr18   26865467 26865472      +    3.50000          0.6913580
-    #    Hsapiens-jaspar2016-ETS1-MA0098.1 chr18   26865467 26865472      +    2.87500          0.6647399
-    #   Hsapiens-jaspar2016-GATA2-MA0036.1 chr18   26865467 26865471      -    2.54717          0.6887755
-    #
-    # ma0098+  wt=0.884  mut=0.664
-    # ma0036-  wt=0.948 only
-    # ma0036+  wt=mut=0.688
-    # ma0037-  wt only
-    # ma0130+  mut only
-    # ma0080-  wt only
-
-    tbl.assay <- assessSnp(trena, jaspar.human.pfms, variant, shoulder, pwmMatchMinimumAsPercentage=65)
-    checkEquals(dim(tbl.assay), c(8, 12))
-
-    expected.colnames <- c("motifName", "status", "assessed", "motifRelativeScore", "delta", "signature",
-                           "chrom", "motifStart", "motifEnd", "strand", "match", "variant")
-
-    checkEquals(sort(colnames(tbl.assay)), sort(expected.colnames))
-    # pull out crucial columns for checking
-    tbl.test <- tbl.assay[, c("signature", "status", "assessed", "motifRelativeScore", "delta")]
-
-    # all 3 categories should be present
-    checkEquals(as.list(table(tbl.test$assessed)), list(in.both=4, mut.only=1, wt.only=3))
-
-    # deltas are zero if both wt and mut for a motif/strand were found
-    # in this case, the delta can be read off the two motifRelativeScore valus
-    checkTrue(all(tbl.test$delta[grep("both", tbl.test$assessed)]==0))
-    checkTrue(all(tbl.test$delta[grep("only", tbl.test$assessed)]!=0))
-
-    tbl.ma0098 <- tbl.test[grep("MA0098.1;26865467;+", tbl.test$signature, fixed=TRUE),]
-    checkEquals(nrow(tbl.ma0098), 2)
-    checkTrue(all(tbl.ma0098$delta == 0))
-    checkTrue(all(c("wt", "mut") %in% tbl.ma0098$status))
-    checkEqualsNumeric(tbl.test[grep("MA0098", tbl.test$signature),"motifRelativeScore"],
-                       c(0.8843931, 0.6647399), tol=1e-5)
-
-    # now test for an empty table - no wt or mut motifs for this region at this minimum match
-    suppressWarnings(tbl.assay.short <- assessSnp(trena, jaspar.human.pfms, "rs3875089", 3, pwmMatchMinimumAsPercentage=95))
-    checkEquals(nrow(tbl.assay.short), 0)
-
-} # test_assessSnp
-#------------------------------------------------------------------------------------------------------------------------
-# in preparation for adding, and ongoing testing of, a delta column for all entries, here we use a snp which at the 80%
-# match level # returns all three kinds of match: in.both. wt.only, mut.only
-test_assessSnp_allTypesWithDeltas <- function()
-{
-    printf("--- test_assessSnp_allTypesWithDeltas")
-
-    trena <- Trena("hg38")
-    jaspar.human.pfms <- as.list(query(query(MotifDb, "jaspar2016"), "sapiens"))
-    snp <- "rs3763043"
-    shoulder <- 10
-
-    tbl.assay <- assessSnp(trena, jaspar.human.pfms, snp, shoulder=shoulder, pwmMatchMinimumAsPercentage=80)
-    checkEquals(sort(unique(tbl.assay$assessed)), c("in.both", "mut.only", "wt.only"))
-
-    checkEquals(ncol(tbl.assay), 12)
-    checkTrue("delta" %in% colnames(tbl.assay))
-    checkEqualsNumeric(min(tbl.assay$delta), -0.0487, tol=1e-3)
-    checkEqualsNumeric(max(tbl.assay$delta),  0.22, tol=1e-2)
-
-} # test_assessSnp_allTypesWithDeltas
 #------------------------------------------------------------------------------------------------------------------------
 test_getProximalPromoterHuman <- function()
 {
