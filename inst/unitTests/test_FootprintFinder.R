@@ -118,7 +118,7 @@ test_getChromLoc <- function()
    closeDatabaseConnections(fp)
 
 } # test_getChromLoc
-#------------------------------------------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------------
 test_getGenePromoterRegion <- function()
 {
    printf("--- test_getGenePromoterRegion")
@@ -307,8 +307,8 @@ explore_variantsInFootprints <- function()
       fimo.service <-  FimoClient("whovian", 5558, quiet=TRUE)
    library(BSgenome.Hsapiens.UCSC.hg38)
    hg38 = BSgenome.Hsapiens.UCSC.hg38
-   library(SNPlocs.Hsapiens.dbSNP144.GRCh38)
-   snps <- SNPlocs.Hsapiens.dbSNP144.GRCh38
+   library(SNPlocs.Hsapiens.dbSNP150.GRCh38)
+   snps <- SNPlocs.Hsapiens.dbSNP150.GRCh38
    as.data.frame(snpsById(snps, "rs13384219"))
 
      #   seqnames      pos strand  RefSNP_id alleles_as_ambig
@@ -336,8 +336,8 @@ explore_variantsInFootprints <- function()
 #       fimo.service <-  FimoClient("whovian", 5558, quiet=TRUE)
 #    library(BSgenome.Hsapiens.UCSC.hg38)
 #    hg38 = BSgenome.Hsapiens.UCSC.hg38
-#    library(SNPlocs.Hsapiens.dbSNP144.GRCh38)
-#    snps <- SNPlocs.Hsapiens.dbSNP144.GRCh38
+#    library(SNPlocs.Hsapiens.dbSNP150.GRCh38)
+#    snps <- SNPlocs.Hsapiens.dbSNP150.GRCh38
 #    rsid <- "rs6718960"
 #    chrom <- "chr2"
 #    loc <- 165239218
@@ -361,5 +361,5 @@ explore_variantsInFootprints <- function()
 #    doComparativeFimo(chrom, loc, wt, mut, 10, quiet=FALSE) # noMotif
 #
 #
-#------------------------------------------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------------
 if(!interactive()) runTests()

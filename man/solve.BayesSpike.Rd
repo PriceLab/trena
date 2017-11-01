@@ -22,6 +22,7 @@ function to estimate coefficients for each transcription factor as a predictor o
 gene's expression level.
 }
 \examples{
+\dontrun{
 # Load included Alzheimer's data, create a TReNA object with Bayes Spike as solver, and solve
 load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
 target.gene <- "MEF2C"
@@ -32,6 +33,7 @@ tbl <- run(bayes.solver)
 # Solve the same Alzheimer's problem, but this time set the number of random starts to 100
 bayes.solver <- BayesSpikeSolver(mtx.sub, target.gene, tfs, nOrderings = 100)
 tbl <- run(bayes.solver)
+}
 }
 \seealso{
 \code{\link{vbsr}}, \code{\link{BayesSpikeSolver}}

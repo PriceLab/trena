@@ -21,6 +21,7 @@ Get candidate genes using a human DHS filter
 \examples{
 
 # Make a filter for "transcription, DNA-templated" and use it to filter candidates
+\dontrun{
 #' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
 targetGene <- "VRK2"
 promoter.length <- 1000
@@ -37,6 +38,7 @@ hd.filter <- HumanDHSFilter(genomeName, pwmMatchPercentageThreshold = 85,
 geneInfoDatabase.uri = genome.db.uri, regions = tbl.regions, pfms = jaspar.human)
 
 getCandidates(hd.filter)
+}
 }
 \seealso{
 \code{\link{FootprintFilter}}

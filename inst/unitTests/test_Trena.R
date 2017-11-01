@@ -23,7 +23,6 @@ runTests <- function()
     test_getRegulatoryRegions_twoFootprintSources()
 
     test_createGeneModel()
-    test_assessSnp()
 
     test_getProximalPromoterHuman()
     test_getProximalPromoterMouse()
@@ -120,7 +119,7 @@ test_getRegulatoryRegions_encodeDHS <- function()
     checkEquals(openPostgresConnections(), 0)
 
 } # test_getRegulatoryRegions_encodeDHS
-#------------------------------------------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------------
 # for quick testing, we use only the small (mef2c-centered) sqlite database distributed
 # with the package.  so this "two-source" test uses that one source twice, producing
 # a list of length 2, each with the same name, each with the same contents
@@ -171,7 +170,7 @@ openPostgresConnections <- function()
     length(connections)
 
 } # openPostgresConnections
-#------------------------------------------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------------
 test_createGeneModel <- function()
 {
 
@@ -204,7 +203,67 @@ test_createGeneModel <- function()
     checkEquals(openPostgresConnections(), 0)
 
 } # test_createGeneModel
-#------------------------------------------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------------
+test_getProximalPromoterHuman <- function()
+{
+    printf("--- test_getProximalPromoterHuman")
+
+    trena <- Trena("hg38")
+
+    # Designate the MEF2C gene and a shoulder size of 1000
+    geneSymbol <- "MEF2C"
+    tssUpstream <- 1000
+    tssDownstream <- 1000
+
+    # Pull the regions for MEF2C
+    regions <- getProximalPromoter(trena, geneSymbol, tssUpstream, tssDownstream)
+
+    # Check the type of data returned and its size
+    checkEquals(dim(regions), c(1,3))
+    checkEquals(class(regions), "data.frame")
+
+    # Check the nominal values (tss = 88904257)
+    tss <- 88904257
+    checkEquals(regions$chrom, "chr5")
+    checkEquals(regions$start, tss - tssUpstream)
+    checkEquals(regions$end, tss + tssDownstream)
+
+    # check with bogus gene symbol
+    checkTrue(is.na(getProximalPromoter(trena, "bogus", tssUpstream, tssDownstream)))
+
+} # test_getProximalPromoterHuman
+#----------------------------------------------------------------------------------------------------
+test_getProximalPromoterMouse <- function(){
+
+    printf("--- test_getProximalPromoterMouse")
+
+    trena <- Trena("mm10")
+
+    # Designate the Twist2 gene and a shoulder size of 1000
+    geneSymbol <- "Twist2"
+    tssUpstream <- 1000
+    tssDownstream <- 1000
+
+    # Pull the regions for Twist2
+    regions <- getProximalPromoter(trena, geneSymbol, tssUpstream, tssDownstream)
+
+    # Check the type of data returned and its size
+    checkEquals(dim(regions), c(1,3))
+    checkEquals(class(regions), "data.frame")
+
+    # Check the nominal values (tss = 88904257)
+    tss <- 91801461
+    checkEquals(regions$chrom, "chr1")
+    checkEquals(regions$start, tss - tssUpstream)
+    checkEquals(regions$end, tss + tssDownstream)
+
+    # check with bogus gene symbol
+    checkTrue(is.na(getProximalPromoter(trena, "bogus", tssUpstream, tssDownstream)))
+
+} # test_getProximalPromoterMouse
+#----------------------------------------------------------------------------------------------------
+# Unit tests and such
+
 test_assessSnp <- function()
 {
     printf("--- test_assessSnp")
@@ -272,7 +331,7 @@ test_assessSnp <- function()
     checkEquals(nrow(tbl.assay.short), 0)
 
 } # test_assessSnp
-#------------------------------------------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------------
 # in preparation for adding, and ongoing testing of, a delta column for all entries, here we use a snp which at the 80%
 # match level # returns all three kinds of match: in.both. wt.only, mut.only
 test_assessSnp_allTypesWithDeltas <- function()
@@ -293,63 +352,5 @@ test_assessSnp_allTypesWithDeltas <- function()
     checkEqualsNumeric(max(tbl.assay$delta),  0.22, tol=1e-2)
 
 } # test_assessSnp_allTypesWithDeltas
-#------------------------------------------------------------------------------------------------------------------------
-test_getProximalPromoterHuman <- function()
-{
-    printf("--- test_getProximalPromoterHuman")
-
-    trena <- Trena("hg38")
-
-    # Designate the MEF2C gene and a shoulder size of 1000
-    geneSymbol <- "MEF2C"
-    tssUpstream <- 1000
-    tssDownstream <- 1000
-
-    # Pull the regions for MEF2C
-    regions <- getProximalPromoter(trena, geneSymbol, tssUpstream, tssDownstream)
-
-    # Check the type of data returned and its size
-    checkEquals(dim(regions), c(1,3))
-    checkEquals(class(regions), "data.frame")
-
-    # Check the nominal values (tss = 88904257)
-    tss <- 88904257
-    checkEquals(regions$chrom, "chr5")
-    checkEquals(regions$start, tss - tssUpstream)
-    checkEquals(regions$end, tss + tssDownstream)
-
-    # check with bogus gene symbol
-    checkTrue(is.na(getProximalPromoter(trena, "bogus", tssUpstream, tssDownstream)))
-
-} # test_getProximalPromoterHuman
-#----------------------------------------------------------------------------------------------------
-test_getProximalPromoterMouse <- function(){
-
-    printf("--- test_getProximalPromoterMouse")
-
-    trena <- Trena("mm10")
-
-    # Designate the Twist2 gene and a shoulder size of 1000
-    geneSymbol <- "Twist2"
-    tssUpstream <- 1000
-    tssDownstream <- 1000
-
-    # Pull the regions for Twist2
-    regions <- getProximalPromoter(trena, geneSymbol, tssUpstream, tssDownstream)
-
-    # Check the type of data returned and its size
-    checkEquals(dim(regions), c(1,3))
-    checkEquals(class(regions), "data.frame")
-
-    # Check the nominal values (tss = 88904257)
-    tss <- 91801461
-    checkEquals(regions$chrom, "chr1")
-    checkEquals(regions$start, tss - tssUpstream)
-    checkEquals(regions$end, tss + tssDownstream)
-
-    # check with bogus gene symbol
-    checkTrue(is.na(getProximalPromoter(trena, "bogus", tssUpstream, tssDownstream)))
-
-} # test_getProximalPromoterMouse
 #----------------------------------------------------------------------------------------------------
 if(!interactive()) runTests()

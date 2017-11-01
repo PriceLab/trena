@@ -29,6 +29,7 @@ A data frame containing the gene model
 Assess the effect of a SNP using a Trena object
 }
 \examples{
+\dontrun{
 # Create a Trena object for human, assign a variant, then assess the effects of the variant
 trena <- Trena("hg38")
 
@@ -39,5 +40,5 @@ variant <- "rs3875089" # chr18:26865469  T->C
 
 tbl <- assessSnp(trena, jaspar.human.pfms, variant, shoulder = 3,
 pwmMatchMinimumAsPercentage = 65)
-
+}
 }

@@ -58,8 +58,8 @@ exportMethods(
     getRegulatoryTableColumnNames,
     getGeneModelTableColumnNames,
     createGeneModel,
-    assessSnp,
-    getSolverNames
+    getSolverNames,
+    assessSnp
 )
 
 import(
@@ -84,7 +84,7 @@ importFrom(stringr, str_match)
 importFrom(org.Hs.eg.db, org.Hs.eg.db)
 importFrom(BSgenome.Hsapiens.UCSC.hg38,BSgenome.Hsapiens.UCSC.hg38)
 importFrom(BSgenome.Hsapiens.UCSC.hg19,BSgenome.Hsapiens.UCSC.hg19)
-importFrom(SNPlocs.Hsapiens.dbSNP144.GRCh38,SNPlocs.Hsapiens.dbSNP144.GRCh38)
+importFrom(SNPlocs.Hsapiens.dbSNP150.GRCh38, SNPlocs.Hsapiens.dbSNP150.GRCh38)
 importFrom(Biostrings, IUPAC_CODE_MAP)
 importFrom(Biostrings, maxScore)
 importFrom(Biostrings, matchPWM)

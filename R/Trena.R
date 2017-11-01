@@ -22,11 +22,11 @@ setGeneric('getGeneModelTableColumnNames',  signature='obj', function(obj) stand
 setGeneric('createGeneModel', signature='obj', function(obj, targetGene,  solverNames, tbl.regulatoryRegions, mtx)
     standardGeneric('createGeneModel'))
 
-setGeneric('assessSnp', signature='obj', function(obj, pfms, variant, shoulder, pwmMatchMinimumAsPercentage, relaxedMatchDelta=25)
-    standardGeneric('assessSnp'))
-
 setGeneric('getProximalPromoter', signature='obj', function(obj, geneSymbol, tssUpstream, tssDownstream)
     standardGeneric('getProximalPromoter'))
+
+setGeneric('assessSnp', signature='obj', function(obj, pfms, variant, shoulder, pwmMatchMinimumAsPercentage, relaxedMatchDelta=25)
+    standardGeneric('assessSnp'))
 #----------------------------------------------------------------------------------------------------
 # a temporary hack: some constants
 genome.db.uri <- "postgres://bddsrds.globusgenomics.org/hg38"   # has gtf and motifsgenes tables
@@ -54,8 +54,7 @@ genome.db.uri <- "postgres://bddsrds.globusgenomics.org/hg38"   # has gtf and mo
 #' trena <- Trena("hg38")
 #'
 #' @seealso \code{\link{getRegulatoryChromosomalRegions}}, \code{\link{getRegulatoryTableColumnNames}},
-#' \code{\link{getGeneModelTableColumnNames}}, \code{\link{createGeneModel}},
-#' \code{\link{assessSnp}}
+#' \code{\link{getGeneModelTableColumnNames}}, \code{\link{createGeneModel}}
 
 Trena = function(genomeName, quiet=TRUE)
 {
@@ -317,6 +316,76 @@ setMethod('createGeneModel', 'Trena',
               tbl.model
           }) # createGeneModel
 #----------------------------------------------------------------------------------------------------
+#' Grab the region of the proximal promoter for a given gene symbol
+#'
+#' For the genome of a given Trena object, retrieve a data frame containing the region
+#' surrounding a target gene.
+#'
+#' @rdname getProximalPromoter
+#' @aliases getProximalPromoter
+#'
+#' @param obj An object of class Trena
+#' @param geneSymbol A gene of interest
+#' @param tssUpstream A designated distance upstream of the promoter to use as a shoulder
+#' (default = 1000)
+#' @param tssDownstream A designated distance downstream of the promoter to use as a shoulder
+#' (default = 1000)
+#'
+#' @return A dataframe containing the regions surrounding the proximal promoter
+#'
+#' @export
+#'
+#' @examples
+#' # Retrieve the proximal promoter for MEF2C using a shoulder size of 2000 on each side
+#' trena <- Trena("hg38")
+#' regions <- getProximalPromoter(trena, "MEF2C", 2000, 2000)
+
+setMethod("getProximalPromoter", "Trena",
+
+          function(obj, geneSymbol,
+                   tssUpstream = 1000,
+                   tssDownstream = 1000){
+
+              # Switch the name of the database and filter we use
+              db.name <- switch(obj@genomeName,
+                                "hg38" = "hsapiens_gene_ensembl",
+                                "mm10" = "mmusculus_gene_ensembl")
+              filter.name <- switch(obj@genomeName,
+                                "hg38" = "hgnc_symbol",
+                                "mm10" = "mgi_symbol")
+
+              my.mart <- biomaRt::useMart(biomart="ensembl", dataset= db.name)              
+              
+              tbl.geneInfo <- biomaRt::getBM(attributes=c("chromosome_name",
+                                                          "transcription_start_site",
+                                                          filter.name,
+                                                          "strand"),
+                                             filters=filter.name, value=geneSymbol, mart=my.mart)
+              
+              if(nrow(tbl.geneInfo) == 0)
+                  return(NA)
+              
+              # make sure all transcripts are on the same strand
+              strand <- unique(tbl.geneInfo$strand)
+              stopifnot(length(strand) == 1)
+              chrom <- sprintf("chr%s", unique(tbl.geneInfo$chromosome_name))
+              stopifnot(length(chrom) == 1)
+              
+              # assume + strand
+              tss <- min(tbl.geneInfo$transcription_start_site)
+              start.loc <- tss - tssUpstream
+              end.loc   <- tss + tssDownstream
+              
+              if(strand == -1){
+                  tss <- max(tbl.geneInfo$transcription_start_site)
+                  start.loc <- tss - tssDownstream
+                  end.loc   <- tss + tssUpstream
+              }
+                    
+          return (data.frame(chrom=chrom, start=start.loc, end=end.loc, stringsAsFactors=FALSE))
+
+          })# getProximalPromoter
+#----------------------------------------------------------------------------------------------------
 #' Assess the effect of a SNP using a Trena object
 #'
 #' @rdname assessSnp
@@ -334,6 +403,7 @@ setMethod('createGeneModel', 'Trena',
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' # Create a Trena object for human, assign a variant, then assess the effects of the variant
 #' trena <- Trena("hg38")
 #'
@@ -344,7 +414,7 @@ setMethod('createGeneModel', 'Trena',
 #'
 #' tbl <- assessSnp(trena, jaspar.human.pfms, variant, shoulder = 3,
 #' pwmMatchMinimumAsPercentage = 65)
-#'
+#' }
 
 setMethod('assessSnp', 'Trena',
 
@@ -452,74 +522,4 @@ setMethod('assessSnp', 'Trena',
               tbl$variant <- variant
               tbl
           }) # assessSnp
-#----------------------------------------------------------------------------------------------------
-#' Grab the region of the proximal promoter for a given gene symbol
-#'
-#' For the genome of a given Trena object, retrieve a data frame containing the region
-#' surrounding a target gene.
-#'
-#' @rdname getProximalPromoter
-#' @aliases getProximalPromoter
-#'
-#' @param obj An object of class Trena
-#' @param geneSymbol A gene of interest
-#' @param tssUpstream A designated distance upstream of the promoter to use as a shoulder
-#' (default = 1000)
-#' @param tssDownstream A designated distance downstream of the promoter to use as a shoulder
-#' (default = 1000)
-#'
-#' @return A dataframe containing the regions surrounding the proximal promoter
-#'
-#' @export
-#'
-#' @examples
-#' # Retrieve the proximal promoter for MEF2C using a shoulder size of 2000 on each side
-#' trena <- Trena("hg38")
-#' regions <- getProximalPromoter(trena, "MEF2C", 2000, 2000)
-
-setMethod("getProximalPromoter", "Trena",
-
-          function(obj, geneSymbol,
-                   tssUpstream = 1000,
-                   tssDownstream = 1000){
-
-              # Switch the name of the database and filter we use
-              db.name <- switch(obj@genomeName,
-                                "hg38" = "hsapiens_gene_ensembl",
-                                "mm10" = "mmusculus_gene_ensembl")
-              filter.name <- switch(obj@genomeName,
-                                "hg38" = "hgnc_symbol",
-                                "mm10" = "mgi_symbol")
-
-              my.mart <- biomaRt::useMart(biomart="ensembl", dataset= db.name)              
-              
-              tbl.geneInfo <- biomaRt::getBM(attributes=c("chromosome_name",
-                                                          "transcription_start_site",
-                                                          filter.name,
-                                                          "strand"),
-                                             filters=filter.name, value=geneSymbol, mart=my.mart)
-              
-              if(nrow(tbl.geneInfo) == 0)
-                  return(NA)
-              
-              # make sure all transcripts are on the same strand
-              strand <- unique(tbl.geneInfo$strand)
-              stopifnot(length(strand) == 1)
-              chrom <- sprintf("chr%s", unique(tbl.geneInfo$chromosome_name))
-              stopifnot(length(chrom) == 1)
-              
-              # assume + strand
-              tss <- min(tbl.geneInfo$transcription_start_site)
-              start.loc <- tss - tssUpstream
-              end.loc   <- tss + tssDownstream
-              
-              if(strand == -1){
-                  tss <- max(tbl.geneInfo$transcription_start_site)
-                  start.loc <- tss - tssDownstream
-                  end.loc   <- tss + tssUpstream
-              }
-                    
-          return (data.frame(chrom=chrom, start=start.loc, end=end.loc, stringsAsFactors=FALSE))
-
-          })# getProximalPromoter
 #----------------------------------------------------------------------------------------------------

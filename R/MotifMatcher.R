@@ -138,6 +138,7 @@ setMethod("show", "MotifMatcher",
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' # Perform a simple match in the rs13384219 neighborhood
 #' library(MotifDb)
 #' motifMatcher <- MotifMatcher(genomeName="hg38",
@@ -148,6 +149,7 @@ setMethod("show", "MotifMatcher",
 #' # Perform the same match, but now include a variant
 #' x.mut <- findMatchesByChromosomalRegion(motifMatcher, tbl.regions,
 #' pwmMatchMinimumAsPercentage=92, variants = "rs13384219")
+#' }
 
 setMethod("findMatchesByChromosomalRegion", "MotifMatcher",
           
@@ -211,7 +213,7 @@ setMethod("findMatchesByChromosomalRegion", "MotifMatcher",
               #    tbl.out$seq <- paste(substring(tbl.out$seq, 1, 37), "...", sep="")
               #list(tbl=tbl.out, tfs=all.tfs)
               tbl.out
-          })
+          }) #findMatchesByChromosomalRegion
 #----------------------------------------------------------------------------------------------------
 #' Retrieve the motifs from the pfms slot
 #'
@@ -485,9 +487,8 @@ setMethod(".parseVariantString", "MotifMatcher",
                       variantString <- tokens[1]
                       explicitly.specified.alternate.allele <- tokens[2]
                   }
-                  #require(SNPlocs.Hsapiens.dbSNP144.GRCh38)
                   snp.info <- as.data.frame(BSgenome::snpsById(
-                      SNPlocs.Hsapiens.dbSNP144.GRCh38::SNPlocs.Hsapiens.dbSNP144.GRCh38, variantString))[1,]
+                      SNPlocs.Hsapiens.dbSNP150.GRCh38::SNPlocs.Hsapiens.dbSNP150.GRCh38, variantString))[1,]
                   chrom <- as.character(snp.info$seqnames)
                   if(!grepl("ch", chrom))
                       chrom <- sprintf("chr%s", chrom)
@@ -552,6 +553,7 @@ setMethod(".parseVariantString", "MotifMatcher",
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' # Retrieve the sequences for the rs13384219 neighborhood
 #' library(MotifDb)
 #' motifMatcher <- MotifMatcher(genomeName="hg38",
@@ -562,6 +564,7 @@ setMethod(".parseVariantString", "MotifMatcher",
 #' # Retrieve the sequences, but now include a variant
 #' x.mut <- findMatchesByChromosomalRegion(motifMatcher, tbl.regions,
 #' pwmMatchMinimumAsPercentage=92, "rs13384219")
+#' }
 
 setMethod("getSequence", "MotifMatcher",
 

@@ -32,6 +32,5 @@ trena <- Trena("hg38")
 }
 \seealso{
 \code{\link{getRegulatoryChromosomalRegions}}, \code{\link{getRegulatoryTableColumnNames}},
-\code{\link{getGeneModelTableColumnNames}}, \code{\link{createGeneModel}},
-\code{\link{assessSnp}}
+\code{\link{getGeneModelTableColumnNames}}, \code{\link{createGeneModel}}
 }

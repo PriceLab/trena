@@ -30,6 +30,7 @@ method combine all specified solvers to create a composite score for each transc
 This method should be called using the \code{\link{solve}} method on an appropriate TReNA object.
 }
 \examples{
+\dontrun{
 # Load included Alzheimer's data, create an Ensemble object with default solvers, and solve
 load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
 target.gene <- "MEF2C"
@@ -46,6 +47,7 @@ tbl <- run(ensemble.solver)
 ensemble.solver <- EnsembleSolver(mtx.sub, target.gene, tfs,
 solverNames = c("lasso", "pearson", "ridge"))
 tbl <- run(ensemble.solver)
+}
 }
 \seealso{
 \code{\link{EnsembleSolver}}

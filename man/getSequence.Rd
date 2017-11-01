@@ -28,6 +28,7 @@ Given a MotifMatcher object, a table of chromosomal regions, and an optional set
 return the sequences as a new column of the table.
 }
 \examples{
+\dontrun{
 # Retrieve the sequences for the rs13384219 neighborhood
 library(MotifDb)
 motifMatcher <- MotifMatcher(genomeName="hg38",
@@ -38,4 +39,5 @@ x <- findMatchesByChromosomalRegion(motifMatcher, tbl.regions, pwmMatchMinimumAs
 # Retrieve the sequences, but now include a variant
 x.mut <- findMatchesByChromosomalRegion(motifMatcher, tbl.regions,
 pwmMatchMinimumAsPercentage=92, "rs13384219")
+}
 }

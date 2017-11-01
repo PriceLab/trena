@@ -129,6 +129,8 @@ setMethod('show', 'SqrtLassoSolver',
 #' @examples
 #' # Load included Alzheimer's data, create a TReNA object with Square Root LASSO as solver,
 #' # and run using a few predictors
+#'
+#' \dontrun{
 #' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
 #' target.gene <- "MEF2C"
 #'
@@ -136,7 +138,7 @@ setMethod('show', 'SqrtLassoSolver',
 #' tfs <- setdiff(rownames(mtx.sub), target.gene)[1:5]
 #' sqrt.solver <- SqrtLassoSolver(mtx.sub, target.gene, tfs)
 #' tbl <- run(sqrt.solver)
-#'
+#' }
 
 setMethod("run", "SqrtLassoSolver",
 

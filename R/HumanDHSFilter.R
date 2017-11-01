@@ -219,6 +219,7 @@ setMethod("show", "HumanDHSFilter",
 #' @examples
 #'
 #' # Make a filter for "transcription, DNA-templated" and use it to filter candidates
+#' \dontrun{
 #' #' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
 #' targetGene <- "VRK2"
 #' promoter.length <- 1000
@@ -235,6 +236,7 @@ setMethod("show", "HumanDHSFilter",
 #' geneInfoDatabase.uri = genome.db.uri, regions = tbl.regions, pfms = jaspar.human)
 #'
 #' getCandidates(hd.filter)
+#' }
 
 setMethod("getCandidates", "HumanDHSFilter",
 
@@ -304,7 +306,7 @@ setMethod("getCandidates", "HumanDHSFilter",
 #' @export
 #'
 #' @examples
-#'
+#' \dontrun{
 #' # Make a filter for "transcription, DNA-templated" and use it to filter candidates
 #' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
 #' targetGene <- "VRK2"
@@ -329,6 +331,7 @@ setMethod("getCandidates", "HumanDHSFilter",
 #' tableNames <- getEncodeRegulatoryTableNames(hd.filter)
 #'
 #' getRegulatoryRegions(hd.filter, tableNames[1], chrom, start, end)
+#' }
 
 setMethod("getRegulatoryRegions", "HumanDHSFilter",
           
