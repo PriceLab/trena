@@ -22,7 +22,7 @@ setGeneric('getGeneModelTableColumnNames',  signature='obj', function(obj) stand
 setGeneric('createGeneModel', signature='obj', function(obj, targetGene,  solverNames, tbl.regulatoryRegions, mtx)
     standardGeneric('createGeneModel'))
 
-setGeneric('getProximalPromoter', signature='obj', function(obj, geneSymbol, tssUpstream, tssDownstream)
+setGeneric('getProximalPromoter', signature='obj', function(obj, geneSymbols, tssUpstream, tssDownstream)
     standardGeneric('getProximalPromoter'))
 
 setGeneric('assessSnp', signature='obj', function(obj, pfms, variant, shoulder, pwmMatchMinimumAsPercentage, relaxedMatchDelta=25)
@@ -325,7 +325,7 @@ setMethod('createGeneModel', 'Trena',
 #' @aliases getProximalPromoter
 #'
 #' @param obj An object of class Trena
-#' @param geneSymbol A gene of interest
+#' @param geneSymbols A vector containing genes of interest
 #' @param tssUpstream A designated distance upstream of the promoter to use as a shoulder
 #' (default = 1000)
 #' @param tssDownstream A designated distance downstream of the promoter to use as a shoulder
@@ -342,7 +342,7 @@ setMethod('createGeneModel', 'Trena',
 
 setMethod("getProximalPromoter", "Trena",
 
-          function(obj, geneSymbol,
+          function(obj, geneSymbols,
                    tssUpstream = 1000,
                    tssDownstream = 1000){
 
@@ -358,31 +358,32 @@ setMethod("getProximalPromoter", "Trena",
               
               tbl.geneInfo <- biomaRt::getBM(attributes=c("chromosome_name",
                                                           "transcription_start_site",
-                                                          filter.name,
-                                                          "strand"),
-                                             filters=filter.name, value=geneSymbol, mart=my.mart)
+                                                          "transcript_tsl",
+                                                          filter.name),
+                                             filters=filter.name, value=geneSymbols, mart=my.mart)
               
               if(nrow(tbl.geneInfo) == 0)
                   return(NA)
               
-              # make sure all transcripts are on the same strand
-              strand <- unique(tbl.geneInfo$strand)
-              stopifnot(length(strand) == 1)
-              chrom <- sprintf("chr%s", unique(tbl.geneInfo$chromosome_name))
-              stopifnot(length(chrom) == 1)
+              # Sort by hgnc_symbol and transcript_tsl, then pull the first entry for each gene
+              tbl.geneInfo <- tbl.geneInfo[order(tbl.geneInfo[[filter.name]],
+                                                 tbl.geneInfo$transcript_tsl),]
+              tbl.geneInfo <- tbl.geneInfo[match(unique(tbl.geneInfo[[filter.name]]),
+                                                 tbl.geneInfo[[filter.name]]),]
               
-              # assume + strand
-              tss <- min(tbl.geneInfo$transcription_start_site)
-              start.loc <- tss - tssUpstream
-              end.loc   <- tss + tssDownstream
+              # remove contigs and check to make sure it's just 1 chromosome
+              tbl.geneInfo <- subset(tbl.geneInfo, chromosome_name %in% c(1:22, "X", "Y", "MT"))
+              chrom <- sprintf("chr%s", tbl.geneInfo$chromosome_name)
               
-              if(strand == -1){
-                  tss <- max(tbl.geneInfo$transcription_start_site)
-                  start.loc <- tss - tssDownstream
-                  end.loc   <- tss + tssUpstream
-              }
+              tss <- tbl.geneInfo$transcription_start_site
+              start.loc <- tss - tssDownstream
+              end.loc   <- tss + tssUpstream
                     
-          return (data.frame(chrom=chrom, start=start.loc, end=end.loc, stringsAsFactors=FALSE))
+              return (data.frame(geneSymbol=tbl.geneInfo[[filter.name]],
+                                 chrom=chrom,
+                                 start=start.loc,
+                                 end=end.loc,
+                                 stringsAsFactors=FALSE))
 
           })# getProximalPromoter
 #----------------------------------------------------------------------------------------------------
