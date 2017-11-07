@@ -41,17 +41,16 @@ This gives us a matrix, `mtx.sub`, that contains our gene expression data in uni
 hist(mtx.sub, main = "Expression Matrix Data")
 ```
 
-The skewed nature of the matrix may profoundly affect our results. To overcome this, we will transform our matrix using the `voom` function in the `limma` package.
+The skewed nature of the matrix may profoundly affect our results. To overcome this, we will transform our matrix using the hyperbolic arcsine (`asinh`) function
 
 ```{r message = FALSE}
-library(limma)
-mtx.voom <- voom(mtx.sub)$E
+mtx.asinh <- asinh(mtx.sub)
 ```
 
 If we now plot our transformed matrix, we can see that it's been scaled down substantially.
 
 ```{r echo=FALSE, fig.width = 6}
-hist(mtx.voom, main = "VOOM-Transformed Expression Matrix Data")
+hist(mtx.asinh, main = "VOOM-Transformed Expression Matrix Data")
 ```
 
 In general, we recommend a transformation of this nature to adjust skewed data. The `voom` transformation or something similar (e.g. `asinh()`) adjusts the mean-variance relationship and can greatly change the results we see. Moving forward, we will use this transformed data set in the rest of our analyses. 
@@ -76,7 +75,7 @@ In order to get a list of transcription factor candidates, you must construct th
 The `VarianceFilter` requires the specification of the expression matrix and a target gene, plus it allows you to optionally specify a variance size range. It finds the variance of all genes in the assay matrix, then returns all transcription factors with variance within the variance size range of the target gene. For instance, we can create a VarianceFilter and use it to find all transcription factors with variance within 50% of the target gene's variance. This will return a named list with both the names of the transcription factors and their variances.
 
 ```{r }
-variance.filter <- VarianceFilter(mtx.assay = mtx.voom, targetGene = "MEF2C", varSize = 0.5)
+variance.filter <- VarianceFilter(mtx.assay = mtx.asinh, targetGene = "MEF2C", varSize = 0.5)
 tf.list <- getCandidates(variance.filter)
 str(tf.list)
 ```
@@ -143,7 +142,7 @@ Once you know your candidate regulators and you've got a target gene in mind, yo
 When it comes to selecting a solver, we recommend doing some critical thinking about which solver most suits your purposes before choosing. Each of solvers has its own strengths and weaknesses that we will not delve into here, but that are generally detailed within their own packages. To begin with, we will use  the LassoSolver, which uses LASSO regularlized regression to select features. Once a solver has been chosen, the particular `Solver` object is simply specified:
 
 ```{r}
-lasso.solver <- LassoSolver(mtx.assay = mtx.voom,
+lasso.solver <- LassoSolver(mtx.assay = mtx.asinh,
                             targetGene = "MEF2C",
                             candidateRegulators = tbl.tfs$geneSymbol
                             )
@@ -163,7 +162,7 @@ First, we will alter a different parameter of the `LassoSolver` object, the `kee
 
 ```{r}
 set.seed(10)
-lasso.solver.keep <- LassoSolver(mtx.assay = mtx.voom,
+lasso.solver.keep <- LassoSolver(mtx.assay = mtx.asinh,
                                  targetGene = "MEF2C",
                                  candidateRegulators = tbl.tfs$geneSymbol,
                                  keep.metrics = TRUE
@@ -177,7 +176,7 @@ As shown, we now get a list where the first element is our data frame from the p
 Now we can change the value of `lambda` to change how many features are returned by the solver. In this case, we'll make `lambda` much smaller; this will relax the penalty imposed on regression coefficients, thus we expect to get more features returned to us:
 
 ```{r}
-lasso.solver.lenient  <- LassoSolver(mtx.assay = mtx.voom,
+lasso.solver.lenient  <- LassoSolver(mtx.assay = mtx.asinh,
                                      targetGene = "MEF2C",
                                      candidateRegulators = tbl.tfs$geneSymbol,
                                      lambda = 0.05
@@ -205,7 +204,7 @@ Besides computing and returning the individual scores of each solver, the ensemb
 We can see this in action by constructing and running an `EnsembleSolver` object with the default arguments for `solverNames` and `geneCutoff`:
 
 ```{r}
-ensemble.solver <- EnsembleSolver(mtx.assay = mtx.voom, 
+ensemble.solver <- EnsembleSolver(mtx.assay = mtx.asinh, 
                                   targetGene = "MEF2C",
                                   candidateRegulators = tbl.tfs$geneSymbol)
 tbl.out <- run(ensemble.solver)
@@ -215,7 +214,7 @@ tbl.out
 Note that in the final data frame, regulators are returned in descending order of `pcaMax` score. If we so choose, we can change the `solverNames` and `geneCutoff` as well; for this example, we'll change them to just 4 solver methods and 100% of the genes, respectively:
 
 ```{r}
-ensemble.full <- EnsembleSolver(mtx.assay = mtx.voom,
+ensemble.full <- EnsembleSolver(mtx.assay = mtx.asinh,
                                 targetGene = "MEF2C",
                                 candidateRegulators = tbl.tfs$geneSymbol,
                                 solverNames = c("lasso","pearson","randomforest","ridge"),
