@@ -219,14 +219,14 @@ test_getProximalPromoterHuman <- function()
     regions <- getProximalPromoter(trena, geneSymbol, tssUpstream, tssDownstream)
 
     # Check the type of data returned and its size
-    checkEquals(dim(regions), c(1,3))
+    checkEquals(dim(regions), c(1,4))
     checkEquals(class(regions), "data.frame")
 
-    # Check the nominal values (tss = 88904257)
+    # Check the nominal values (tss = 88904257 OR 88883464)
     tss <- 88904257
     checkEquals(regions$chrom, "chr5")
-    checkEquals(regions$start, tss - tssUpstream)
-    checkEquals(regions$end, tss + tssDownstream)
+    checkTrue(regions$start > 88882000)
+    checkTrue(regions$end < 88906000)
 
     # check with bogus gene symbol
     checkTrue(is.na(getProximalPromoter(trena, "bogus", tssUpstream, tssDownstream)))
@@ -248,7 +248,7 @@ test_getProximalPromoterMouse <- function(){
     regions <- getProximalPromoter(trena, geneSymbol, tssUpstream, tssDownstream)
 
     # Check the type of data returned and its size
-    checkEquals(dim(regions), c(1,3))
+    checkEquals(dim(regions), c(1,4))
     checkEquals(class(regions), "data.frame")
 
     # Check the nominal values (tss = 88904257)

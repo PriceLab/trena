@@ -6,13 +6,13 @@
 \alias{getProximalPromoter}
 \title{Grab the region of the proximal promoter for a given gene symbol}
 \usage{
-\S4method{getProximalPromoter}{Trena}(obj, geneSymbol, tssUpstream = 1000,
+\S4method{getProximalPromoter}{Trena}(obj, geneSymbols, tssUpstream = 1000,
   tssDownstream = 1000)
 }
 \arguments{
 \item{obj}{An object of class Trena}
 
-\item{geneSymbol}{A gene of interest}
+\item{geneSymbols}{A vector containing genes of interest}
 
 \item{tssUpstream}{A designated distance upstream of the promoter to use as a shoulder
 (default = 1000)}

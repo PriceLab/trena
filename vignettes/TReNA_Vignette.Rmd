@@ -97,19 +97,22 @@ db.address <- system.file(package="trena", "extdata")
 genome.db.uri <- paste("sqlite:/",db.address,"mef2c.neighborhood.hg38.gtfAnnotation.db", sep = "/")
 project.db.uri <- paste("sqlite:/",db.address,"mef2c.neigborhood.hg38.footprints.db", sep = "/")
 
-# Create the specs for the gene region and retrieve it
-target.gene <- "MEF2C"
-size.upstream <- 1000
-size.downstream <- 1000
-trena <- Trena("hg38")
-gene.regions <- getProximalPromoter(trena, target.gene, size.upstream, size.downstream)
+# Create the specs for the MEF2C gene region
+tss <- 88904257
+start <- tss - 1000
+end <- tss + 1000
+chrom <- "chr5"
+gene.regions <- data.frame(chrom=chrom,
+                           start=start,
+                           end=end,
+                           stringsAsFactors = FALSE)
 
 # Create a filter using the geneCenteredSpec option
 footprint.filter <- FootprintFilter(genomeDB = genome.db.uri, footprintDB = project.db.uri,
 regions = gene.regions)
 
 # Run the getCandidates method
-tbl <- getCandidates(footprint.filter)
+tbl <- getCandidates(footprint.filter)[[1]]
 str(tbl)
 ```
 

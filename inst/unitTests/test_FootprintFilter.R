@@ -35,7 +35,7 @@ test_FootprintFilter.byRegion <- function()
                               tbl.regions,
                               quiet=TRUE)
     
-    tbl.out <- getCandidates(filter)
+    tbl.out <- getCandidates(filter)[[1]]
     min.fp.start <- min(tbl.out$start)
     max.fp.end   <- max(tbl.out$end)
     checkTrue(min.fp.start > (mef2c.tss - 1000))
@@ -71,7 +71,9 @@ test_FootprintFilter.byTwoRegions <- function()
                               recipe$regions,
                               quiet=TRUE)
     
-    tbl.out <- getCandidates(filter)
+    list.out <- getCandidates(filter)
+    checkTrue(length(list.out) == 2)
+    tbl.out <- rbind(list.out[[1]],list.out[[2]])
     min.fp.start <- min(tbl.out$fp_start)
     max.fp.end   <- max(tbl.out$fp_end)
     checkTrue(min.fp.start > (mef2c.tss - 1020))

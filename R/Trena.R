@@ -117,7 +117,8 @@ setMethod('getGeneModelTableColumnNames', 'Trena',
     chromLocString <- sprintf("%s:%d-%d", chromosome, chromStart, chromEnd)
     fpFilter <- FootprintFilter(genome.db.uri, source,
                                 regions=data.frame(chrom=chromosome, start=chromStart, end=chromEnd, stringsAsFactors=FALSE))
-    tbl.fp <- getCandidates(fpFilter)
+    list.fp <- getCandidates(fpFilter)
+    tbl.fp <- do.call("rbind",list.fp)
 
     if(nrow(tbl.fp) == 0){
         warning("no footprints found in %s:%d-%d, targetGene is %s", chromosome, chromStart, chromEnd, targetGene);
