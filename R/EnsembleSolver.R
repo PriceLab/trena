@@ -473,8 +473,9 @@ setMethod("run", "EnsembleSolver",
               
               if(class(tbl.augmented) == "try-error"){
                   #browser()
-                  warning("Signal strength of individual solvers is insufficient for adding
-composite scores. Try increasing your sample size")
+                  warning("The signal strength of ensemble of solvers is too weak to support
+composite scores ('pcaMax' and 'concordance' in the model output table. This is a classic
+'large n, small m' problem that could be rectified by providing more samples")
                   tbl.all$pcaMax <- NA
                   tbl.all$concordance <- NA
               } else {

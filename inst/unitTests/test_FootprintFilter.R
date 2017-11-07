@@ -84,7 +84,29 @@ test_FootprintFilter.byTwoRegions <- function()
     
     checkTrue(nrow(tbl.out) > 130)
     checkTrue(nrow(tbl.out) < 150)
+
+    # Make a Filter, but add a bogus region to the end
+    new.row <- data.frame(chrom = "chr0", start = 1, end = 2, stringsAsFactors = FALSE)
+    tbl.regions.2 <- rbind(tbl.regions, new.row)
+
+    recipe <- list(genomeDB=genome.db.uri,
+                   footprintDB=footprint.db.uri,
+                   regions=tbl.regions.2)
     
+    filter <- FootprintFilter(recipe$genomeDB,
+                              recipe$footprintDB,
+                              recipe$regions,
+                              quiet=TRUE)
+
+    # Check that it adds an empty DF as an entry
+    list.out <- getCandidates(filter)
+    checkTrue(length(list.out) == 3)
+    checkTrue(nrow(list.out[[3]]) == 0)
+
+    # Make a table that adds regions and make sure it's the same as before
+    tbl.out.2 <- rbind(list.out[[1]], list.out[[2]], list.out[[3]])
+    checkEquals(nrow(tbl.out), nrow(tbl.out.2))
+        
 } # test_FootprintFilter.byTwoRegions
 #----------------------------------------------------------------------------------------------------
 if(!interactive()) runTests()

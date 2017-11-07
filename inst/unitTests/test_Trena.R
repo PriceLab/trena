@@ -231,6 +231,10 @@ test_getProximalPromoterHuman <- function()
     # check with bogus gene symbol
     checkTrue(is.na(getProximalPromoter(trena, "bogus", tssUpstream, tssDownstream)))
 
+    # Test it on a list, with one real and one bogus, and make sure its the same as the first
+    regions.2 <- getProximalPromoter(trena, c(geneSymbol, "bogus"), tssUpstream, tssDownstream)
+    checkEquals(regions, regions.2)
+
 } # test_getProximalPromoterHuman
 #----------------------------------------------------------------------------------------------------
 test_getProximalPromoterMouse <- function(){
@@ -259,6 +263,10 @@ test_getProximalPromoterMouse <- function(){
 
     # check with bogus gene symbol
     checkTrue(is.na(getProximalPromoter(trena, "bogus", tssUpstream, tssDownstream)))
+
+    # Test it on a list, with one real and one bogus, and make sure its the same as the first
+    regions.2 <- getProximalPromoter(trena, c(geneSymbol, "bogus"), tssUpstream, tssDownstream)
+    checkEquals(regions, regions.2)
 
 } # test_getProximalPromoterMouse
 #----------------------------------------------------------------------------------------------------
