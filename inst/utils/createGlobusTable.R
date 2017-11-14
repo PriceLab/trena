@@ -1,17 +1,18 @@
 library(htmlTable)
 library(dplyr)
+library(RPostgreSQL)
 
 # Function for grabbing the list of databases currently on BDDS
 getAvailableDBs <- function(host){
-  
-  db <- dbConnect(PostgreSQL(), 
-                  user = "trena", 
-                  password = "trena", 
-                  host = host, 
+
+  db <- dbConnect(PostgreSQL(),
+                  user = "trena",
+                  password = "trena",
+                  host = host,
                   dbname = "hg38")
-  
+
   existing.databases <- dbGetQuery(db, "select datname from pg_database")[,1]
-  
+
   # Pull out the databases I want using a grep
   important.dbs <- grep("(hint|wellington)_(20|16)",existing.databases, value = TRUE)
   dbDisconnect(db)
@@ -19,7 +20,7 @@ getAvailableDBs <- function(host){
 }
 
 findApproxHits <- function(dbname, host){
-  
+
   # Specify the connection
   db <- dbConnect(PostgreSQL(),
                   user = 'trena',
