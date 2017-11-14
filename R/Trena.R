@@ -121,7 +121,8 @@ setMethod('getGeneModelTableColumnNames', 'Trena',
     tbl.fp <- do.call("rbind",list.fp)
 
     if(nrow(tbl.fp) == 0){
-        warning("no footprints found in %s:%d-%d, targetGene is %s", chromosome, chromStart, chromEnd, targetGene);
+       warning(sprintf("no footprints found in %s, region %s:%d-%d, targetGene is %s",
+                       source, chromosome, chromStart, chromEnd, targetGene));
         return(tbl.fp)
     }
 
@@ -355,31 +356,31 @@ setMethod("getProximalPromoter", "Trena",
                                 "hg38" = "hgnc_symbol",
                                 "mm10" = "mgi_symbol")
 
-              my.mart <- biomaRt::useMart(biomart="ensembl", dataset= db.name)              
-              
+              my.mart <- biomaRt::useMart(biomart="ensembl", dataset= db.name)
+
               tbl.geneInfo <- biomaRt::getBM(attributes=c("chromosome_name",
                                                           "transcription_start_site",
                                                           "transcript_tsl",
                                                           filter.name),
                                              filters=filter.name, value=geneSymbols, mart=my.mart)
-              
+
               if(nrow(tbl.geneInfo) == 0)
                   return(NA)
-              
+
               # Sort by hgnc_symbol and transcript_tsl, then pull the first entry for each gene
               tbl.geneInfo <- tbl.geneInfo[order(tbl.geneInfo[[filter.name]],
                                                  tbl.geneInfo$transcript_tsl),]
               tbl.geneInfo <- tbl.geneInfo[match(unique(tbl.geneInfo[[filter.name]]),
                                                  tbl.geneInfo[[filter.name]]),]
-              
+
               # remove contigs and check to make sure it's just 1 chromosome
               tbl.geneInfo <- subset(tbl.geneInfo, chromosome_name %in% c(1:22, "X", "Y", "MT"))
               chrom <- sprintf("chr%s", tbl.geneInfo$chromosome_name)
-              
+
               tss <- tbl.geneInfo$transcription_start_site
               start.loc <- tss - tssDownstream
               end.loc   <- tss + tssUpstream
-                    
+
               return (data.frame(geneSymbol=tbl.geneInfo[[filter.name]],
                                  chrom=chrom,
                                  start=start.loc,
