@@ -143,7 +143,7 @@ setMethod('getGeneModelTableColumnNames', 'Trena',
 {
     if(!obj@quiet) printf("--- in .callHumanDHS")
     chromLocString <- sprintf("%s:%d-%d", chromosome, chromStart, chromEnd)
-    dhsFilter <- HumanDHSFilter(genome="hg38",
+    dhsFilter <- HumanDHSFilter(genomeName="hg38",
                                 encodeTableName="wgEncodeRegDnaseClustered",
                                 pwmMatchPercentageThreshold=85L,
                                 geneInfoDatabase.uri=genome.db.uri,
@@ -354,34 +354,34 @@ setMethod("getProximalPromoter", "Trena",
                                 "hg38" = "hgnc_symbol",
                                 "mm10" = "mgi_symbol")
 
-              my.mart <- biomaRt::useMart(biomart="ensembl", dataset= db.name)              
-              
+              my.mart <- biomaRt::useMart(biomart="ensembl", dataset= db.name)
+
               tbl.geneInfo <- biomaRt::getBM(attributes=c("chromosome_name",
                                                           "transcription_start_site",
                                                           filter.name,
                                                           "strand"),
                                              filters=filter.name, value=geneSymbol, mart=my.mart)
-              
+
               if(nrow(tbl.geneInfo) == 0)
                   return(NA)
-              
+
               # make sure all transcripts are on the same strand
               strand <- unique(tbl.geneInfo$strand)
               stopifnot(length(strand) == 1)
               chrom <- sprintf("chr%s", unique(tbl.geneInfo$chromosome_name))
               stopifnot(length(chrom) == 1)
-              
+
               # assume + strand
               tss <- min(tbl.geneInfo$transcription_start_site)
               start.loc <- tss - tssUpstream
               end.loc   <- tss + tssDownstream
-              
+
               if(strand == -1){
                   tss <- max(tbl.geneInfo$transcription_start_site)
                   start.loc <- tss - tssDownstream
                   end.loc   <- tss + tssUpstream
               }
-                    
+
           return (data.frame(chrom=chrom, start=start.loc, end=end.loc, stringsAsFactors=FALSE))
 
           })# getProximalPromoter
@@ -441,7 +441,7 @@ setMethod('assessSnp', 'Trena',
 
               tbl.mut <- findMatchesByChromosomalRegion(motifMatcher, tbl.regions,
                                                         pwmMatchMinimumAsPercentage=pwmMatchMinimumAsPercentage,
-                                                        variant=variant)
+                                                        variants=variant)
               if(nrow(tbl.mut) == 0){
                   warning(sprintf("no motifs altered by %s with shoulder %d", variant, shoulder))
                   return(data.frame())
@@ -462,7 +462,7 @@ setMethod('assessSnp', 'Trena',
               relaxedMatchPercentage <- pwmMatchMinimumAsPercentage-relaxedMatchDelta
               tbl.wt.relaxed <- findMatchesByChromosomalRegion(motifMatcher, tbl.regions, relaxedMatchPercentage)
               tbl.wt.relaxed$signature <- sprintf("%s;%s;%s", tbl.wt.relaxed$motifName, tbl.wt.relaxed$motifStart, tbl.wt.relaxed$strand)
-              tbl.mut.relaxed <- findMatchesByChromosomalRegion(motifMatcher, tbl.regions, relaxedMatchPercentage, variant=variant)
+              tbl.mut.relaxed <- findMatchesByChromosomalRegion(motifMatcher, tbl.regions, relaxedMatchPercentage, variants=variant)
               tbl.mut.relaxed$signature <- sprintf("%s;%s;%s", tbl.mut.relaxed$motifName, tbl.mut.relaxed$motifStart, tbl.mut.relaxed$strand)
 
               signatures.in.both <- intersect(subset(tbl, status=="mut")$signature, subset(tbl, status=="wt")$signature)

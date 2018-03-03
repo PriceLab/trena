@@ -1,10 +1,9 @@
 library(trena)
 library(MotifDb)
 library(RUnit)
-
+Sys.setlocale("LC_ALL", "C")
 #----------------------------------------------------------------------------------------------------
 printf <- function(...) print(noquote(sprintf(...)))
-#sequence <- "ACCAGCATGCAAATTAGACAA"
 #----------------------------------------------------------------------------------------------------
 runTests <- function()
 {
@@ -396,7 +395,13 @@ test_findMatchesByChromosomalRegion <- function()
    checkEquals(best$match, "CATGCAAAT")
    checkEquals(best$chromStart, 57907313)
    checkEquals(best$chromEnd, 57907333)
+
+   printf("--- about to check best$seq");
+   print(best)
+       # mystery here.  in context of R CMD CHECK, best$seq is "ACCAGCATGCAAATTAGACAA"
+       #                when running this test interactively, it is "ACCAGCATGCAAATTAG..."
    checkEquals(best$seq, "ACCAGCATGCAAATTAGACAA")
+   #checkEquals(best$seq, "ACCAGCATGCAAATTAG...")
    checkEquals(best$status, "wt")
 
 } # test_findMatchesByChromosomalRegion
@@ -407,7 +412,7 @@ test_findMatchesByChromosomalRegion_contrastReferenceWithVariant <- function()
 
      # the vrk2 promoter snp,  chr2:57907313-57907333
 
-   jaspar.human.pfms <- as.list(query (query(MotifDb, "sapiens"), "jaspar"))
+   jaspar.human.pfms <- as.list(query (query(MotifDb, "sapiens"), "jaspar2016"))
 
    motifMatcher <- MotifMatcher(genomeName="hg38", pfms=jaspar.human.pfms, quiet=FALSE)
 
