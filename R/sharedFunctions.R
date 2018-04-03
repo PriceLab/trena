@@ -14,14 +14,13 @@
 #'
 #' @seealso \code{\link{glmnet}}
 #'
-#' @examples
-#' 
+#'
 
-.elasticNetSolver <-  function (obj, target.gene, tfs, tf.weights, alpha, lambda, keep.metrics){
+elasticNetSolver <-  function (obj, target.gene, tfs, tf.weights, alpha, lambda, keep.metrics){
 
     if(length(tfs) == 0)
         return(data.frame())
-    
+
     # we don't try to handle tf self-regulation
     deleters <- grep(target.gene, tfs)
     if(length(deleters) > 0){
@@ -45,8 +44,10 @@
         mtx.beta = stats::coef(fit)
         mtx.beta = data.frame( beta = mtx.beta[2] , intercept = mtx.beta[1])
         rownames(mtx.beta) = tfs
-        if( keep.metrics == FALSE ) return( mtx.beta )
-        if( keep.metrics == TRUE ) return( list( mtx.beta = mtx.beta , lambda = NA , r2 = cor.target.feature^2 ) )
+        return(mtx.beta)
+          # branching on keep.metrix disabled: cor.target.feature is neither defined nor assigned
+          # if( keep.metrics == FALSE ) return( mtx.beta )
+          #  if( keep.metrics == TRUE ) return( list( mtx.beta = mtx.beta , lambda = NA , r2 = cor.target.feature^2 ) )
     }
 
     if( length(lambda) == 0  ) {
@@ -60,20 +61,20 @@
         lambda.change <- 10^(-4)
         lambda <- 1
         lambda.list <- numeric(length=50)
-        
-        for(i in 1:length(lambda.list)){             
-            # Do a binary search             
-            step.size <- lambda/2 # Start at 0.5             
+
+        for(i in 1:length(lambda.list)){
+            # Do a binary search
+            step.size <- lambda/2 # Start at 0.5
             while(step.size > lambda.change){
-                
+
                 # Get the fit
                 fit <- glmnet(features, target.mixed, penalty.factor = tf.weights, alpha=alpha.perm, lambda=lambda)
-                
+
                 # Case 1: nonsense, need to lower lambda
                 if(max(fit$beta) < threshold){
                     lambda <- lambda - step.size
                 }
-                
+
                 # Case 2: sense, need to raise lambda
                 else{
                     lambda <- lambda + step.size
@@ -86,16 +87,16 @@
         }
         # Give lambda as 1 + 1se
         lambda <- mean(lambda.list) + (stats::sd(lambda.list)/sqrt(length(lambda.list)))
-        
+
         fit <- glmnet(features, target, penalty.factor=tf.weights, alpha=alpha, lambda=lambda)
-        
+
     }
 
     # For non-LASSO
     #        else{
-    #            fit <- cv.glmnet(features, target, penalty.factor=tf.weights, grouped=FALSE , alpha = alpha )         
-    #            lambda.min <- fit$lambda.min         
-    #            lambda <-fit$lambda.1se          
+    #            fit <- cv.glmnet(features, target, penalty.factor=tf.weights, grouped=FALSE , alpha = alpha )
+    #            lambda.min <- fit$lambda.min
+    #            lambda <-fit$lambda.1se
     #        }
 
     else if(is.numeric(lambda)){
@@ -110,10 +111,10 @@
     if(length(deleters) > 0)
         mtx.beta <- mtx.beta[-deleters, , drop=FALSE]
 
-    # put the intercept, admittedly with much redundancy, into its own column    
-    intercept <- mtx.beta[1,1]    
-    mtx.beta <- mtx.beta[-1, , drop=FALSE]    
-    mtx.beta <- cbind(mtx.beta, intercept=rep(intercept, nrow(mtx.beta)))    
+    # put the intercept, admittedly with much redundancy, into its own column
+    intercept <- mtx.beta[1,1]
+    mtx.beta <- mtx.beta[-1, , drop=FALSE]
+    mtx.beta <- cbind(mtx.beta, intercept=rep(intercept, nrow(mtx.beta)))
 
     #if(!obj@quiet)
     #   graphics::plot(fit.nolambda, xvar='lambda', label=TRUE)
@@ -133,6 +134,5 @@
 
     if( keep.metrics == FALSE )
         return(mtx.beta)
-}
-# ElasticNetSolver 
+} # elasticNetSolver
 #----------------------------------------------------------------------------------------------------

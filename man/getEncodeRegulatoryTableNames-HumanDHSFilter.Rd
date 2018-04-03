@@ -35,7 +35,7 @@ tbl.regions <- getProximalPromoter(trena, "VRK2", 1000, 1000)
 hd.filter <- HumanDHSFilter(genomeName, pwmMatchPercentageThreshold = 85,
 geneInfoDatabase.uri = genome.db.uri, regions = tbl.regions, pfms = jaspar.human)
 
-getEncodeRegulatoryTableNames(hd.filter) 
+getEncodeRegulatoryTableNames(hd.filter)
 }
 \seealso{
 \code{\link{HumanDHSFilter}}

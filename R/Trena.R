@@ -1,3 +1,5 @@
+#' @import MotifDb
+#' @import RPostgreSQL
 #----------------------------------------------------------------------------------------------------
 #' @name Trena-class
 #' @rdname Trena-class
@@ -145,7 +147,8 @@ setMethod('getGeneModelTableColumnNames', 'Trena',
 {
     if(!obj@quiet) printf("--- in .callHumanDHS")
     chromLocString <- sprintf("%s:%d-%d", chromosome, chromStart, chromEnd)
-    dhsFilter <- HumanDHSFilter(genome="hg38",
+    pfms <- as.list(query(query(MotifDb, "sapiens"), "jaspar2018"))
+    dhsFilter <- HumanDHSFilter(genomeName="hg38",
                                 encodeTableName="wgEncodeRegDnaseClustered",
                                 pwmMatchPercentageThreshold=85L,
                                 geneInfoDatabase.uri=genome.db.uri,
@@ -153,8 +156,7 @@ setMethod('getGeneModelTableColumnNames', 'Trena',
                                                    start=chromStart,
                                                    end=chromEnd,
                                                    stringsAsFactors=FALSE),
-                                pfms = as.list(query(query(MotifDb, "sapiens"),
-                                                     "jaspar2016"))
+                                pfms = pfms
                                 )
 
     tbl.dhs <- getCandidates(dhsFilter)
@@ -374,6 +376,7 @@ setMethod("getProximalPromoter", "Trena",
                                                  tbl.geneInfo[[filter.name]]),]
 
               # remove contigs and check to make sure it's just 1 chromosome
+              chromosome_name <- NULL
               tbl.geneInfo <- subset(tbl.geneInfo, chromosome_name %in% c(1:22, "X", "Y", "MT"))
               chrom <- sprintf("chr%s", tbl.geneInfo$chromosome_name)
 
@@ -424,7 +427,7 @@ setMethod('assessSnp', 'Trena',
           function(obj, pfms, variant, shoulder, pwmMatchMinimumAsPercentage, relaxedMatchDelta=25){
 
               motifMatcher <- MotifMatcher(genomeName=obj@genomeName, pfms=pfms, quiet=obj@quiet)
-              tbl.variant <- try(.parseVariantString(motifMatcher, variant), silent=TRUE)
+              tbl.variant <- try(.parseVariantString(motifMatcher, variantString=variant), silent=TRUE)
               if(is(tbl.variant, "try-error")){
                   printf("error, unrecognized variant name: '%s'", variant)
                   return(data.frame())
@@ -444,7 +447,7 @@ setMethod('assessSnp', 'Trena',
 
               tbl.mut <- findMatchesByChromosomalRegion(motifMatcher, tbl.regions,
                                                         pwmMatchMinimumAsPercentage=pwmMatchMinimumAsPercentage,
-                                                        variant=variant)
+                                                        variants=variant)
               if(nrow(tbl.mut) == 0){
                   warning(sprintf("no motifs altered by %s with shoulder %d", variant, shoulder))
                   return(data.frame())
@@ -465,9 +468,10 @@ setMethod('assessSnp', 'Trena',
               relaxedMatchPercentage <- pwmMatchMinimumAsPercentage-relaxedMatchDelta
               tbl.wt.relaxed <- findMatchesByChromosomalRegion(motifMatcher, tbl.regions, relaxedMatchPercentage)
               tbl.wt.relaxed$signature <- sprintf("%s;%s;%s", tbl.wt.relaxed$motifName, tbl.wt.relaxed$motifStart, tbl.wt.relaxed$strand)
-              tbl.mut.relaxed <- findMatchesByChromosomalRegion(motifMatcher, tbl.regions, relaxedMatchPercentage, variant=variant)
+              tbl.mut.relaxed <- findMatchesByChromosomalRegion(motifMatcher, tbl.regions, relaxedMatchPercentage, variants=variant)
               tbl.mut.relaxed$signature <- sprintf("%s;%s;%s", tbl.mut.relaxed$motifName, tbl.mut.relaxed$motifStart, tbl.mut.relaxed$strand)
 
+              status <- NULL   # workaround "no global binding" error
               signatures.in.both <- intersect(subset(tbl, status=="mut")$signature, subset(tbl, status=="wt")$signature)
               signatures.only.in.wt <- setdiff(subset(tbl, status=="wt")$signature, subset(tbl, status=="mut")$signature)
               signatures.only.in.mut <- setdiff(subset(tbl, status=="mut")$signature, subset(tbl, status=="wt")$signature)
@@ -491,7 +495,11 @@ setMethod('assessSnp', 'Trena',
 
               tbl$delta <- 0
 
-              # find the mut scores for each of the "wt.only" entries, subtract from the wt score
+                 # find the mut scores for each of the "wt.only" entries, subtract from the wt score
+                 # workaround "no visible binding"
+              assessed <- NULL
+              motifRelativeScore <- NULL
+
               tbl.wt.only  <- subset(tbl, assessed=="wt.only", select=c(signature, motifRelativeScore))
               if(nrow(tbl.wt.only) > 0){
                   sigs <- tbl.wt.only$signature

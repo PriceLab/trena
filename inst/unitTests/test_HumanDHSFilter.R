@@ -1,6 +1,7 @@
 library(trena)
 library(MotifDb)
 library(RUnit)
+library(RPostgreSQL)
 #----------------------------------------------------------------------------------------------------
 printf <- function(...) print(noquote(sprintf(...)))
 mef2c.tss <- 88904257
@@ -121,6 +122,7 @@ test_basicConstructor <- function(reuse=FALSE)
                               pfms = as.list(query(query(MotifDb, "sapiens"),"jaspar2016")),
                               regions=regions)),
                     silent = TRUE)
+
    if(reuse)
       return(hdf)
 
@@ -140,6 +142,7 @@ test_getEncodeRegulatoryTableNames <- function()
                               regions=regions))
 
     names <- getEncodeRegulatoryTableNames(hdf)
+
     checkTrue(length(names) > 90)   # 96 on (18 oct 2017)
 
 } # test_getEncodeRegulatoryTableNames
@@ -177,6 +180,7 @@ test_checkSampleOfEncodeTables <- function(quiet=TRUE)
       checkTrue(nrow(tbl) >= 0)
       checkEquals(colnames(tbl), c("chrom", "chromStart", "chromEnd",  "count",  "score"))
       }
+
 
 } # test_checkSampleOfEncodeTables
 #----------------------------------------------------------------------------------------------------

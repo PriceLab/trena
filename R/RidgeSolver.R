@@ -4,7 +4,7 @@
 #' @include Solver.R
 #' @import glmnet
 #' @import methods
-#' 
+#'
 #' @name RidgeSolver-class
 #' @rdname RidgeSolver-class
 
@@ -17,7 +17,7 @@
                          )
 #----------------------------------------------------------------------------------------------------
 #' Create a Solver class object using the Ridge solver
-#' 
+#'
 #' @param mtx.assay An assay matrix of gene expression data
 #' @param targetGene A designated target gene that should be part of the mtx.assay data
 #' @param candidateRegulators The designated set of transcription factors that could be associated
@@ -38,9 +38,9 @@
 #' @seealso  \code{\link{solve.Ridge}}, \code{\link{getAssayData}}
 #'
 #' @family Solver class objects
-#' 
+#'
 #' @export
-#' 
+#'
 #' @examples
 #' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
 #' target.gene <- "MEF2C"
@@ -54,10 +54,10 @@ RidgeSolver <- function(mtx.assay=matrix(), targetGene, candidateRegulators,
 {
     if(any(grepl(targetGene, candidateRegulators)))
         candidateRegulators <- candidateRegulators[-grep(targetGene, candidateRegulators)]
-    
+
     candidateRegulators <- intersect(candidateRegulators, rownames(mtx.assay))
     stopifnot(length(candidateRegulators) > 0)
-    
+
     obj <- .RidgeSolver(Solver(mtx.assay=mtx.assay,
                                quiet=quiet,
                                targetGene=targetGene,
@@ -68,11 +68,11 @@ RidgeSolver <- function(mtx.assay=matrix(), targetGene, candidateRegulators,
                         keep.metrics = keep.metrics
                         )
     obj
-    
+
 } # RidgeSolver, the constructor
 #----------------------------------------------------------------------------------------------------
 #' Show the Ridge Solver
-#' 
+#'
 #' @rdname show.RidgeSolver
 #' @aliases show.RidgeSolver
 #'
@@ -97,7 +97,7 @@ setMethod('show', 'RidgeSolver',
               }
               else
                   regulatorString <- paste(getRegulators(object), collapse=",")
-              
+
               msg = sprintf("RidgeSolver with mtx.assay (%d, %d), targetGene %s, %d candidate regulators %s, alpha = %f",
                             nrow(getAssayData(object)), ncol(getAssayData(object)),
                             getTarget(object), regulator.count, regulatorString, object@alpha)
@@ -108,7 +108,7 @@ setMethod('show', 'RidgeSolver',
 #'
 #' @rdname solve.Ridge
 #' @aliases run.RidgeSolver solve.Ridge
-#' 
+#'
 #' @description Given a TReNA object with Ridge Regression as the solver,
 #' use the \code{\link{glmnet}} function to estimate coefficients
 #' for each transcription factor as a predictor of the target gene's expression level.
@@ -121,7 +121,7 @@ setMethod('show', 'RidgeSolver',
 #' @seealso \code{\link{glmnet}}, , \code{\link{RidgeSolver}}
 #'
 #' @family solver methods
-#' 
+#'
 #' @examples
 #' # Load included Alzheimer's data, create a TReNA object with Bayes Spike as solver, and solve
 #' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
@@ -133,16 +133,16 @@ setMethod('show', 'RidgeSolver',
 setMethod("run", "RidgeSolver",
 
           function (obj){
-              
+
               mtx <- getAssayData(obj)
               target.gene <- getTarget(obj)
-              tfs <- getRegulators(obj)    
-              
-              mtx.beta <- .elasticNetSolver(obj, target.gene, tfs,
-                                            obj@regulatorWeights,
-                                            obj@alpha,
-                                            obj@lambda,
-                                            obj@keep.metrics)
+              tfs <- getRegulators(obj)
+
+              mtx.beta <- elasticNetSolver(obj, target.gene, tfs,
+                                           obj@regulatorWeights,
+                                           obj@alpha,
+                                           obj@lambda,
+                                           obj@keep.metrics)
               return(mtx.beta)
           })
 #----------------------------------------------------------------------------------------------------

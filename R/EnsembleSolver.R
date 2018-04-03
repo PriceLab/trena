@@ -1,8 +1,8 @@
-#----------------------------------------------------------------------------------------------------
 #' Class EnsembleSolver
 #'
-#' @include Solver.R
 #' @import methods
+#' @import utils
+#' @include Solver.R
 #'
 #' @name EnsembleSolver-class
 #'
@@ -84,14 +84,14 @@ EnsembleSolver <- function(mtx.assay=matrix(), targetGene, candidateRegulators,
 {
     if(any(grepl(targetGene, candidateRegulators)))
         candidateRegulators <- candidateRegulators[-grep(targetGene, candidateRegulators)]
-    
+
     candidateRegulators <- intersect(candidateRegulators, rownames(mtx.assay))
     stopifnot(length(candidateRegulators) > 0)
-    
+
     # Send a warning if there's a row of zeros
     if(!is.na(max(mtx.assay)) & any(rowSums(mtx.assay) == 0))
         warning("One or more gene has zero expression; this may cause difficulty when using Bayes Spike. You may want to try 'lasso' or 'ridge' instead.")
-    
+
     obj <- .EnsembleSolver(Solver(mtx.assay = mtx.assay,
                                   targetGene = targetGene,
                                   candidateRegulators = candidateRegulators,
@@ -106,7 +106,7 @@ EnsembleSolver <- function(mtx.assay=matrix(), targetGene, candidateRegulators,
                            nCores.sqrt = nCores.sqrt,
                            nOrderings.bayes = nOrderings.bayes)
     obj
-    
+
 } # EnsembleSolver, the constructor
 #----------------------------------------------------------------------------------------------------
 #' Show the Ensemble Solver
@@ -126,7 +126,7 @@ EnsembleSolver <- function(mtx.assay=matrix(), targetGene, candidateRegulators,
 #' show(ensemble.solver)
 
 setMethod('show', 'EnsembleSolver',
-          
+
           function(object) {
               regulator.count <- length(getRegulators(object))
               if(regulator.count > 10){
@@ -135,7 +135,7 @@ setMethod('show', 'EnsembleSolver',
               }
               else
                   regulatorString <- paste(getRegulators(object), collapse=",")
-              
+
               msg = sprintf("EnsembleSolver with mtx.assay (%d, %d), targetGene %s, %d candidate regulators %s,  solvers: %s",
                             nrow(getAssayData(object)), ncol(getAssayData(object)),
                             getTarget(object), regulator.count, regulatorString,
@@ -159,12 +159,12 @@ setMethod('show', 'EnsembleSolver',
 #' candidateRegulators <- setdiff(rownames(mtx.sub), targetGene)
 #' solver <- EnsembleSolver(mtx.sub, targetGene, candidateRegulators,
 #' solverNames = c("lasso","randomForest"))
-#' solver.names <- getSolverNames(solver) 
+#' solver.names <- getSolverNames(solver)
 
 #' @export
 
 setMethod("getSolverNames", "EnsembleSolver",
-          
+
           function (obj){
               obj@solverNames
           })
@@ -219,28 +219,28 @@ setMethod("getSolverNames", "EnsembleSolver",
 setMethod("run", "EnsembleSolver",
 
           function(obj){
-              
+
               mtx <- getAssayData(obj)
               target.gene <- getTarget(obj)
               tfs <- getRegulators(obj)
               gene.cutoff <- obj@geneCutoff
-              
+
               # Create a list of solvers and a list for solutions
               out.list <- list()
               solver.list <- tolower(getSolverNames(obj))
-              
+
               # Intersect with the accepted solvers
               accepted.solvers <- c("bayesspike", "lassopv", "lasso", "pearson",
                                     "ridge", "randomforest", "spearman", "sqrtlasso")
               not.accepted <- setdiff(solver.list, accepted.solvers)
               solver.list <- intersect(solver.list, accepted.solvers)
-              
+
               # If there's no valid solvers, exit with an error
               if(length(solver.list) == 0){
                   stop("No valid solvers supplied;
                        Run getAvailableSolvers() to see all available solvers")
               }
-              
+
               # If there's any invalid solvers, throw a warning
               if(length(not.accepted) > 0){
                   not.accepted <- paste(not.accepted,collapse = ", ")
@@ -249,12 +249,12 @@ setMethod("run", "EnsembleSolver",
                                       not.accepted)
                   warning(warn.msg)
               }
-              
+
               # If there's only 1 solver, catch it, send a warning, and run THAT solver
               if(length(solver.list) == 1){
-                  
+
                   # Capture the correct solver
-                  solver <- switch(solver.list,                                   
+                  solver <- switch(solver.list,
                                    "lasso" = LassoSolver(mtx, target.gene, tfs,
                                                          alpha = obj@alpha.lasso, lambda = obj@lambda.lasso),
                                    "randomforest" = RandomForestSolver(mtx, target.gene, tfs),
@@ -267,20 +267,20 @@ setMethod("run", "EnsembleSolver",
                                    "lassopv" = LassoPVSolver(mtx, target.gene, tfs),
                                    "ridge" = RidgeSolver(mtx, target.gene, tfs,
                                                          alpha = obj@alpha.ridge, lambda = obj@lambda.ridge))
-                  
+
                   # Send a specific warning message
                   warn.message <- sprintf("Only one solver(%s) was provided. Running %s instead",
                                           solver.list, class(solver)[1])
                   warning(warn.message)
-                  
+
                   # Run the solver
                   tbl.single <- run(solver)
-                  
+
                   # Return the output of the solver
                   return(tbl.single)
               }
-              
-              
+
+
               for(i in 1:length(solver.list)){
                   # Find the correct solver
                   solver <- switch(solver.list[i],
@@ -296,12 +296,12 @@ setMethod("run", "EnsembleSolver",
                                    "lassopv" = LassoPVSolver(mtx, target.gene, tfs),
                                    "ridge" = RidgeSolver(mtx, target.gene, tfs,
                                                          alpha = obj@alpha.ridge, lambda = obj@lambda.ridge))
-                  
+
                   # Solve each Solver object and save it to the output list
                   out.list[[i]] <- run(solver)
                   names(out.list)[i] <- paste("out",tolower(solver.list[[i]]),sep=".")
               }
-              
+
               # Output lasso with beta
               if("lasso" %in% tolower(solver.list)){
                   out.list$out.lasso$gene <- rownames(out.list$out.lasso)
@@ -311,7 +311,7 @@ setMethod("run", "EnsembleSolver",
                   lasso.med <- stats::median(out.list$out.lasso$betaLasso)
                   lasso.scale <- stats::mad(out.list$out.lasso$betaLasso)
               }
-              
+
               # Output randomforest IncNodePurity
               if("randomforest" %in% tolower(solver.list)){
                   out.list$out.randomforest$gene <- rownames(out.list$out.randomforest)
@@ -322,7 +322,7 @@ setMethod("run", "EnsembleSolver",
                   randomforest.scale <- sqrt(mean(
                       out.list$out.randomforest$rfScore*out.list$out.randomforest$rfScore))
               }
-              
+
               # Output the z-score from bayesspike
               if("bayesspike" %in% tolower(solver.list)){
                   out.list$out.bayesspike$gene <- rownames(out.list$out.bayesspike)
@@ -332,7 +332,7 @@ setMethod("run", "EnsembleSolver",
                   bayesspike.med <- stats::median(out.list$out.bayesspike$bayesScore)
                   bayesspike.scale <- stats::mad(out.list$out.bayesspike$bayesScore)
               }
-              
+
               # Pearson
               if("pearson" %in% tolower(solver.list)){
                   out.list$out.pearson$gene <- rownames(out.list$out.pearson)
@@ -341,7 +341,7 @@ setMethod("run", "EnsembleSolver",
                   pearson.med <- stats::median(out.list$out.pearson$pearsonCoeff)
                   pearson.scale <- stats::mad(out.list$out.pearson$pearsonCoeff)
               }
-              
+
               #Spearman
               if("spearman" %in% tolower(solver.list)){
                   out.list$out.spearman$gene <- rownames(out.list$out.spearman)
@@ -350,7 +350,7 @@ setMethod("run", "EnsembleSolver",
                   spearman.med <- stats::median(out.list$out.spearman$spearmanCoeff)
                   spearman.scale <- stats::mad(out.list$out.spearman$spearmanCoeff)
               }
-              
+
               #LassoPV
               if("lassopv" %in% tolower(solver.list)){
                   out.list$out.lassopv$gene <- rownames(out.list$out.lassopv)
@@ -361,7 +361,7 @@ setMethod("run", "EnsembleSolver",
                   lassopv.med <- stats::median(p.log10)
                   lassopv.scale <- sqrt(mean(p.log10*p.log10))
               }
-              
+
               #SqrtLasso
               if("sqrtlasso" %in% tolower(solver.list)){
                   out.list$out.sqrtlasso$gene <- rownames(out.list$out.sqrtlasso)
@@ -371,7 +371,7 @@ setMethod("run", "EnsembleSolver",
                   sqrtlasso.med <- stats::median(out.list$out.sqrtlasso$betaSqrtLasso)
                   sqrtlasso.scale <- stats::mad(out.list$out.sqrtlasso$betaSqrtLasso)
               }
-              
+
               #Ridge
               if("ridge" %in% tolower(solver.list)){
                   out.list$out.ridge$gene <- rownames(out.list$out.ridge)
@@ -381,27 +381,27 @@ setMethod("run", "EnsembleSolver",
                   ridge.med <- stats::median(out.list$out.ridge$betaRidge)
                   ridge.scale <- stats::mad(out.list$out.ridge$betaRidge)
               }
-              
+
               # Grab all genes for each solver to start with
               how.many <- length(tfs)
               top.list <- lapply(out.list, function(x) head(x$gene, how.many))
               all.genes <- unique(as.character(unlist(top.list)))
-              
+
               # Run same thing in a while loop until the cutoff or 10 is reached
               while(length(all.genes) > gene.cutoff * length(tfs) & length(all.genes) > 10){
-                  
+
                   how.many <- round(0.75*how.many)
                   top.list <- lapply(out.list, function(x) utils::head(x$gene, how.many))
                   all.genes <- unique(as.character(unlist(top.list)))
               }
-              
+
               # Pull out the specified genes
               sub.list <- list()
               for(i in 1:length(out.list)){
-                  
+
                   sub.list[[i]] <- subset(out.list[[i]], out.list[[i]]$gene %in% all.genes)
               }
-              
+
               # Merge the tables
               tbl.all <- merge(sub.list[[1]], sub.list[[2]], by = "gene", all = TRUE)
               if(length(sub.list) > 2){
@@ -409,68 +409,68 @@ setMethod("run", "EnsembleSolver",
                       tbl.all <- merge(tbl.all, sub.list[[i]], by = "gene", all = TRUE)
                   }
               }
-              
+
               # Replace missing values and scale the data
               # Use the *.med and *.scale values to center/scale everything
               tbl.all[is.na(tbl.all)] <- 0
               tbl.scale <- tbl.all[,-1]
-              
+
               if("lassoPValue" %in% names(tbl.scale)){
                   tbl.scale$lassoPValue <- -log10(tbl.scale$lassoPValue)
                   tbl.scale$lassoPValue <- scale(tbl.scale$lassoPValue,
                                                    center = lassopv.med,
                                                    scale = lassopv.scale)
               }
-              
+
               if("betaLasso" %in% names(tbl.scale)){
                   tbl.scale$betaLasso <- scale(tbl.scale$betaLasso,
                                                 center = lasso.med,
                                                 scale = lasso.scale)
               }
-              
+
               if("betaRidge" %in% names(tbl.scale)){
                   tbl.scale$betaRidge <- scale(tbl.scale$betaRidge,
                                                 center = ridge.med,
                                                 scale = ridge.scale)
               }
-              
+
               if("pearsonCoeff" %in% names(tbl.scale)){
                   tbl.scale$pearsonCoeff <- scale(tbl.scale$pearsonCoeff,
                                                    center = pearson.med,
                                                    scale = pearson.scale)
               }
-              
+
               if("spearmanCoeff" %in% names(tbl.scale)){
                   tbl.scale$spearmanCoeff <- scale(tbl.scale$spearmanCoeff,
                                                     center = spearman.med,
                                                     scale = spearman.scale)
               }
-              
+
               if("betaSqrtLasso" %in% names(tbl.scale)){
                   tbl.scale$betaSqrtLasso <- scale(tbl.scale$betaSqrtLasso,
                                                     center = sqrtlasso.med,
                                                     scale = sqrtlasso.scale)
               }
-              
+
               if("bayesScore" %in% names(tbl.scale)){
                   tbl.scale$bayesScore <- scale(tbl.scale$bayesScore,
                                              center = bayesspike.med,
                                              scale = bayesspike.scale)
               }
-              
+
               if("rfScore" %in% names(tbl.scale)){
                   tbl.scale$rfScore <- scale(tbl.scale$rfScore,
                                               center = randomforest.med,
                                               scale = randomforest.scale)
               }
-              
+
               rownames(tbl.scale) <- tbl.all$gene
-              
+
               tbl.augmented <- try(.addEnsembleScores(tbl.scale, tbl.all), silent = TRUE)
-              
+
               # If you get new scores, add them;
               # Else, just keep the old table and throw a warning
-              
+
               if(class(tbl.augmented) == "try-error"){
                   #browser()
                   warning("The signal strength of ensemble of solvers is too weak to support
@@ -481,17 +481,17 @@ composite scores ('pcaMax' and 'concordance' in the model output table. This is 
               } else {
                   tbl.all <- tbl.augmented
               }
-              
+
               # Regardless of output, return the table of scores
               return(tbl.all)
-              
+
           })
 #----------------------------------------------------------------------------------------------------
 .addEnsembleScores <- function(tbl.scale, tbl.all) {
-    
+
     # Compute the scaled "concordance score"
     pca <- stats::prcomp(tbl.scale, center=FALSE, scale.=FALSE)
-    
+
     pca$x <- pca$x / sqrt(length(which(pca$sdev > 0.1)))
     concordance <- apply(pca$x[, pca$sdev > 0.1, drop=FALSE], 1,
                          function(x) {sqrt(mean((2*atan(x)/pi)^2))})
@@ -499,17 +499,17 @@ composite scores ('pcaMax' and 'concordance' in the model output table. This is 
     concordance$gene <- rownames(concordance)
     rownames(concordance) <- NULL
     tbl.all <- merge(tbl.all, concordance, by = "gene", all = TRUE)
-    
+
     # Transform via PCA and compute the pcaMax score
     pcaMax <- apply(pca$x[, pca$sdev > 0.1, drop=FALSE],1, function(x) {sqrt(mean(x*x))})
     pcaMax <- as.data.frame(pcaMax)
     pcaMax$gene <- rownames(pcaMax)
     rownames(pcaMax) <- NULL
     tbl.all <- merge(tbl.all, pcaMax, by = "gene", all = TRUE)
-    
+
     # Sort by pcaMax
     tbl.all <- tbl.all[order(tbl.all$pcaMax, decreasing = TRUE),]
-    
+
     return(tbl.all)
 }
 #----------------------------------------------------------------------------------------------------

@@ -24,5 +24,5 @@ targetGene <- "MEF2C"
 candidateRegulators <- setdiff(rownames(mtx.sub), targetGene)
 solver <- EnsembleSolver(mtx.sub, targetGene, candidateRegulators,
 solverNames = c("lasso","randomForest"))
-solver.names <- getSolverNames(solver) 
+solver.names <- getSolverNames(solver)
 }

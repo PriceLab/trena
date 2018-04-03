@@ -3,7 +3,7 @@
 #' @import glmnet
 #' @include Solver.R
 #' @import methods
-#' 
+#'
 #' @name LassoSolver-class
 
 .LassoSolver <- setClass("LassoSolver",
@@ -36,9 +36,9 @@
 #' @seealso  \code{\link{solve.Lasso}}, \code{\link{getAssayData}}
 #'
 #' @family Solver class objects
-#' 
+#'
 #' @export
-#' 
+#'
 #' @examples
 #' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
 #' target.gene <- "MEF2C"
@@ -52,10 +52,10 @@ LassoSolver <- function(mtx.assay=matrix(), targetGene, candidateRegulators,
 {
     if(any(grepl(targetGene, candidateRegulators)))
         candidateRegulators <- candidateRegulators[-grep(targetGene, candidateRegulators)]
-    
+
     candidateRegulators <- intersect(candidateRegulators, rownames(mtx.assay))
     stopifnot(length(candidateRegulators) > 0)
-    
+
     obj <- .LassoSolver(Solver(mtx.assay=mtx.assay,
                                quiet=quiet,
                                targetGene=targetGene,
@@ -65,11 +65,11 @@ LassoSolver <- function(mtx.assay=matrix(), targetGene, candidateRegulators,
                         lambda = lambda,
                         keep.metrics = keep.metrics
                         )
-    obj    
+    obj
 } # LassoSolver, the constructor
 #----------------------------------------------------------------------------------------------------
 #' Show the Lasso Solver
-#' 
+#'
 #' @rdname show.LassoSolver
 #' @aliases show.LassoSolver
 #'
@@ -85,7 +85,7 @@ LassoSolver <- function(mtx.assay=matrix(), targetGene, candidateRegulators,
 #' show(lasso.solver)
 
 setMethod('show', 'LassoSolver',
-          
+
           function(object) {
               regulator.count <- length(getRegulators(object))
               if(regulator.count > 10){
@@ -94,7 +94,7 @@ setMethod('show', 'LassoSolver',
               }
               else
                   regulatorString <- paste(getRegulators(object), collapse=",")
-              
+
               msg = sprintf("LassoSolver with mtx.assay (%d, %d), targetGene %s, %d candidate regulators %s, alpha = %f",
                             nrow(getAssayData(object)), ncol(getAssayData(object)),
                             getTarget(object), regulator.count, regulatorString, object@alpha)
@@ -105,7 +105,7 @@ setMethod('show', 'LassoSolver',
 #'
 #' @rdname solve.Lasso
 #' @aliases run.LassoSolver solve.Lasso
-#' 
+#'
 #' @description Given a LassoSolver object, use the \code{\link{glmnet}} function
 #' to estimate coefficients for each transcription factor as a predictor of the target gene's
 #' expression level.
@@ -127,18 +127,18 @@ setMethod('show', 'LassoSolver',
 #' tbl <- run(lasso.solver)
 
 setMethod("run", "LassoSolver",
-          
+
           function (obj){
-              
+
               mtx <- getAssayData(obj)
               target.gene <- getTarget(obj)
               tfs <- getRegulators(obj)
-              
-              mtx.beta <- .elasticNetSolver(obj, target.gene, tfs,
-                                            obj@regulatorWeights,
-                                            obj@alpha,
-                                            obj@lambda,
-                                            obj@keep.metrics)
+
+              mtx.beta <- elasticNetSolver(obj, target.gene, tfs,
+                                           obj@regulatorWeights,
+                                           obj@alpha,
+                                           obj@lambda,
+                                           obj@keep.metrics)
               return(mtx.beta)
           })
 #----------------------------------------------------------------------------------------------------
