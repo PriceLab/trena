@@ -215,24 +215,20 @@ test_getProximalPromoterHuman <- function()
     tssUpstream <- 1000
     tssDownstream <- 1000
 
-    # Pull the regions for MEF2C
+       # Pull the regions for MEF2C
     regions <- getProximalPromoter(trena, geneSymbol, tssUpstream, tssDownstream)
 
-    # Check the type of data returned and its size
+       # Check the type of data returned and its size
     checkEquals(dim(regions), c(1,4))
     checkEquals(class(regions), "data.frame")
+    checkEquals(with(regions,  end - start), tssUpstream + tssDownstream)
 
-    # Check the nominal values (tss = 88904257 OR 88883464)
-    tss <- 88904257
-    checkEquals(regions$chrom, "chr5")
-    checkTrue(regions$start > 88882000)
-    checkTrue(regions$end < 88906000)
-
-    # check with bogus gene symbol
+      # check with bogus gene symbol
     checkTrue(is.na(getProximalPromoter(trena, "bogus", tssUpstream, tssDownstream)))
 
     # Test it on a list, with one real and one bogus, and make sure its the same as the first
-    regions.2 <- getProximalPromoter(trena, c(geneSymbol, "bogus"), tssUpstream, tssDownstream)
+    genes.of.interest <- c(geneSymbol, "bogus")
+    regions.2 <- getProximalPromoter(trena, genes.of.interest, tssUpstream, tssDownstream)
     checkEquals(regions, regions.2)
 
 } # test_getProximalPromoterHuman
