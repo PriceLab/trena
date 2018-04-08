@@ -11,7 +11,7 @@ mef2c.promoter.string <- with(mef2c.promoter.region, sprintf("%s:%d-%d", chrom, 
 runTests <- function()
 {
    test_basicConstructor()
-   test_getEncodeRegulatoryTableNames()
+   notest_getEncodeRegulatoryTableNames()
    test_checkSampleOfEncodeTables(quiet=FALSE)
 
    test_getRegulatoryRegions()
@@ -128,7 +128,8 @@ test_basicConstructor <- function(reuse=FALSE)
 
 } # test_basicConstructor
 #----------------------------------------------------------------------------------------------------
-test_getEncodeRegulatoryTableNames <- function()
+# takes > 5 seconds, bioc check
+notest_getEncodeRegulatoryTableNames <- function()
 {
    printf("--- test_getEncodeRegulatoryTableNames")
 

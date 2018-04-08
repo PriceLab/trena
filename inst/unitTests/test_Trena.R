@@ -24,8 +24,8 @@ runTests <- function()
 
     test_createGeneModel()
 
-    test_getProximalPromoterHuman()
-    test_getProximalPromoterMouse()
+    notest_getProximalPromoterHuman()
+    notest_getProximalPromoterMouse()
 
     checkEquals(openPostgresConnections(), 0)
 
@@ -204,7 +204,7 @@ test_createGeneModel <- function()
 
 } # test_createGeneModel
 #----------------------------------------------------------------------------------------------------
-test_getProximalPromoterHuman <- function()
+notest_getProximalPromoterHuman <- function()
 {
     printf("--- test_getProximalPromoterHuman")
 
@@ -233,7 +233,7 @@ test_getProximalPromoterHuman <- function()
 
 } # test_getProximalPromoterHuman
 #----------------------------------------------------------------------------------------------------
-test_getProximalPromoterMouse <- function(){
+notest_getProximalPromoterMouse <- function(){
 
     printf("--- test_getProximalPromoterMouse")
 
