@@ -42,10 +42,12 @@
 #' @export
 #'
 #' @examples
-#' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
-#' target.gene <- "MEF2C"
-#' tfs <- setdiff(rownames(mtx.sub), target.gene)
-#' ridge.solver <- RidgeSolver(mtx.sub, target.gene, tfs)
+#' \dontrun{
+#'    load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+#'    target.gene <- "MEF2C"
+#'    tfs <- setdiff(rownames(mtx.sub), target.gene)
+#'    ridge.solver <- RidgeSolver(mtx.sub, target.gene, tfs)
+#'    }
 
 RidgeSolver <- function(mtx.assay=matrix(), targetGene, candidateRegulators,
                         regulatorWeights = rep(1, length(candidateRegulators)),

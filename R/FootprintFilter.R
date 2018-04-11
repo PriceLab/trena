@@ -40,28 +40,30 @@ printf <- function(...) print(noquote(sprintf(...)))
 #' @family Filtering Objects
 #'
 #' @examples
-#' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
-#' db.address <- system.file(package="trena", "extdata")
-#' genome.db.uri <- paste("sqlite:/",db.address,"mef2c.neighborhood.hg38.gtfAnnotation.db", sep = "/")
-#' project.db.uri <- paste("sqlite:/",db.address,"mef2c.neigborhood.hg38.footprints.db", sep = "/")
-#' target.gene <- "MEF2C"
-#' size.upstream <- 1000
-#' size.downstream <- 1000
+#' \dontrun{
+#'    load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+#'    db.address <- system.file(package="trena", "extdata")
+#'    genome.db.uri <- paste("sqlite:/",db.address,"mef2c.neighborhood.hg38.gtfAnnotation.db", sep = "/")
+#'    project.db.uri <- paste("sqlite:/",db.address,"mef2c.neigborhood.hg38.footprints.db", sep = "/")
+#'    target.gene <- "MEF2C"
+#'    size.upstream <- 1000
+#'    size.downstream <- 1000
 #'
-#' # Construct a Trena object and use it to retrive the regions
-#' trena <- Trena("hg38")
-#' regions <- getProximalPromoter(trena,target.gene, size.upstream, size.downstream)
-#'  
-#' footprint.filter <- FootprintFilter(genomeDB = genome.db.uri, footprintDB = project.db.uri,
-#' regions = regions)
+#'       # Construct a Trena object and use it to retrive the regions
+#'    trena <- Trena("hg38")
+#'    regions <- getProximalPromoter(trena,target.gene, size.upstream, size.downstream)
+#'
+#'    footprint.filter <- FootprintFilter(genomeDB = genome.db.uri, footprintDB = project.db.uri,
+#'                                        regions = regions)
+#'    }
 
 FootprintFilter <- function(genomeDB, footprintDB, regions=data.frame(), quiet=TRUE)
-{    
+{
     .FootprintFilter(CandidateFilter(quiet = quiet),
                      genomeDB=genomeDB,
                      footprintDB=footprintDB,
                      regions=regions)
-    
+
 } # FootprintFilter, the constructor
 #----------------------------------------------------------------------------------------------------
 #' Get candidate genes using the footprint filter
@@ -83,28 +85,27 @@ FootprintFilter <- function(genomeDB, footprintDB, regions=data.frame(), quiet=T
 #'
 #' # Use footprint filter with the included SQLite database for MEF2C to filter candidates
 #' # in the included Alzheimer's dataset, using the Trena object to get regions
-#' target.gene <- "MEF2C"
-#' db.address <- system.file(package="trena", "extdata")
-#' genome.db.uri <- paste("sqlite:/",db.address,"mef2c.neighborhood.hg38.gtfAnnotation.db", sep = "/")
-#' project.db.uri <- paste("sqlite:/",db.address,"mef2c.neigborhood.hg38.footprints.db", sep = "/")
-#' size.upstream <- 1000
-#' size.downstream <- 1000
-#'
-#' # Construct a Trena object and use it to retrive the regions
-#' trena <- Trena("hg38")
-#' regions <- getProximalPromoter(trena,target.gene, size.upstream, size.downstream)
-#'
-#' footprint.filter <- FootprintFilter(genomeDB = genome.db.uri, footprintDB = project.db.uri,
-#' regions = regions)
-#' footprints <- getCandidates(footprint.filter)
+#' \dontrun{
+#'    target.gene <- "MEF2C"
+#'    db.address <- system.file(package="trena", "extdata")
+#'    genome.db.uri <- paste("sqlite:/",db.address,"mef2c.neighborhood.hg38.gtfAnnotation.db", sep = "/")
+#'    project.db.uri <- paste("sqlite:/",db.address,"mef2c.neigborhood.hg38.footprints.db", sep = "/")
+#'    size.upstream <- 1000
+#'    size.downstream <- 1000
+#'       # Construct a Trena object and use it to retrive the regions
+#'    trena <- Trena("hg38")
+#'    regions <- getProximalPromoter(trena,target.gene, size.upstream, size.downstream)
+#'    footprint.filter <- FootprintFilter(genomeDB = genome.db.uri, footprintDB = project.db.uri,
+#'                                        regions = regions)
+#'    footprints <- getCandidates(footprint.filter)
+#'    }
 
 setMethod("getCandidates", "FootprintFilter",
 
           function(obj){
-              
+
               # Retrieve the FootprintFinder object and find the footprints
               fp <- FootprintFinder(obj@genomeDB, obj@footprintDB)
-#              tbl.out <- data.frame()
 
               # Assume the regions are all different genes; put them into a list
               tbl.out <- list()
@@ -125,7 +126,7 @@ setMethod("getCandidates", "FootprintFilter",
                   #                  tbl.out <- rbind(tbl.out, tbl.fp)
                   tbl.out[[r]] <- tbl.fp
               } # for region
-              
+
               # Close the DB connections and return the tabl
               closeDatabaseConnections(fp)
               return(tbl.out)

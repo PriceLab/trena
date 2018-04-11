@@ -11,7 +11,7 @@ mef2c.promoter.string <- with(mef2c.promoter.region, sprintf("%s:%d-%d", chrom, 
 runTests <- function()
 {
    test_basicConstructor()
-   notest_getEncodeRegulatoryTableNames()
+   test_getEncodeRegulatoryTableNames()
    test_checkSampleOfEncodeTables(quiet=FALSE)
 
    test_getRegulatoryRegions()
@@ -96,6 +96,8 @@ create.vrk2.rs13384219.variant.candidateFilterSpec <- function(shoulder=10)
 #----------------------------------------------------------------------------------------------------
 test_basicConstructor <- function(reuse=FALSE)
 {
+   if(!interactive()) return(TRUE)
+
    if(!reuse)  printf("--- test_basicConstructor")
 
    candidateFilterSpec <- create.vrk2.candidateFilterSpec()
@@ -129,8 +131,10 @@ test_basicConstructor <- function(reuse=FALSE)
 } # test_basicConstructor
 #----------------------------------------------------------------------------------------------------
 # takes > 5 seconds, bioc check
-notest_getEncodeRegulatoryTableNames <- function()
+test_getEncodeRegulatoryTableNames <- function()
 {
+   if(!interactive()) return(TRUE)
+
    printf("--- test_getEncodeRegulatoryTableNames")
 
    candidateFilterSpec <- create.vrk2.candidateFilterSpec()
@@ -150,6 +154,8 @@ notest_getEncodeRegulatoryTableNames <- function()
 #----------------------------------------------------------------------------------------------------
 test_checkSampleOfEncodeTables <- function(quiet=TRUE)
 {
+   if(!interactive()) return(TRUE)
+
    printf("--- test_checkSampleOfEncodeTables")
 
    candidateFilterSpec <- create.vrk2.candidateFilterSpec()
@@ -219,6 +225,8 @@ explore.ucsc.database <- function()
 #----------------------------------------------------------------------------------------------------
 test_getRegulatoryRegions <- function()
 {
+   if(!interactive()) return(TRUE)
+
    printf("--- test_getRegulatoryRegions");
 
    hdf <- test_basicConstructor(reuse=TRUE)
@@ -291,6 +299,8 @@ test_getRegulatoryRegions <- function()
 #----------------------------------------------------------------------------------------------------
 test_getCandidates.emptyRegion <- function()
 {
+   if(!interactive()) return(TRUE)
+
     printf("--- test_getCandidates.emptyRegion")
 
     db.address <- system.file(package="trena", "extdata")
@@ -310,6 +320,8 @@ test_getCandidates.emptyRegion <- function()
 #----------------------------------------------------------------------------------------------------
 test_getCandidates.vrk2.twoRegions <- function()
 {
+   if(!interactive()) return(TRUE)
+
    printf("--- test_getCandidates.vrk2.twoRegions")
 
    cfSpec <- create.vrk2.candidateFilterSpec.twoRegions()
@@ -370,6 +382,8 @@ test_getCandidates.vrk2.twoRegions <- function()
 #----------------------------------------------------------------------------------------------------
 test_getCandidates.vrk2.rs13384219.variant <- function()
 {
+   if(!interactive()) return(TRUE)
+
    printf("--- test_getCandidates.vrk2.rs13384219.variant")
    cfSpec <- create.vrk2.rs13384219.variant.candidateFilterSpec()
 
