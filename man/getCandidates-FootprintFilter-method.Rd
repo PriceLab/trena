@@ -22,20 +22,20 @@ Get candidate genes using the footprint filter
 
 # Use footprint filter with the included SQLite database for MEF2C to filter candidates
 # in the included Alzheimer's dataset, using the Trena object to get regions
-target.gene <- "MEF2C"
-db.address <- system.file(package="trena", "extdata")
-genome.db.uri <- paste("sqlite:/",db.address,"mef2c.neighborhood.hg38.gtfAnnotation.db", sep = "/")
-project.db.uri <- paste("sqlite:/",db.address,"mef2c.neigborhood.hg38.footprints.db", sep = "/")
-size.upstream <- 1000
-size.downstream <- 1000
-
-# Construct a Trena object and use it to retrive the regions
-trena <- Trena("hg38")
-regions <- getProximalPromoter(trena,target.gene, size.upstream, size.downstream)
-
-footprint.filter <- FootprintFilter(genomeDB = genome.db.uri, footprintDB = project.db.uri,
-regions = regions)
-footprints <- getCandidates(footprint.filter)
+\dontrun{
+   target.gene <- "MEF2C"
+   db.address <- system.file(package="trena", "extdata")
+   genome.db.uri <- paste("sqlite:/",db.address,"mef2c.neighborhood.hg38.gtfAnnotation.db", sep = "/")
+   project.db.uri <- paste("sqlite:/",db.address,"mef2c.neigborhood.hg38.footprints.db", sep = "/")
+   size.upstream <- 1000
+   size.downstream <- 1000
+      # Construct a Trena object and use it to retrive the regions
+   trena <- Trena("hg38")
+   regions <- getProximalPromoter(trena,target.gene, size.upstream, size.downstream)
+   footprint.filter <- FootprintFilter(genomeDB = genome.db.uri, footprintDB = project.db.uri,
+                                       regions = regions)
+   footprints <- getCandidates(footprint.filter)
+   }
 }
 \seealso{
 \code{\link{FootprintFilter}}

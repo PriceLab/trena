@@ -28,7 +28,9 @@ For the genome of a given Trena object, retrieve a data frame containing the reg
 surrounding a target gene.
 }
 \examples{
-# Retrieve the proximal promoter for MEF2C using a shoulder size of 2000 on each side
-trena <- Trena("hg38")
-regions <- getProximalPromoter(trena, "MEF2C", 2000, 2000)
+if(interactive()) {  # too slow for the bioc windows build
+   # Retrieve the proximal promoter for MEF2C using a shoulder size of 2000 on each side
+   trena <- Trena("hg38")
+   regions <- getProximalPromoter(trena, "MEF2C", 2000, 2000)
+   }
 }

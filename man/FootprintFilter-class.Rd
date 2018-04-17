@@ -30,20 +30,22 @@ a FootprintFilter object can be used to filter a list of possible transcription 
 that match footprint motifs for a supplied target gene.
 }
 \examples{
-load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
-db.address <- system.file(package="trena", "extdata")
-genome.db.uri <- paste("sqlite:/",db.address,"mef2c.neighborhood.hg38.gtfAnnotation.db", sep = "/")
-project.db.uri <- paste("sqlite:/",db.address,"mef2c.neigborhood.hg38.footprints.db", sep = "/")
-target.gene <- "MEF2C"
-size.upstream <- 1000
-size.downstream <- 1000
+\dontrun{
+   load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+   db.address <- system.file(package="trena", "extdata")
+   genome.db.uri <- paste("sqlite:/",db.address,"mef2c.neighborhood.hg38.gtfAnnotation.db", sep = "/")
+   project.db.uri <- paste("sqlite:/",db.address,"mef2c.neigborhood.hg38.footprints.db", sep = "/")
+   target.gene <- "MEF2C"
+   size.upstream <- 1000
+   size.downstream <- 1000
 
-# Construct a Trena object and use it to retrive the regions
-trena <- Trena("hg38")
-regions <- getProximalPromoter(trena,target.gene, size.upstream, size.downstream)
- 
-footprint.filter <- FootprintFilter(genomeDB = genome.db.uri, footprintDB = project.db.uri,
-regions = regions)
+      # Construct a Trena object and use it to retrive the regions
+   trena <- Trena("hg38")
+   regions <- getProximalPromoter(trena,target.gene, size.upstream, size.downstream)
+
+   footprint.filter <- FootprintFilter(genomeDB = genome.db.uri, footprintDB = project.db.uri,
+                                       regions = regions)
+   }
 }
 \seealso{
 \code{\link{getCandidates-FootprintFilter}}

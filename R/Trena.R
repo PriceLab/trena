@@ -277,24 +277,26 @@ setMethod('getRegulatoryChromosomalRegions', 'Trena',
 #' @export
 #'
 #' @examples
-#' # Create a Trena object for human and make a gene model for "MEF2C" using a footprint filter
-#' trena <- Trena("hg38")
-#' chromosome <- "chr5"
-#' mef2c.tss <- 88904257
-#' loc.start <- mef2c.tss - 1000
-#' loc.end   <- mef2c.tss + 1000
+#' if(interactive()){  # takes too long for the bioconductor build
+#'    # Create a Trena object for human and make a gene model for "MEF2C" using a footprint filter
+#'    trena <- Trena("hg38")
+#'    chromosome <- "chr5"
+#'    mef2c.tss <- 88904257
+#'    loc.start <- mef2c.tss - 1000
+#'    loc.end   <- mef2c.tss + 1000
 #'
-#' database.filename <- system.file(package="trena", "extdata", "mef2c.neigborhood.hg38.footprints.db")
-#' database.uri <- sprintf("sqlite://%s", database.filename)
-#' sources <- c(database.uri)
-#' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+#'    database.filename <- system.file(package="trena", "extdata", "mef2c.neigborhood.hg38.footprints.db")
+#'    database.uri <- sprintf("sqlite://%s", database.filename)
+#'    sources <- c(database.uri)
+#'    load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
 #'
-#' motifs.list <- getRegulatoryChromosomalRegions(trena, chromosome, mef2c.tss-1000, mef2c.tss+1000,
-#' sources, "MEF2C", mef2c.tss)
+#'    motifs.list <- getRegulatoryChromosomalRegions(trena, chromosome, mef2c.tss-1000, mef2c.tss+1000,
+#'    sources, "MEF2C", mef2c.tss)
 #'
-#' library(MotifDb)
-#' tbl.motifs.tfs <- associateTranscriptionFactors(MotifDb, motifs.list[[1]], source="MotifDb", expand.rows=TRUE)
-#' model.mef2c <- createGeneModel(trena, "MEF2C", c("lasso","ridge","randomforest"), tbl.motifs.tfs, mtx.sub)
+#'    library(MotifDb)
+#'    tbl.motifs.tfs <- associateTranscriptionFactors(MotifDb, motifs.list[[1]], source="MotifDb", expand.rows=TRUE)
+#'    model.mef2c <- createGeneModel(trena, "MEF2C", c("lasso","ridge","randomforest"), tbl.motifs.tfs, mtx.sub)
+#'    } # if interactive
 
 
 setMethod('createGeneModel', 'Trena',
@@ -340,9 +342,11 @@ setMethod('createGeneModel', 'Trena',
 #' @export
 #'
 #' @examples
-#' # Retrieve the proximal promoter for MEF2C using a shoulder size of 2000 on each side
-#' trena <- Trena("hg38")
-#' regions <- getProximalPromoter(trena, "MEF2C", 2000, 2000)
+#' if(interactive()) {  # too slow for the bioc windows build
+#'    # Retrieve the proximal promoter for MEF2C using a shoulder size of 2000 on each side
+#'    trena <- Trena("hg38")
+#'    regions <- getProximalPromoter(trena, "MEF2C", 2000, 2000)
+#'    }
 
 setMethod("getProximalPromoter", "Trena",
 

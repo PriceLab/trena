@@ -43,20 +43,22 @@ to filter a list of possible regulators factors to those that match the supplied
 Create a CandidateFilter using Human DNAse Hypersensitivity
 }
 \examples{
-load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
-targetGene <- "VRK2"
-promoter.length <- 1000
-genomeName <- "hg38"
-db.address <- system.file(package="trena", "extdata")
-genome.db.uri    <- paste("sqlite:/", db.address, "vrk2.neighborhood.hg38.gtfAnnotation.db",  sep = "/")
+if(interactive()) { # takes too long in the bioc windows build
+  load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+  targetGene <- "VRK2"
+  promoter.length <- 1000
+  genomeName <- "hg38"
+  db.address <- system.file(package="trena", "extdata")
+  genome.db.uri    <- paste("sqlite:/", db.address, "vrk2.neighborhood.hg38.gtfAnnotation.db",  sep = "/")
 
-# Grab regions for VRK2 using shoulder size of 1000
-trena <- Trena(genomeName)
-tbl.regions <- getProximalPromoter(trena, "VRK2", 1000, 1000)
+    # Grab regions for VRK2 using shoulder size of 1000
+  trena <- Trena(genomeName)
+  tbl.regions <- getProximalPromoter(trena, "VRK2", 1000, 1000)
 
-hd.filter <- HumanDHSFilter(genomeName, pwmMatchPercentageThreshold = 85,
-geneInfoDatabase.uri = genome.db.uri, regions = tbl.regions,
-pfms = as.list(query(query(MotifDb, "sapiens"),"jaspar2016")))
+  hd.filter <- HumanDHSFilter(genomeName, pwmMatchPercentageThreshold = 85,
+  geneInfoDatabase.uri = genome.db.uri, regions = tbl.regions,
+   pfms = as.list(query(query(MotifDb, "sapiens"),"jaspar2016")))
+   } # if interactive
 }
 \seealso{
 \code{\link{getCandidates-HumanDHSFilter}},
