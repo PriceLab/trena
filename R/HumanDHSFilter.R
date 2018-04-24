@@ -9,7 +9,7 @@
 #' @include CandidateFilter.R
 #' @import methods
 #' @import BSgenome
-#' @import RMySQL
+### @importFrom RMySQL dbConnect dbListTables dbGetQuery dbListConnections dbDisconnect
 #' @import GenomicRanges
 #'
 #' @rdname HumanDHSFilter-class

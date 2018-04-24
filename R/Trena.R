@@ -1,5 +1,7 @@
 #' @import MotifDb
-#' @import RPostgreSQL
+#### @import RPostgreSQL
+#' @importFrom DBI   dbConnect dbListTables dbGetQuery dbListConnections dbDisconnect
+#' @importFrom RPostgreSQL dbConnect dbListTables dbGetQuery dbListConnections dbDisconnect
 #----------------------------------------------------------------------------------------------------
 #' @name Trena-class
 #' @rdname Trena-class

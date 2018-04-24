@@ -24,8 +24,8 @@ runTests <- function()
 
     test_createGeneModel()
 
-    notest_getProximalPromoterHuman()
-    notest_getProximalPromoterMouse()
+    test_getProximalPromoterHuman()
+    test_getProximalPromoterMouse()
 
     checkEquals(openPostgresConnections(), 0)
 
@@ -204,9 +204,12 @@ test_createGeneModel <- function()
 
 } # test_createGeneModel
 #----------------------------------------------------------------------------------------------------
-notest_getProximalPromoterHuman <- function()
+test_getProximalPromoterHuman <- function()
 {
     printf("--- test_getProximalPromoterHuman")
+
+    if(!interactive())
+       return(TRUE)
 
     trena <- Trena("hg38")
 
@@ -233,9 +236,12 @@ notest_getProximalPromoterHuman <- function()
 
 } # test_getProximalPromoterHuman
 #----------------------------------------------------------------------------------------------------
-notest_getProximalPromoterMouse <- function(){
+test_getProximalPromoterMouse <- function(){
 
     printf("--- test_getProximalPromoterMouse")
+
+    if(!interactive())
+       return(TRUE)
 
     trena <- Trena("mm10")
 
