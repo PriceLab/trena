@@ -382,7 +382,7 @@ test_findMatchesByChromosomalRegion <- function()
 
    tbl.regions <- data.frame(chrom="chr2", start=57907313, end=57907333, stringsAsFactors=FALSE)
    tbl.hits <- findMatchesByChromosomalRegion(motifMatcher, tbl.regions, pwmMatchMinimumAsPercentage=92)
-   checkEquals(dim(tbl.hits), c(5, 12))
+   checkEquals(dim(tbl.hits), c(5, 13))
    checkEquals(unique(tbl.hits$status), "wt")
 
       # the best match (longest, all bases in agreement with the motif:
@@ -399,8 +399,7 @@ test_findMatchesByChromosomalRegion <- function()
    checkEquals(best$match, "CATGCAAAT")
    checkEquals(best$chromStart, 57907313)
    checkEquals(best$chromEnd, 57907333)
-   printf("best$seq: %s", best$seq)
-   checkEquals(best$seq, "ACCAGCATGCAAATTAGACAA")
+   checkEquals(best$seq, "ACCAGCATGCAAATTAG...")
    checkEquals(best$status, "wt")
 
 } # test_findMatchesByChromosomalRegion
@@ -479,7 +478,7 @@ test_findMatchesByMultipleChromosomalRegions <- function()
    checkEquals(m1$match, "CAAATTAG")
    checkEquals(m1$chromStart, 57907313)
    checkEquals(m1$chromEnd, 57907333)
-   checkEquals(m1$seq, "ACCAGCATGCAAATTAGACAA")
+   checkEquals(m1$seq, "ACCAGCATGCAAATTAG...")
    checkEquals(m1$status, "wt")
 
    m2 <- as.list(tbl.hits[2,])
@@ -493,7 +492,7 @@ test_findMatchesByMultipleChromosomalRegions <- function()
    checkEquals(m2$match, "CTCCAC")
    checkEquals(m2$chromStart, 26864400)
    checkEquals(m2$chromEnd, 26864420)
-   checkEquals(m2$seq, "GCTCCACAGGGGGGTGGCCAG")
+   checkEquals(m2$seq, "GCTCCACAGGGGGGTGG...")
    checkEquals(m2$status, "wt")
 
       # now repeat with a looser match threshold
@@ -501,7 +500,7 @@ test_findMatchesByMultipleChromosomalRegions <- function()
    tbl.freq <- as.data.frame(table(tbl.hits2$chrom))
 
       # one match each found for these two regions at the stringent match threshold
-   checkEquals(dim(tbl.hits2), c(18, 12))
+   checkEquals(dim(tbl.hits2), c(18, 13))
       # two motifs from chr18, the rest from chr2
    checkEquals(nrow(subset(tbl.hits2, chrom=="chr18")), 1)
    checkEquals(nrow(subset(tbl.hits2, chrom=="chr2")), 17)
