@@ -22,7 +22,8 @@ runTests <- function()
     test_getRegulatoryRegions_encodeDHS()
     test_getRegulatoryRegions_twoFootprintSources()
 
-    test_createGeneModel()
+    test_createGeneModelFromRegulatoryRegions()
+    test_createGeneModelFromTfList()
 
     test_getProximalPromoterHuman()
     test_getProximalPromoterMouse()
@@ -171,13 +172,12 @@ openPostgresConnections <- function()
 
 } # openPostgresConnections
 #----------------------------------------------------------------------------------------------------
-test_createGeneModel <- function()
+test_createGeneModelFromRegulatoryRegions <- function()
 {
-
-    printf("--- test_createGeneModel")
+    printf("--- test_createGeneModelFromRegulatoryRegions")
 
     targetGene <- "MEF2C"
-    jaspar.human.pfms <- as.list(query(query(MotifDb, "jaspar2016"), "sapiens"))
+    jaspar.human.pfms <- as.list(query(MotifDb, "jaspar2016", "sapiens"))
     motifMatcher <- MotifMatcher(genomeName="hg38", pfms=jaspar.human.pfms)
 
     # pretend that all motifs are potentially active transcription sites - that is, ignore
@@ -186,23 +186,54 @@ test_createGeneModel <- function()
 
     tss <- 88825894
     tbl.region <- data.frame(chrom="chr5", start=tss-100, end=tss+500, stringsAsFactors=FALSE)
-    tbl.motifs <- findMatchesByChromosomalRegion(motifMatcher, tbl.region, pwmMatchMinimumAsPercentage=92)
-    tbl.motifs.tfs <- associateTranscriptionFactors(MotifDb, tbl.motifs, source="MotifDb", expand.rows=FALSE)
+    tbl.region <- data.frame(chrom="chr5", start=tss-5000, end=tss+5000, stringsAsFactors=FALSE)
+    tbl.motifs <- findMatchesByChromosomalRegion(motifMatcher, tbl.region, pwmMatchMinimumAsPercentage=85)
+    tbl.motifs.tfs <- associateTranscriptionFactors(MotifDb, tbl.motifs, source=c("MotifDb", "TFClass"), expand.rows=FALSE)
     solver.names <- c("lasso", "lassopv", "pearson", "randomForest", "ridge", "spearman")
     trena <- Trena("hg38")
-    tbl.geneModel <- createGeneModel(trena, targetGene, solver.names, tbl.motifs.tfs, mtx)
+
+       # very meager model results - but useful for testing nonetheless.
+    tbl.geneModel <- createGeneModelFromRegulatoryRegions(trena, targetGene, solver.names, tbl.motifs.tfs, mtx)
 
     checkTrue(is.data.frame(tbl.geneModel))
 
     expected.colnames <- c("gene", "betaLasso", "lassoPValue", "pearsonCoeff", "rfScore", "betaRidge",
                            "spearmanCoeff", "concordance", "pcaMax", "bindingSites")
     checkTrue(all(expected.colnames %in% colnames(tbl.geneModel)))
-    checkTrue(nrow(tbl.geneModel) == 3)
-    checkTrue("FOXC1" %in% tbl.geneModel$gene)
+    checkTrue(nrow(tbl.geneModel) > 100)
+    checkTrue(all(c("HLF", "STAT4", "SATB2") %in% tbl.geneModel$gene[1:10]))
 
     checkEquals(openPostgresConnections(), 0)
 
-} # test_createGeneModel
+} # test_createGeneModelFromRegulatoryRegions
+#----------------------------------------------------------------------------------------------------
+test_createGeneModelFromTfList <- function()
+{
+    printf("--- test_createGeneModelFromTfList")
+
+    targetGene <- "MEF2C"
+
+    solver.names <- c("lasso", "lassopv", "pearson", "randomForest", "ridge", "spearman")
+
+    candidate.tfs <-   c("HLF", "STAT4", "SATB2", "SATB1", "TSHZ3", "TSHZ2", "FOXP2",
+                         "FOXP1", "LHX6", "BACH1", "SOX12", "FOXD4L1", "NFE2L2", "ZHX3",
+                         "ZBTB16", "ZHX1", "TAF1", "STAT6", "POU4F1", "FOXD1", "ATF2",
+                         "BCL6B", "STAT5B", "NR5A2", "FOXE3", "STAT3", "ATF7", "STAT2")
+
+    trena <- Trena("hg38")
+
+    tbl.geneModel <- createGeneModelFromTfList(trena, targetGene, solver.names, candidate.tfs, mtx)
+    checkTrue(is.data.frame(tbl.geneModel))
+
+    expected.colnames <- c("gene", "betaLasso", "lassoPValue", "pearsonCoeff", "rfScore", "betaRidge",
+                           "spearmanCoeff", "concordance", "pcaMax", "bindingSites")
+    checkTrue(all(expected.colnames %in% colnames(tbl.geneModel)))
+    checkTrue(nrow(tbl.geneModel) > 25)
+    checkTrue(all(c("HLF", "STAT4", "SATB2") %in% tbl.geneModel$gene[1:10]))
+
+    checkEquals(openPostgresConnections(), 0)
+
+} # test_createGeneModelFromTfList
 #----------------------------------------------------------------------------------------------------
 test_getProximalPromoterHuman <- function()
 {
@@ -272,8 +303,6 @@ test_getProximalPromoterMouse <- function(){
 
 } # test_getProximalPromoterMouse
 #----------------------------------------------------------------------------------------------------
-# Unit tests and such
-
 test_assessSnp <- function()
 {
     printf("--- test_assessSnp")

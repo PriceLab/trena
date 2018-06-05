@@ -11,6 +11,8 @@ mef2c.promoter.string <- with(mef2c.promoter.region, sprintf("%s:%d-%d", chrom, 
 runTests <- function()
 {
    test_basicConstructor()
+   test_getOpenChromatinFastAndSimple()
+
    test_getEncodeRegulatoryTableNames()
    test_checkSampleOfEncodeTables(quiet=FALSE)
 
@@ -419,6 +421,26 @@ test_getCandidates.vrk2.rs13384219.variant <- function()
    checkEquals(length(setdiff(tbl.var$motifName, tbl.wt$motifName)),    2)
 
 } # test_getCandidates.vrk2.rs13384219.variant
+#------------------------------------------------------------------------------------------------------------------------
+# demonstrate an initially unanticipated use of this class: just get the open chromatin regions from ucsc.  a hack...
+test_getOpenChromatinFastAndSimple <- function()
+{
+   printf("--- test_getOpenChromatinFastAndSimple")
+
+   hdf <- HumanDHSFilter("hg38", "wgEncodeRegDnaseClustered", pwmMatchPercentageThreshold=0,
+                         geneInfoDatabase.uri="bogus", regions=data.frame(), pfms=list())
+   chrom <- "chr14"
+   start <- 91654248
+   end <-   93010778
+   tbl.dhs <- getRegulatoryRegions(hdf, "wgEncodeRegDnaseClustered", chrom, start, end)
+
+   checkEquals(colnames(tbl.dhs), c("chrom", "chromStart", "chromEnd", "count", "score"))
+   checkTrue(nrow(tbl.dhs) > 1200)
+   checkTrue(all(tbl.dhs$chrom == chrom))
+   checkTrue(all(tbl.dhs$start >= start))
+   checkTrue(all(tbl.dhs$end <= end))
+
+} # test_getOpenChromatinFastAndSimple
 #------------------------------------------------------------------------------------------------------------------------
 if(!interactive())
    runTests()

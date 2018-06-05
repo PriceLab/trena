@@ -23,8 +23,13 @@ setGeneric('getRegulatoryTableColumnNames',  signature='obj', function(obj) stan
 
 setGeneric('getGeneModelTableColumnNames',  signature='obj', function(obj) standardGeneric ('getGeneModelTableColumnNames'))
 
-setGeneric('createGeneModel', signature='obj', function(obj, targetGene,  solverNames, tbl.regulatoryRegions, mtx)
-    standardGeneric('createGeneModel'))
+setGeneric('createGeneModelFromRegulatoryRegions', signature='obj',
+           function(obj, targetGene,  solverNames, tbl.regulatoryRegions, mtx)
+              standardGeneric('createGeneModelFromRegulatoryRegions'))
+
+setGeneric('createGeneModelFromTfList', signature='obj',
+           function(obj, targetGene,  solverNames, tfList, mtx)
+              standardGeneric('createGeneModelFromTfList'))
 
 setGeneric('getProximalPromoter', signature='obj', function(obj, geneSymbols, tssUpstream, tssDownstream)
     standardGeneric('getProximalPromoter'))
@@ -265,8 +270,8 @@ setMethod('getRegulatoryChromosomalRegions', 'Trena',
 #----------------------------------------------------------------------------------------------------
 #' Create a model for a target gene using a Trena object
 #'
-#' @rdname createGeneModel
-#' @aliases createGeneModel
+#' @rdname createGeneModelFromRegulatoryRegions
+#' @aliases createGeneModelFromRegulatoryRegions
 #'
 #' @param obj An object of class Trena
 #' @param targetGene The name of a target gene to use for building a model
@@ -297,14 +302,16 @@ setMethod('getRegulatoryChromosomalRegions', 'Trena',
 #'
 #'    library(MotifDb)
 #'    tbl.motifs.tfs <- associateTranscriptionFactors(MotifDb, motifs.list[[1]], source="MotifDb", expand.rows=TRUE)
-#'    model.mef2c <- createGeneModel(trena, "MEF2C", c("lasso","ridge","randomforest"), tbl.motifs.tfs, mtx.sub)
+#'    model.mef2c <- createGeneModelFromRegulatoryRegions(trena, "MEF2C", c("lasso","ridge","randomforest"),
+#'                                                        tbl.motifs.tfs, mtx.sub)
 #'    } # if interactive
 
 
-setMethod('createGeneModel', 'Trena',
+setMethod('createGeneModelFromRegulatoryRegions', 'Trena',
 
           function(obj, targetGene, solverNames, tbl.regulatoryRegions, mtx){
 
+              stopifnot(is.data.frame(tbl.regulatoryRegions))
               stopifnot("geneSymbol" %in% colnames(tbl.regulatoryRegions))
               unique.tfs.from.regulatory.regions <- unique(tbl.regulatoryRegions$geneSymbol)
               tfs <- intersect(unique.tfs.from.regulatory.regions, rownames(mtx))
@@ -315,14 +322,68 @@ setMethod('createGeneModel', 'Trena',
               if(length(tfs) == 0)
                   return(data.frame())
 
-              solver <- EnsembleSolver(mtx, targetGene=targetGene, candidateRegulators=tfs, solverNames)
+             solver <- EnsembleSolver(mtx, targetGene=targetGene, candidateRegulators=tfs, solverNames,
+                                      geneCutoff=1)
               tbl.model <- run(solver)
               tbl.tf.frequencies <- as.data.frame(table(tbl.regulatoryRegions$geneSymbol))
               colnames(tbl.tf.frequencies) <- c("gene", "bindingSites")
               tbl.model <- merge(tbl.model, tbl.tf.frequencies, by="gene")
               tbl.model <- tbl.model[order(tbl.model$pcaMax, decreasing=TRUE),]
               tbl.model
-          }) # createGeneModel
+          }) # createGeneModelFromRegulatoryRegions
+
+#----------------------------------------------------------------------------------------------------
+#' Create a model for a target gene using a Trena object
+#'
+#' @rdname createGeneModelFromTfList
+#' @aliases createGeneModelFromTfList
+#'
+#' @param obj An object of class Trena
+#' @param targetGene The name of a target gene to use for building a model
+#' @param solverNames A character vector containing the solver names to be used for building the model
+#' @param tfList A character list, often the gene symbols for known transcription factors
+#' @param mtx An assay matrix of expression data
+#'
+#' @return A data frame containing the gene model
+#'
+#' @export
+#'
+#' @examples
+#' if(interactive()){  # takes too long for the bioconductor build
+#'    # Create a Trena object for human and make a gene model for "MEF2C" using a footprint filter
+#'    trena <- Trena("hg38")
+#'    chromosome <- "chr5"
+#'    mef2c.tss <- 88904257
+#'    loc.start <- mef2c.tss - 1000
+#'    loc.end   <- mef2c.tss + 1000
+#'
+#'    database.filename <- system.file(package="trena", "extdata", "mef2c.neigborhood.hg38.footprints.db")
+#'    database.uri <- sprintf("sqlite://%s", database.filename)
+#'    sources <- c(database.uri)
+#'    load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+#'
+#'    model.mef2c <- createGeneModelFromTfList(trena, "MEF2C", c("lasso","ridge","randomforest"),
+#'                                             tfList=c())
+#'    } # if interactive
+
+
+setMethod('createGeneModelFromTfList', 'Trena',
+
+     function(obj, targetGene, solverNames, tfList, mtx){
+
+        tfs <- unique(intersect(tfList, rownames(mtx)))
+        if(!obj@quiet)
+           printf("tf candidate count, also in mtx, from tfList: %d/%d", length(tfs), length(tfList))
+        if(length(tfs) == 0)
+            return(data.frame())
+        solver <- EnsembleSolver(mtx, targetGene=targetGene, candidateRegulators=tfs, solverNames,
+                                    geneCutoff=1)
+        tbl.model <- run(solver)
+        tbl.model$bindingSites <- NA
+        tbl.model <- tbl.model[order(tbl.model$pcaMax, decreasing=TRUE),]  # default ordering
+        tbl.model
+        }) # createGeneModelFromRegulatoryRegions
+
 #----------------------------------------------------------------------------------------------------
 #' Grab the region of the proximal promoter for a given gene symbol
 #'
@@ -463,10 +524,10 @@ setMethod('assessSnp', 'Trena',
               tbl.mut$signature <- sprintf("%s;%s;%s", tbl.mut$motifName, tbl.mut$motifStart, tbl.mut$strand)
 
               # comine wt and mut tables, reorder columns and rows for easier comprehension
-              tbl <- rbind(tbl.wt[, c(1,12,2,3,4,5,6,7,8,13)], tbl.mut[, c(1,12,2,3,4,5,6,7,8,13)])
+              tbl <- rbind(tbl.wt[, c(1,12,2,3,4,5,6,7,8,13, 14)], tbl.mut[, c(1,12,2,3,4,5,6,7,8,13, 14)])
               tbl <- tbl[order(tbl$motifName, tbl$motifRelativeScore, decreasing=TRUE),]
               #tbl$signature <- sprintf("%s;%s;%s", tbl$motifName, tbl$motifStart, tbl$strand)
-              tbl <- tbl[,c(1,2,3:10)]
+              #tbl <- tbl[,c(1,2,3:110)]
 
               # now look for less stringent matches.  these will be matched up with the
               # wt and mut motifs which do not yet have partners, thus enabling us to
@@ -485,19 +546,19 @@ setMethod('assessSnp', 'Trena',
               tbl$assessed <- rep("failed", nrow(tbl))
 
               if(length(signatures.in.both) > 0) {
-                  indices <- sort(unlist(lapply(signatures.in.both, function(sig) grep(sig, tbl$signature))))
-                  tbl$assessed[indices] <- "in.both"
-              }
+                 indices <- sort(unlist(lapply(signatures.in.both, function(sig) grep(sig, tbl$signature))))
+                 tbl$assessed[indices] <- "in.both"
+                 }
 
               if(length(signatures.only.in.wt) > 0) {
-                  indices <- sort(unlist(lapply(signatures.only.in.wt, function(sig) grep(sig, tbl$signature))))
-                  tbl$assessed[indices] <- "wt.only"
-              }
+                 indices <- sort(unlist(lapply(signatures.only.in.wt, function(sig) grep(sig, tbl$signature))))
+                 tbl$assessed[indices] <- "wt.only"
+                 }
 
               if(length(signatures.only.in.mut) > 0) {
-                  indices <- sort(unlist(lapply(signatures.only.in.mut, function(sig) grep(sig, tbl$signature))))
-                  tbl$assessed[indices] <- "mut.only"
-              }
+                 indices <- sort(unlist(lapply(signatures.only.in.mut, function(sig) grep(sig, tbl$signature))))
+                 tbl$assessed[indices] <- "mut.only"
+                 }
 
               tbl$delta <- 0
 

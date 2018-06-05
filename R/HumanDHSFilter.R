@@ -145,7 +145,7 @@ HumanDHSFilter <- function(genomeName,
 setMethod("getEncodeRegulatoryTableNames", "HumanDHSFilter",
 
           function(obj){
-              driver <- RMySQL::MySQL()
+              driver <- RMariaDB::MariaDB()
               host <- "genome-mysql.cse.ucsc.edu"
               user <- "genome"
               dbname <- obj@genomeName
@@ -160,7 +160,8 @@ setMethod("getEncodeRegulatoryTableNames", "HumanDHSFilter",
                                        NA)
               if(clusteredTable %in% all.tableNames)
                   tableNames <- c(clusteredTable, tableNames)
-              lapply(dbListConnections(driver), DBI::dbDisconnect)
+              #lapply(DBI::dbListConnections(driver), DBI::dbDisconnect)
+              dbDisconnect(db)
               invisible(tableNames)
           })
 #----------------------------------------------------------------------------------------------------
@@ -338,7 +339,8 @@ setMethod("getRegulatoryRegions", "HumanDHSFilter",
 
           function(obj, encode.table.name, chromosome, start, end, score.threshold=0) {
 
-              driver <- RMySQL::MySQL()
+              #driver <- RMySQL::MySQL()
+              driver <- RMariaDB::MariaDB()
               host <- "genome-mysql.cse.ucsc.edu"
               user <- "genome"
               dbname <- obj@genomeName
@@ -404,7 +406,8 @@ setMethod("getRegulatoryRegions", "HumanDHSFilter",
                   } # small region query, within DHS region
               } # small region, extension search
 
-              lapply(dbListConnections(driver), dbDisconnect)
+              dbDisconnect(db)
+              # lapply(DBI::dbListConnections(driver), dbDisconnect)
 
               tbl.regions$chrom <- as.character(tbl.regions$chrom)
 
