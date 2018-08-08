@@ -13,7 +13,7 @@
 
 #------------------------------------------------------------------------------------------------------------------------
 setGeneric("normalizeModel",   signature="obj", function(obj, normalizing.max=10) standardGeneric ("normalizeModel"))
-setGeneric("addStats",         signature="obj", function(obj) standardGeneric ("addStats"))
+setGeneric("addStats",         signature="obj", function(obj, varianceToInclude=0.75, scalePCA=FALSE) standardGeneric ("addStats"))
 setGeneric("getCoverage",      signature="obj", function(obj) standardGeneric ("getCoverage"))
 #------------------------------------------------------------------------------------------------------------------------
 #' Create a PCAMax object from a data.frame produced by the EnsembleSolver
@@ -40,6 +40,7 @@ PCAMax <- function(tbl, tfIdentifierColumnName="tf.hgnc")
     rownames(tbl.trimmed) <- tbl[, tfIdentifierColumnName]
     state <- new.env(parent=emptyenv())
     state$coverage <- 0
+    state$tbl.orig <- tbl
     .pcaMax(tbl=tbl.trimmed, solverNames=standardSolverNames, state=state)
 
 } # PCAMax ctor
@@ -91,25 +92,48 @@ setMethod('normalizeModel', 'PCAMax',
 #'
 setMethod('addStats', 'PCAMax',
 
-     function(obj){
+     function(obj, varianceToInclude=0.75, scalePCA=FALSE){
+        stopifnot(varianceToInclude > 0)
         mtx <- obj@state$normalizedMatrix
-        pca <- prcomp(mtx)
+        pca <- prcomp(mtx, scale=scalePCA)
+            #
+        if(varianceToInclude > 0.95)
+           numberOfComponents <- length(pca$sdev)
+        numberOfComponents <- which(cumsum(pca$sdev/sum(pca$sdev) ) > varianceToInclude)[1]
+        obj@state$pca <- pca
         mtx.pca <- pca$x
          # coverage: the variance covered by the first two components
         obj@state$coverage <- sum(pca$sdev[1:2]) / sum(pca$sdev)
         mean <- apply(mtx, 1, function(row) mean(abs(row)))
         mtx.2 <- cbind(mtx, mean)
         rms <- apply(mtx, 1, function(row) sqrt(mean(row * row)))
-        pcaMax <- as.numeric(apply(mtx.pca, 1, function(row) sqrt((row[1] * row[1]) + (row[2] * row[2]))))
-        mtx.3 <- cbind(mtx.2, rms)
-        mtx.4 <- cbind(mtx.3, mtx.pca[, 1:2])
-        mtx.5 <- cbind(mtx.4, pcaMax)
+        calc.pc.vector.length <- function(row, numberOfComponents){
+           sum.of.squares <- 0
+           for(i in seq_len(numberOfComponents)){
+              new.sum <- row[i] * row[i]
+              sum.of.squares <- sum.of.squares + new.sum
+              }
+           sqrt(sum.of.squares/numberOfComponents)
+           }
+        pcaMax <- as.numeric(apply(mtx.pca, 1, function(row) calc.pc.vector.length(row, numberOfComponents)))
+        #mtx.3 <- cbind(mtx.2, rms)
+        #mtx.4 <- cbind(mtx.3, mtx.pca[, 1:2])
+        #mtx.5 <- cbind(mtx.4, pcaMax)
           #  use coefficient of variation to desribe the dispersion (agreement) of the data
         covar <- apply(mtx, 1, function(row) sd(abs(row))/mean(abs(row)))
-        mtx.6 <- cbind(mtx.5, covar)
-        mtx.7 <- mtx.6[order(mtx.6[, "pcaMax"], decreasing=TRUE),]
-        obj@state$normalizedMatrixWithStats <- mtx.7
-        mtx.7
+        #mtx.6 <- cbind(mtx.5, covar)
+        #mtx.7 <- mtx.6[order(mtx.6[, "pcaMax"], decreasing=TRUE),]
+        #obj@state$normalizedMatrixWithStats <- mtx.7
+        tbl.out <- obj@state$tbl.orig
+        existing.pcaMax.column <- grep("pcaMax", colnames(tbl.out))
+        if(length(existing.pcaMax.column) > 0)
+           tbl.out <- tbl.out[, -existing.pcaMax.column]
+        tbl.out <- cbind(tbl.out, pcaMax)
+        tbl.out$covar <- covar
+        tbl.out <- tbl.out[order(tbl.out$pcaMax, decreasing=TRUE),]
+        tbl.out$rank <- seq_len(nrow(tbl.out))
+
+        tbl.out
         })
 
 #------------------------------------------------------------------------------------------------------------------------

@@ -92,8 +92,11 @@ test_addStats <- function()
 
    x <- PCAMax(tbl.mef2c)
    mtx <- normalizeModel(x, normalizing.max=10)
-   mtx.pca <- addStats(x)
-   checkTrue(getCoverage(x) > 0.75)
+   tbl.05 <- addStats(x, varianceToInclude=0.5, scalePCA=TRUE)
+   tbl.10 <- addStats(x, varianceToInclude=.99, scalePCA=FALSE)
+   checkEquals(head(tbl.05$tf.hgnc), c("GABPA", "SMAD5", "STAT4", "TCF12", "TBR1", "PKNOX2"))
+   checkEquals(head(tbl.10$tf.hgnc), c("GABPA", "SMAD5", "TCF12", "STAT4", "TBR1", "PKNOX2"))
+
    # mtx.summary <- apply(mtx, 2, fivenum)
 
 } # test_normalizeModel
