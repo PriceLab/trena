@@ -4,7 +4,8 @@
 \alias{elasticNetSolver}
 \title{Run the Elastic Net Solvers}
 \usage{
-elasticNetSolver(obj, target.gene, tfs, tf.weights, alpha, lambda, keep.metrics)
+elasticNetSolver(obj, target.gene, tfs, tf.weights, alpha, lambda,
+  keep.metrics)
 }
 \arguments{
 \item{obj}{An object of class Solver}

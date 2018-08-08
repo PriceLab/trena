@@ -6,7 +6,8 @@
 \alias{getFootprintsInRegion}
 \title{Get Footprints in a Region}
 \usage{
-\S4method{getFootprintsInRegion}{FootprintFinder}(obj, chromosome, start, end)
+\S4method{getFootprintsInRegion}{FootprintFinder}(obj, chromosome, start,
+  end)
 }
 \arguments{
 \item{obj}{An object of class FootprintFinder}
@@ -44,3 +45,4 @@ Other FootprintFinder methods: \code{\link{FootprintFinder-class}},
   \code{\link{getGtfMoleculeTypes,FootprintFinder-method}},
   \code{\link{getPromoterRegionsAllGenes,FootprintFinder-method}}
 }
+\concept{FootprintFinder methods}

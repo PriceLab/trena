@@ -5,7 +5,6 @@
 \alias{CandidateFilter-class}
 \alias{.CandidateFilter}
 \alias{CandidateFilter}
-\alias{CandidateFilter}
 \title{CandidateFilter}
 \usage{
 CandidateFilter(quiet = TRUE)
@@ -34,3 +33,4 @@ candidate.filter <- CandidateFilter(quiet=TRUE)
 \seealso{
 \code{\link{getCandidates}}
 }
+\concept{Filtering objects}

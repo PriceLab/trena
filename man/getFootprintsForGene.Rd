@@ -7,8 +7,8 @@
 \title{Get Footprints for Gene}
 \usage{
 \S4method{getFootprintsForGene}{FootprintFinder}(obj, gene,
-  size.upstream = 1000, size.downstream = 0, biotype = "protein_coding",
-  moleculetype = "gene")
+  size.upstream = 1000, size.downstream = 0,
+  biotype = "protein_coding", moleculetype = "gene")
 }
 \arguments{
 \item{obj}{An object of class FootprintFinder}
@@ -51,3 +51,4 @@ Other FootprintFinder methods: \code{\link{FootprintFinder-class}},
   \code{\link{getGtfMoleculeTypes,FootprintFinder-method}},
   \code{\link{getPromoterRegionsAllGenes,FootprintFinder-method}}
 }
+\concept{FootprintFinder methods}

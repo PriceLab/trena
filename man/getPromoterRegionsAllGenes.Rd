@@ -7,7 +7,8 @@
 \title{Get Promoter Regions for All Genes}
 \usage{
 \S4method{getPromoterRegionsAllGenes}{FootprintFinder}(obj,
-  size.upstream = 10000, size.downstream = 10000, use_gene_ids = TRUE)
+  size.upstream = 10000, size.downstream = 10000,
+  use_gene_ids = TRUE)
 }
 \arguments{
 \item{obj}{An object of class FootprintFinder}
@@ -45,3 +46,4 @@ Other FootprintFinder methods: \code{\link{FootprintFinder-class}},
   \code{\link{getGtfGeneBioTypes,FootprintFinder-method}},
   \code{\link{getGtfMoleculeTypes,FootprintFinder-method}}
 }
+\concept{FootprintFinder methods}

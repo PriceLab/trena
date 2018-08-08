@@ -5,7 +5,6 @@
 \alias{Trena-class}
 \alias{.Trena}
 \alias{Trena}
-\alias{Trena}
 \title{Define an object of class Trena}
 \usage{
 Trena(genomeName, quiet = TRUE)

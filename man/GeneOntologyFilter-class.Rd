@@ -5,7 +5,6 @@
 \alias{GeneOntologyFilter-class}
 \alias{.GeneOntologyFilter}
 \alias{GeneOntologyFilter}
-\alias{GeneOntologyFilter}
 \title{Create a GeneOntologyFilter object}
 \usage{
 GeneOntologyFilter(organismDatabase = org.Hs.eg.db::org.Hs.eg.db,
@@ -26,8 +25,6 @@ A GeneOntologyFilter object
 A GeneOntologyFilter object allows for filtering based on gene ontology (GO) terms. Its
 associated \code{getCandidates} method uses an organism database and a GO term (e.g. GO:#######)
 to filter a list of possible regulators factors to those that match the GO term.
-
-Create a CandidateFilter using Gene Ontology
 }
 \examples{
 # Make a filter for "transcription, DNA-templated"
@@ -37,3 +34,4 @@ goFilter <- GeneOntologyFilter(org.Hs.eg.db, GOTerm="GO:0006351")
 \seealso{
 \code{\link{CandidateFilter}}
 }
+\concept{CandidateFilter class objects}

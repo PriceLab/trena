@@ -47,3 +47,4 @@ Other solver methods: \code{\link{run,EnsembleSolver-method}},
   \code{\link{run,SpearmanSolver-method}},
   \code{\link{run,SqrtLassoSolver-method}}
 }
+\concept{solver methods}

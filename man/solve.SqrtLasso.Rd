@@ -47,3 +47,4 @@ Other solver methods: \code{\link{run,BayesSpikeSolver-method}},
   \code{\link{run,RidgeSolver-method}},
   \code{\link{run,SpearmanSolver-method}}
 }
+\concept{solver methods}

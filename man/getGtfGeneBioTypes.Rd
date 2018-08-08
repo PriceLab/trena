@@ -37,3 +37,4 @@ Other FootprintFinder methods: \code{\link{FootprintFinder-class}},
   \code{\link{getGtfMoleculeTypes,FootprintFinder-method}},
   \code{\link{getPromoterRegionsAllGenes,FootprintFinder-method}}
 }
+\concept{FootprintFinder methods}

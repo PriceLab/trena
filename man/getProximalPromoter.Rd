@@ -6,8 +6,8 @@
 \alias{getProximalPromoter}
 \title{Grab the region of the proximal promoter for a given gene symbol}
 \usage{
-\S4method{getProximalPromoter}{Trena}(obj, geneSymbols, tssUpstream = 1000,
-  tssDownstream = 1000)
+\S4method{getProximalPromoter}{Trena}(obj, geneSymbols,
+  tssUpstream = 1000, tssDownstream = 1000)
 }
 \arguments{
 \item{obj}{An object of class Trena}

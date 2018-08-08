@@ -43,3 +43,4 @@ Other Solver class objects: \code{\link{BayesSpikeSolver}},
   \code{\link{Solver-class}}, \code{\link{SpearmanSolver}},
   \code{\link{SqrtLassoSolver}}
 }
+\concept{Solver class objects}

@@ -5,10 +5,10 @@
 \alias{Solver-class}
 \alias{.Solver}
 \alias{Solver}
-\alias{Solver}
 \title{Define an object of class Solver}
 \usage{
-Solver(mtx.assay = matrix(), targetGene, candidateRegulators, quiet = TRUE)
+Solver(mtx.assay = matrix(), targetGene, candidateRegulators,
+  quiet = TRUE)
 }
 \arguments{
 \item{mtx.assay}{An assay matrix of gene expression data}
@@ -47,3 +47,4 @@ Other Solver class objects: \code{\link{BayesSpikeSolver}},
   \code{\link{RidgeSolver}}, \code{\link{SpearmanSolver}},
   \code{\link{SqrtLassoSolver}}
 }
+\concept{Solver class objects}

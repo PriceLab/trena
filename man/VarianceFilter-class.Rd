@@ -5,7 +5,6 @@
 \alias{VarianceFilter-class}
 \alias{.VarianceFilter}
 \alias{VarianceFilter}
-\alias{VarianceFilter}
 \title{Create a VarianceFilter object}
 \usage{
 VarianceFilter(mtx.assay = matrix(), targetGene, varSize = 0.5,
@@ -40,3 +39,4 @@ variance.filter <- VarianceFilter(mtx.assay = mtx.sub, targetGene = "MEF2C")
 
 Other Filtering Objects: \code{\link{FootprintFilter-class}}
 }
+\concept{Filtering Objects}

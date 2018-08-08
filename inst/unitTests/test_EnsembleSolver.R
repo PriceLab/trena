@@ -210,5 +210,69 @@ test_invalidSolvers <- function(){
 
 } # test_invalidSolvers
 #----------------------------------------------------------------------------------------------------
+# pshannon (16 jun 2018):
+#   when cory uses the new trenaSGM package, his model shows strong disagreement between
+#   rfScore and pcaMax.  our experience has been that these two scores roughly agree
+#   here we explore, determine and fix that error, using some simple precalculated
+#   ensembleSolver gene model results
+#
+#   3 serialize datasets are used here:
+#      1) pcaMaxBug.01.RData: tbl.all & tbl.scale, illustrates the rfScore/pcaMax disagreement
+#      2) pcaMaxBug.02.RData: tbl.all & tbl.scale, rfScore & pcaMax roughly agree
+#      3) pacaMaxBut.03.Rdata: much larger model because TFClass mapping is used,
+#         here too rfScore & pcaMax
+#
+test_.addEnsembleScore <- function()
+{
+       # demonstrate the problem
+   load(system.file(package="trena", "extdata", "pcaMaxBug.01.RData"))
+   tbl.new <- trena:::.addEnsembleScores(tbl.scale, tbl.all)
+   genes.by.rf <- tbl.new[order(tbl.new$rfScore, decreasing=TRUE), "gene"][1:6]
+   genes.by.pcaMax <- tbl.new[order(tbl.new$pcaMax, decreasing=TRUE), "gene"][1:6]
+   relative.ordering <- match(genes.by.rf, genes.by.pcaMax)  # 2 4 5 6 1 3
 
+      # is scaling the problem?   try it here
+   mtx.scale <- as.matrix(tbl.all[, -1])   # remove the gene column
+   rownames(mtx.scale) <- tbl.all$gene
+
+   scale.scores.normal.distribution <- function(vec){
+      vec.center <- median(vec)
+      vec.scale  <- mad(vec)
+      scale(vec, center=vec.center, scale=vec.scale)
+      }
+
+   scale.scores.poisson.distribution <- function(vec){
+      vec.center <- median(vec)
+      vec.scale <- sqrt(mean(vec*vec))
+      scale(vec, center=vec.center, scale=vec.scale)
+      }
+
+   mtx.scale[, "betaLasso"] <- scale.scores.normal.distribution(mtx.scale[, "betaLasso"])
+   mtx.scale[, "rfScore"] <- scale.scores.poisson.distribution(mtx.scale[, "rfScore"])
+   mtx.scale[, "betaLasso"] <- scale.scores.normal.distribution(mtx.scale[,"betaLasso"])
+   mtx.scale[, "lassoPValue"] <- scale.scores.normal.distribution(-log10(mtx.scale[,"lassoPValue"]))
+   mtx.scale[, "pearsonCoeff"] <- scale.scores.normal.distribution(mtx.scale[,"pearsonCoeff"])
+   mtx.scale[, "betaSqrtLasso"] <- scale.scores.normal.distribution(mtx.scale[,"betaSqrtLasso"])
+   mtx.scale[, "rfScore"] <- scale.scores.normal.distribution(mtx.scale[,"rfScore"])
+   mtx.scale[, "betaRidge"] <- scale.scores.normal.distribution(mtx.scale[,"betaRidge"])
+   mtx.scale[, "spearmanCoeff"] <- scale.scores.normal.distribution(mtx.scale[,"spearmanCoeff"])
+
+    pca <- stats::prcomp(mtx.scale, center=FALSE, scale.=FALSE)
+
+    pca$x <- pca$x / sqrt(length(which(pca$sdev > 0.1)))
+    pcaMax <- apply(pca$x[, pca$sdev > 0.1, drop=FALSE],1, function(x) {sqrt(mean(x*x))})
+    pcaMax <- as.data.frame(pcaMax)
+    pcaMax$gene <- rownames(pcaMax)
+
+       #         pcaMax  gene
+       # CEBPA 0.6601057 CEBPA
+       # IKZF1 2.3129081 IKZF1
+       # IRF2  0.5121313  IRF2
+       # IRF8  0.2370583  IRF8
+       # NR6A1 2.9354326 NR6A1
+       # TAL1  0.1831896  TAL1
+
+
+} # test_.addEnsembleScore
+#----------------------------------------------------------------------------------------------------
 if(!interactive()) runTests()

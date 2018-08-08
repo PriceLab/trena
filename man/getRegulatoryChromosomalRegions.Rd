@@ -6,8 +6,8 @@
 \alias{getRegulatoryChromosomalRegions}
 \title{Get the regulatory chromosomal regions for a Trena object}
 \usage{
-\S4method{getRegulatoryChromosomalRegions}{Trena}(obj, chromosome, chromStart,
-  chromEnd, regulatoryRegionSources, targetGene, targetGeneTSS,
+\S4method{getRegulatoryChromosomalRegions}{Trena}(obj, chromosome,
+  chromStart, chromEnd, regulatoryRegionSources, targetGene, targetGeneTSS,
   combine = FALSE)
 }
 \arguments{

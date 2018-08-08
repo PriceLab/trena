@@ -5,8 +5,6 @@
 \alias{FootprintFinder-class}
 \alias{.FootprintFinder}
 \alias{FootprintFinder}
-\alias{FootprintFinder-class}
-\alias{FootprintFinder}
 \title{Class FootprintFinder}
 \usage{
 FootprintFinder(genome.database.uri, project.database.uri, quiet = TRUE)
@@ -53,3 +51,4 @@ Other FootprintFinder methods: \code{\link{closeDatabaseConnections,FootprintFin
   \code{\link{getGtfMoleculeTypes,FootprintFinder-method}},
   \code{\link{getPromoterRegionsAllGenes,FootprintFinder-method}}
 }
+\concept{FootprintFinder methods}

@@ -5,8 +5,6 @@
 \alias{MotifMatcher-class}
 \alias{.MotifMatcher}
 \alias{MotifMatcher}
-\alias{MotifMatcher-class}
-\alias{MotifMatcher}
 \title{Create a MotifMatcher object}
 \usage{
 MotifMatcher(genomeName, pfms, quiet = TRUE)

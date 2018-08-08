@@ -33,3 +33,4 @@ Other getCandidate Methods: \code{\link{getCandidates,FootprintFilter-method}},
   \code{\link{getCandidates,HumanDHSFilter-method}},
   \code{\link{getCandidates}}
 }
+\concept{getCandidate Methods}

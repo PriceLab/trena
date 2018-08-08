@@ -21,3 +21,4 @@ Other getCandidate Methods: \code{\link{getCandidates,FootprintFilter-method}},
   \code{\link{getCandidates,HumanDHSFilter-method}},
   \code{\link{getCandidates,VarianceFilter-method}}
 }
+\concept{getCandidate Methods}

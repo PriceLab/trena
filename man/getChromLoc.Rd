@@ -6,8 +6,8 @@
 \alias{getChromLoc}
 \title{Get Chromosome Location}
 \usage{
-\S4method{getChromLoc}{FootprintFinder}(obj, name, biotype = "protein_coding",
-  moleculetype = "gene")
+\S4method{getChromLoc}{FootprintFinder}(obj, name,
+  biotype = "protein_coding", moleculetype = "gene")
 }
 \arguments{
 \item{obj}{An object of class FootprintFinder}
@@ -45,3 +45,4 @@ Other FootprintFinder methods: \code{\link{FootprintFinder-class}},
   \code{\link{getGtfMoleculeTypes,FootprintFinder-method}},
   \code{\link{getPromoterRegionsAllGenes,FootprintFinder-method}}
 }
+\concept{FootprintFinder methods}

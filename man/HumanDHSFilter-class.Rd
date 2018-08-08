@@ -5,7 +5,6 @@
 \alias{HumanDHSFilter-class}
 \alias{.HumanDHSFilter}
 \alias{HumanDHSFilter}
-\alias{HumanDHSFilter}
 \title{Create a HumanDHSFilter object}
 \usage{
 HumanDHSFilter(genomeName, encodeTableName = "wgEncodeRegDnaseClustered",
@@ -39,8 +38,6 @@ A HumanDHSFilter object allows for filtering based on DNAse hypersensitivity (DH
 associated \code{getCandidates} method uses a genome from a BSgenome database (either hg19 or
 hg38), DNA region specifications, and (variants/pfms,encodetablename, match%)
 to filter a list of possible regulators factors to those that match the supplied criteria.
-
-Create a CandidateFilter using Human DNAse Hypersensitivity
 }
 \examples{
 if(interactive()) { # takes too long in the bioc windows build
@@ -72,3 +69,4 @@ Other Solver class objects: \code{\link{BayesSpikeSolver}},
   \code{\link{SpearmanSolver}},
   \code{\link{SqrtLassoSolver}}
 }
+\concept{Solver class objects}

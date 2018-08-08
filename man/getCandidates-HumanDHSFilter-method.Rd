@@ -48,3 +48,4 @@ Other getCandidate Methods: \code{\link{getCandidates,FootprintFilter-method}},
   \code{\link{getCandidates,VarianceFilter-method}},
   \code{\link{getCandidates}}
 }
+\concept{getCandidate Methods}
