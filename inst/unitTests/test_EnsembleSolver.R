@@ -8,7 +8,6 @@ runTests <- function()
    test_EnsembleSolverConstructor()
    test_ampAD.mef2c.154tfs.278samples.ensemble()
    test_selectedSolversOnly()
-   test_pcaError()
    test_getSolverNames()
    test_oneSolver()
    test_invalidSolvers()
@@ -48,10 +47,6 @@ test_ampAD.mef2c.154tfs.278samples.ensemble <- function()
    tbl <- run(solver)
 
    # Check for empirical values
-   checkTrue(min(tbl$pcaMax) > 0.6)
-   checkTrue(max(tbl$pcaMax) < 2.5)
-   checkTrue(min(tbl$concordance) > 0.3)
-   checkTrue(max(tbl$concordance) < 0.55)
    checkTrue(c("HLF") %in% tbl$gene)
 
 } # test_ampAD.mef2c.154tfs.278samples.ensemble
@@ -74,15 +69,11 @@ test_selectedSolversOnly <- function()
    tbl <- run(solver)
 
    # Check for empirical values
-   checkTrue(min(tbl$pcaMax) > 0.5)
-   checkTrue(max(tbl$pcaMax) < 3)
-   checkTrue(min(tbl$concordance) > 0.25)
-   checkTrue(max(tbl$concordance) < 0.75)
    checkTrue(c("HLF") %in% tbl$gene)
 
 } # test_selectedSolversOnly
 #----------------------------------------------------------------------------------------------------
-test_pcaError <- function()
+doNot_test_pcaError <- function()
 {
     printf("--- test_pcaError")
 
@@ -224,7 +215,7 @@ test_invalidSolvers <- function(){
 #      3) pacaMaxBut.03.Rdata: much larger model because TFClass mapping is used,
 #         here too rfScore & pcaMax
 #
-test_.addEnsembleScore <- function()
+doNot_test_.addEnsembleScore <- function()
 {
        # demonstrate the problem
    load(system.file(package="trena", "extdata", "pcaMaxBug.01.RData"))

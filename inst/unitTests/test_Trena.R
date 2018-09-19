@@ -198,7 +198,7 @@ test_createGeneModelFromRegulatoryRegions <- function()
     checkTrue(is.data.frame(tbl.geneModel))
 
     expected.colnames <- c("gene", "betaLasso", "lassoPValue", "pearsonCoeff", "rfScore", "betaRidge",
-                           "spearmanCoeff", "concordance", "pcaMax", "bindingSites")
+                           "spearmanCoeff", "bindingSites")
     checkTrue(all(expected.colnames %in% colnames(tbl.geneModel)))
     checkTrue(nrow(tbl.geneModel) > 100)
     checkTrue(all(c("HLF", "STAT4", "SATB2") %in% tbl.geneModel$gene[1:10]))
@@ -226,7 +226,7 @@ test_createGeneModelFromTfList <- function()
     checkTrue(is.data.frame(tbl.geneModel))
 
     expected.colnames <- c("gene", "betaLasso", "lassoPValue", "pearsonCoeff", "rfScore", "betaRidge",
-                           "spearmanCoeff", "concordance", "pcaMax", "bindingSites")
+                           "spearmanCoeff",  "bindingSites")
     checkTrue(all(expected.colnames %in% colnames(tbl.geneModel)))
     checkTrue(nrow(tbl.geneModel) > 25)
     checkTrue(all(c("HLF", "STAT4", "SATB2") %in% tbl.geneModel$gene[1:10]))
