@@ -203,16 +203,18 @@ test_invalidSolvers <- function(){
     options(warn = 1)
     set.seed(11451)
     tbl <- suppressWarnings(run(solver))
-    checkEquals(names(tbl), c("gene", "betaLasso", "betaRidge", "concordance", "pcaMax"))
-    checkTrue(max(tbl$pcaMax) > 22.5)
-    checkTrue(max(tbl$concordance) > 0.7)
-    checkTrue(!("parson" %in% names(tbl)))
+    checkEquals(colnames(tbl), c("gene", "betaLasso", "betaRidge"))
+    checkTrue(!("parson" %in% colnames(tbl)))
 
 } # test_invalidSolvers
 #----------------------------------------------------------------------------------------------------
+# pshannon (19 sep 2018): scoring multiple solvers together is no longer done
+#                         within the EnsemblSolver class: it is a post-processing step,
+#                         of some complexity, with no single analytical "right way'
+#                         see the soon-to-appear class to be named something like "EnsembleScorer"
 # pshannon (16 jun 2018):
 #   when cory uses the new trenaSGM package, his model shows strong disagreement between
-#   rfScore and pcaMax.  our experience has been that these two scores roughly agree
+#   rfScore and pcaMax.  our experience has been that these two scores roughly agree.
 #   here we explore, determine and fix that error, using some simple precalculated
 #   ensembleSolver gene model results
 #

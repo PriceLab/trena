@@ -410,106 +410,106 @@ setMethod("run", "EnsembleSolver",
                   }
               }
 
-              # Replace missing values and scale the data
-              # Use the *.med and *.scale values to center/scale everything
-              tbl.all[is.na(tbl.all)] <- 0
-              tbl.scale <- tbl.all[,-1]
+#              # Replace missing values and scale the data
+#              # Use the *.med and *.scale values to center/scale everything
+#              tbl.all[is.na(tbl.all)] <- 0
+#              tbl.scale <- tbl.all[,-1]
+#
+#              if("lassoPValue" %in% names(tbl.scale)){
+#                  tbl.scale$lassoPValue <- -log10(tbl.scale$lassoPValue)
+#                  tbl.scale$lassoPValue <- scale(tbl.scale$lassoPValue,
+#                                                   center = lassopv.med,
+#                                                   scale = lassopv.scale)
+#              }
+#
+#              if("betaLasso" %in% names(tbl.scale)){
+#                  tbl.scale$betaLasso <- scale(tbl.scale$betaLasso,
+#                                                center = lasso.med,
+#                                                scale = lasso.scale)
+#              }
+#
+#              if("betaRidge" %in% names(tbl.scale)){
+#                  tbl.scale$betaRidge <- scale(tbl.scale$betaRidge,
+#                                                center = ridge.med,
+#                                                scale = ridge.scale)
+#              }
+#
+#              if("pearsonCoeff" %in% names(tbl.scale)){
+#                  tbl.scale$pearsonCoeff <- scale(tbl.scale$pearsonCoeff,
+#                                                   center = pearson.med,
+#                                                   scale = pearson.scale)
+#              }
+#
+#              if("spearmanCoeff" %in% names(tbl.scale)){
+#                  tbl.scale$spearmanCoeff <- scale(tbl.scale$spearmanCoeff,
+#                                                    center = spearman.med,
+#                                                    scale = spearman.scale)
+#              }
+#
+#              if("betaSqrtLasso" %in% names(tbl.scale)){
+#                  tbl.scale$betaSqrtLasso <- scale(tbl.scale$betaSqrtLasso,
+#                                                    center = sqrtlasso.med,
+#                                                    scale = sqrtlasso.scale)
+#              }
+#
+#              if("bayesScore" %in% names(tbl.scale)){
+#                  tbl.scale$bayesScore <- scale(tbl.scale$bayesScore,
+#                                             center = bayesspike.med,
+#                                             scale = bayesspike.scale)
+#              }
+#
+#              if("rfScore" %in% names(tbl.scale)){
+#                  tbl.scale$rfScore <- scale(tbl.scale$rfScore,
+#                                              center = randomforest.med,
+#                                              scale = randomforest.scale)
+#              }
+#
+#              rownames(tbl.scale) <- tbl.all$gene
+#
+#              tbl.augmented <- try(.addEnsembleScores(tbl.scale, tbl.all), silent = TRUE)
+#
+#              # If you get new scores, add them;
+#              # Else, just keep the old table and throw a warning
+#
+#              if(class(tbl.augmented) == "try-error"){
+#                  #browser()
+#                  warning("The signal strength of ensemble of solvers is too weak to support
+#composite scores ('pcaMax' and 'concordance' in the model output table. This is a classic
+#'large n, small m' problem that could be rectified by providing more samples")
+#                  tbl.all$pcaMax <- NA
+#                  tbl.all$concordance <- NA
+#              } else {
+#                  tbl.all <- tbl.augmented
+#              }
+#
+#              # Regardless of output, return the table of scores
 
-              if("lassoPValue" %in% names(tbl.scale)){
-                  tbl.scale$lassoPValue <- -log10(tbl.scale$lassoPValue)
-                  tbl.scale$lassoPValue <- scale(tbl.scale$lassoPValue,
-                                                   center = lassopv.med,
-                                                   scale = lassopv.scale)
-              }
-
-              if("betaLasso" %in% names(tbl.scale)){
-                  tbl.scale$betaLasso <- scale(tbl.scale$betaLasso,
-                                                center = lasso.med,
-                                                scale = lasso.scale)
-              }
-
-              if("betaRidge" %in% names(tbl.scale)){
-                  tbl.scale$betaRidge <- scale(tbl.scale$betaRidge,
-                                                center = ridge.med,
-                                                scale = ridge.scale)
-              }
-
-              if("pearsonCoeff" %in% names(tbl.scale)){
-                  tbl.scale$pearsonCoeff <- scale(tbl.scale$pearsonCoeff,
-                                                   center = pearson.med,
-                                                   scale = pearson.scale)
-              }
-
-              if("spearmanCoeff" %in% names(tbl.scale)){
-                  tbl.scale$spearmanCoeff <- scale(tbl.scale$spearmanCoeff,
-                                                    center = spearman.med,
-                                                    scale = spearman.scale)
-              }
-
-              if("betaSqrtLasso" %in% names(tbl.scale)){
-                  tbl.scale$betaSqrtLasso <- scale(tbl.scale$betaSqrtLasso,
-                                                    center = sqrtlasso.med,
-                                                    scale = sqrtlasso.scale)
-              }
-
-              if("bayesScore" %in% names(tbl.scale)){
-                  tbl.scale$bayesScore <- scale(tbl.scale$bayesScore,
-                                             center = bayesspike.med,
-                                             scale = bayesspike.scale)
-              }
-
-              if("rfScore" %in% names(tbl.scale)){
-                  tbl.scale$rfScore <- scale(tbl.scale$rfScore,
-                                              center = randomforest.med,
-                                              scale = randomforest.scale)
-              }
-
-              rownames(tbl.scale) <- tbl.all$gene
-
-              tbl.augmented <- try(.addEnsembleScores(tbl.scale, tbl.all), silent = TRUE)
-
-              # If you get new scores, add them;
-              # Else, just keep the old table and throw a warning
-
-              if(class(tbl.augmented) == "try-error"){
-                  #browser()
-                  warning("The signal strength of ensemble of solvers is too weak to support
-composite scores ('pcaMax' and 'concordance' in the model output table. This is a classic
-'large n, small m' problem that could be rectified by providing more samples")
-                  tbl.all$pcaMax <- NA
-                  tbl.all$concordance <- NA
-              } else {
-                  tbl.all <- tbl.augmented
-              }
-
-              # Regardless of output, return the table of scores
-              return(tbl.all)
-
+          return(tbl.all)
           })
 #----------------------------------------------------------------------------------------------------
-.addEnsembleScores <- function(tbl.scale, tbl.all) {
-
-    # Compute the scaled "concordance score"
-    pca <- stats::prcomp(tbl.scale, center=FALSE, scale.=FALSE)
-
-    pca$x <- pca$x / sqrt(length(which(pca$sdev > 0.1)))
-    concordance <- apply(pca$x[, pca$sdev > 0.1, drop=FALSE], 1,
-                         function(x) {sqrt(mean((2*atan(x)/pi)^2))})
-    concordance <- as.data.frame(concordance)
-    concordance$gene <- rownames(concordance)
-    rownames(concordance) <- NULL
-    tbl.all <- merge(tbl.all, concordance, by = "gene", all = TRUE)
-
-    # Transform via PCA and compute the pcaMax score
-    pcaMax <- apply(pca$x[, pca$sdev > 0.1, drop=FALSE],1, function(x) {sqrt(mean(x*x))})
-    pcaMax <- as.data.frame(pcaMax)
-    pcaMax$gene <- rownames(pcaMax)
-    rownames(pcaMax) <- NULL
-    tbl.all <- merge(tbl.all, pcaMax, by = "gene", all = TRUE)
-
-    # Sort by pcaMax
-    tbl.all <- tbl.all[order(tbl.all$pcaMax, decreasing = TRUE),]
-
-    return(tbl.all)
-}
+#.addEnsembleScores <- function(tbl.scale, tbl.all) {
+#
+#    # Compute the scaled "concordance score"
+#    pca <- stats::prcomp(tbl.scale, center=FALSE, scale.=FALSE)
+#
+#    pca$x <- pca$x / sqrt(length(which(pca$sdev > 0.1)))
+#    concordance <- apply(pca$x[, pca$sdev > 0.1, drop=FALSE], 1,
+#                         function(x) {sqrt(mean((2*atan(x)/pi)^2))})
+#    concordance <- as.data.frame(concordance)
+#    concordance$gene <- rownames(concordance)
+#    rownames(concordance) <- NULL
+#    tbl.all <- merge(tbl.all, concordance, by = "gene", all = TRUE)
+#
+#    # Transform via PCA and compute the pcaMax score
+#    pcaMax <- apply(pca$x[, pca$sdev > 0.1, drop=FALSE],1, function(x) {sqrt(mean(x*x))})
+#    pcaMax <- as.data.frame(pcaMax)
+#    pcaMax$gene <- rownames(pcaMax)
+#    rownames(pcaMax) <- NULL
+#    tbl.all <- merge(tbl.all, pcaMax, by = "gene", all = TRUE)
+#
+#    # Sort by pcaMax
+#    tbl.all <- tbl.all[order(tbl.all$pcaMax, decreasing = TRUE),]
+#
+#    return(tbl.all)
+#}
 #----------------------------------------------------------------------------------------------------

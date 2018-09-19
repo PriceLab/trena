@@ -12,8 +12,10 @@
                     )
 
 #------------------------------------------------------------------------------------------------------------------------
-setGeneric("normalizeModel",   signature="obj", function(obj, normalizing.max=10) standardGeneric ("normalizeModel"))
+setGeneric("normalizeModel",   signature="obj", function(obj, normalizing.max=10)
+            standardGeneric ("normalizeModel"))
 setGeneric("addStats",         signature="obj", function(obj, varianceToInclude=0.75, scalePCA=FALSE) standardGeneric ("addStats"))
+setGeneric("addStatsSimple",   signature="obj", function(obj, varianceToInclude=0.75, scalePCA=FALSE, excludeLasso=TRUE, quiet=TRUE) standardGeneric ("addStatsSimple"))
 setGeneric("getCoverage",      signature="obj", function(obj) standardGeneric ("getCoverage"))
 #------------------------------------------------------------------------------------------------------------------------
 #' Create a PCAMax object from a data.frame produced by the EnsembleSolver
@@ -95,6 +97,10 @@ setMethod('addStats', 'PCAMax',
      function(obj, varianceToInclude=0.75, scalePCA=FALSE){
         stopifnot(varianceToInclude > 0)
         mtx <- obj@state$normalizedMatrix
+           # try removing lassoPValue
+        col.rm <- grep("lassoPValue", colnames(mtx))
+        if(length(col.rm) > 0)
+           mtx <- mtx[, -col.rm]
         pca <- prcomp(mtx, scale=scalePCA)
             #
         if(varianceToInclude > 0.95)
@@ -137,6 +143,53 @@ setMethod('addStats', 'PCAMax',
         })
 
 #------------------------------------------------------------------------------------------------------------------------
+#' add PCA-based summary stats on all TFs in the model
+#'
+#' @rdname addStatsSimple
+#' @aliases addStatsSimple
+#'
+#' @param obj An object of the class PCAMax
+#'
+#' @return  the original model with extra columns: pcaMax, cov, PC1, PC2,
+#'
+#' @export
+#'
+setMethod('addStatsSimple', 'PCAMax',
+
+     function(obj, varianceToInclude=0.75, scalePCA=FALSE, excludeLasso=TRUE, quiet=TRUE){
+        stopifnot(varianceToInclude > 0)
+        mtx <- obj@state$normalizedMatrix
+           # try removing lassoPValue
+        if(excludeLasso){
+           col.rm <- grep("lasso", colnames(mtx), ignore.case=TRUE)
+           printf("exluding %d lasso-related columns", length(col.rm))
+           if(length(col.rm) > 0)
+              mtx <- mtx[, -col.rm]
+           } # if excludeLasso
+        # browser()
+        scoreRow <- function(row){
+           zeros <- which(abs(row) < 1e-10)
+           if(length(zeros) > 0){
+              #printf("reducing row by %d", length(zeros))
+              row <- row[-zeros]
+              }
+           sum(abs(row))/length(row)
+           }
+        score <- round(apply(mtx, 1, scoreRow), digits=2)
+        if(!quiet){
+           print(mtx)
+           print(score)
+           }
+
+        score.norm <- round(100 * (score/max(score)))
+        tbl.out <- cbind(obj@state$tbl.orig, score.norm)
+        tbl.out <- cbind(tbl.out, score)
+        tbl.out <- tbl.out[order(tbl.out$score, decreasing=TRUE),]
+        tbl.out$rank <- seq_len(nrow(tbl.out))
+        tbl.out
+        })
+
+#------------------------------------------------------------------------------------------------------------------------
 #' what percentage of the variance is captured in the first two principal components?
 #'
 #' @rdname getCoverage
@@ -168,6 +221,7 @@ setMethod('getCoverage', 'PCAMax',
 .normalize_pval <- function(vector, normalizing.max=10)
 {
    stopifnot(all(vector >= 0))
+   # x <- -log10(vector + temper.pvalue.amount) #   ensure no zero values, suppress large numbers
    x <- -log10(vector +  .Machine$double.xmin)  #   ensure no zero values
    actual.max <- max(x)
    scale <- normalizing.max/actual.max

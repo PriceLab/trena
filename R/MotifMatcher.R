@@ -244,6 +244,8 @@ setMethod("getPfms", "MotifMatcher",
 #----------------------------------------------------------------------------------------------------
 .matchPwmForwardAndReverse <- function(sequence, pfm, motifName, min.match.percentage=95, quiet=TRUE)
 {
+   xyz <- .matchPwmForwardAndReverse
+
     min.match.as.string <- sprintf("%02d%%", min.match.percentage)
 
     hits.fwd <- Biostrings::matchPWM(pfm, sequence, with.score=TRUE, min.score=min.match.as.string)
@@ -356,6 +358,7 @@ setMethod("getPfms", "MotifMatcher",
         invisible (pwms)
     } # readRawJasparMatrices
 
+    xyz <- "MotifMatcher .getScoredMotifs"
     result <- lapply(seqs, function(seq) .findMotifs(seq, pfms, min.match.percentage, quiet))
     if(is.null(result))
         result <- data.frame()
