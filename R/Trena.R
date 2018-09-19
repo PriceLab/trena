@@ -116,7 +116,7 @@ setMethod('getRegulatoryTableColumnNames', 'Trena',
 setMethod('getGeneModelTableColumnNames', 'Trena',
 
           function(obj){
-              c("tf", "randomForest", "pearson", "spearman", "betaLasso", "pcaMax", "concordance")
+              c("tf", "randomForest", "pearson", "spearman", "betaLasso")
           })
 
 #----------------------------------------------------------------------------------------------------
@@ -383,7 +383,13 @@ setMethod('createGeneModelFromTfList', 'Trena',
                                     geneCutoff=1)
         tbl.model <- run(solver)
         tbl.model$bindingSites <- NA
-        tbl.model <- tbl.model[order(tbl.model$pcaMax, decreasing=TRUE),]  # default ordering
+        if("rfScore" %in% colnames(tbl.model)){
+            tbl.model <- tbl.model[order(tbl.model$rfScore, decreasing=TRUE),]
+        } else if ("pearsonCoeff" %in% colnames(tbl.model)){
+           tbl.model <- tbl.model[order(abs(tbl.model$pearsonCoeff), decreasing=TRUE),]
+        }
+
+
         tbl.model
         }) # createGeneModelFromRegulatoryRegions
 

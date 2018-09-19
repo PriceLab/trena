@@ -407,12 +407,13 @@ setMethod("run", "EnsembleSolver",
               if(length(sub.list) > 2){
                   for(i in 3:(length(sub.list))){
                       tbl.all <- merge(tbl.all, sub.list[[i]], by = "gene", all = TRUE)
+                      }
                   }
-              }
+
+              tbl.all[is.na(tbl.all)] <- 0
 
 #              # Replace missing values and scale the data
 #              # Use the *.med and *.scale values to center/scale everything
-#              tbl.all[is.na(tbl.all)] <- 0
 #              tbl.scale <- tbl.all[,-1]
 #
 #              if("lassoPValue" %in% names(tbl.scale)){
