@@ -19,8 +19,9 @@ To build and test:
 The most reliable way to install package dependencies (and other of their dependencies):
 
 ````
-source("http://bioconductor.org/biocLite.R")
-biocLite(c("glmnet", "RUnit"))
+if (!requireNamespace("BiocManager", quietly=TRUE))
+    install.packages("BiocManager")
+BiocManager::install(c("glmnet", "RUnit"))
 ````
 
 ## Using TReNA
