@@ -327,11 +327,8 @@ setMethod('createGeneModelFromRegulatoryRegions', 'Trena',
               tbl.tf.frequencies <- as.data.frame(table(tbl.regulatoryRegions$geneSymbol))
               colnames(tbl.tf.frequencies) <- c("gene", "bindingSites")
               tbl.model <- merge(tbl.model, tbl.tf.frequencies, by="gene")
-              if("rfScore" %in% colnames(tbl.model)){
-                  tbl.model <- tbl.model[order(tbl.model$rfScore, decreasing=TRUE),]
-              } else if ("pearsonCoeff" %in% colnames(tbl.model)){
+              if("pearsonCoeff" %in% colnames(tbl.model))  # our default ordering
                  tbl.model <- tbl.model[order(abs(tbl.model$pearsonCoeff), decreasing=TRUE),]
-              }
               tbl.model
           }) # createGeneModelFromRegulatoryRegions
 
