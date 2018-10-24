@@ -1,6 +1,7 @@
 #' @import MotifDb
 #' @importFrom DBI   dbConnect dbListTables dbGetQuery dbListConnections dbDisconnect
 #' @importFrom RPostgreSQL dbConnect dbListTables dbGetQuery dbListConnections dbDisconnect
+#' @importFrom stats fivenum prcomp sd
 #----------------------------------------------------------------------------------------------------
 #' @name Trena-class
 #' @rdname Trena-class

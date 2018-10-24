@@ -10,6 +10,8 @@ PCAMax(tbl, tfIdentifierColumnName = "tf.hgnc")
 }
 \arguments{
 \item{tbl}{a data.frame}
+
+\item{tfIdentifierColumnName}{a character string identifying the transcription factor column}
 }
 \value{
 a PCAMax object

@@ -1,6 +1,8 @@
 library(trena)
 library(RUnit)
 #----------------------------------------------------------------------------------------------------
+Sys.setlocale("LC_ALL", "C")
+#----------------------------------------------------------------------------------------------------
 printf <- function(...) print(noquote(sprintf(...)))
 #----------------------------------------------------------------------------------------------------
 runTests <- function()
@@ -23,9 +25,9 @@ test_basicUse <- function()
     goFilter <- GeneOntologyFilter(org.Hs.eg.db, GOTerm="GO:0006351")
     candidates <- getCandidates(goFilter)
     checkTrue(all(c("tbl", "tfs") %in% names(candidates)))
-    first.genes <- head(candidates$tfs)
+    first.genes <- head(candidates$tfs, n=3)
        # simple test: they should be sorted, and all start with "A"
-    checkEquals(length(grep("^A", first.genes)), 6)
+     checkEquals(length(grep("^A", first.genes)), 3)
 
 } # test_basicUse
 #----------------------------------------------------------------------------------------------------

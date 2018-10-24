@@ -21,6 +21,7 @@ setGeneric("getCoverage",      signature="obj", function(obj) standardGeneric ("
 #' Create a PCAMax object from a data.frame produced by the EnsembleSolver
 #'
 #' @param tbl a data.frame
+#' @param tfIdentifierColumnName a character string identifying the transcription factor column
 #'
 #' @return a PCAMax object
 #'
@@ -87,6 +88,8 @@ setMethod('normalizeModel', 'PCAMax',
 #' @aliases addStats
 #'
 #' @param obj An object of the class PCAMax
+#' @param varianceToInclude numeric variance to include in the PCA
+#' @param scalePCA logical
 #'
 #' @return  the original model with extra columns: pcaMax, cov, PC1, PC2,
 #'
@@ -149,6 +152,10 @@ setMethod('addStats', 'PCAMax',
 #' @aliases addStatsSimple
 #'
 #' @param obj An object of the class PCAMax
+#' @param varianceToInclude numeric variance to include in the PCA
+#' @param scalePCA logical
+#' @param excludeLasso logical excluding lasso avoids dropping TFs due to shrinkage
+#' @param quiet logical
 #'
 #' @return  the original model with extra columns: pcaMax, cov, PC1, PC2,
 #'

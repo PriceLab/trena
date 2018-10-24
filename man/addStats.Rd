@@ -11,6 +11,10 @@
 }
 \arguments{
 \item{obj}{An object of the class PCAMax}
+
+\item{varianceToInclude}{numeric variance to include in the PCA}
+
+\item{scalePCA}{logical}
 }
 \value{
 the original model with extra columns: pcaMax, cov, PC1, PC2,
