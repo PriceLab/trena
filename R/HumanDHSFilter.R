@@ -9,7 +9,8 @@
 #' @include CandidateFilter.R
 #' @import methods
 #' @import BSgenome
-### @importFrom RMySQL dbConnect dbListTables dbGetQuery dbListConnections dbDisconnect
+#' @import RMySQL
+#  @importFrom RMySQL dbConnect dbListTables dbGetQuery dbListConnections dbDisconnect
 #' @import GenomicRanges
 #'
 #' @rdname HumanDHSFilter-class
@@ -145,7 +146,9 @@ HumanDHSFilter <- function(genomeName,
 setMethod("getEncodeRegulatoryTableNames", "HumanDHSFilter",
 
           function(obj){
-              driver <- RMariaDB::MariaDB()
+              message(sprintf("about to create RMySQL driver, getting table names"))
+              driver <- RMySQL::MySQL()
+              #driver <- RMariaDB::MariaDB()
               host <- "genome-mysql.cse.ucsc.edu"
               user <- "genome"
               dbname <- obj@genomeName
@@ -339,8 +342,9 @@ setMethod("getRegulatoryRegions", "HumanDHSFilter",
 
           function(obj, encode.table.name, chromosome, start, end, score.threshold=0) {
 
-              #driver <- RMySQL::MySQL()
-              driver <- RMariaDB::MariaDB()
+              message(sprintf("about to create RMySQL dirver, getting regulatory regions"))
+              driver <- RMySQL::MySQL()
+              #driver <- RMariaDB::MariaDB()
               host <- "genome-mysql.cse.ucsc.edu"
               user <- "genome"
               dbname <- obj@genomeName
