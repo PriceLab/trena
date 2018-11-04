@@ -198,7 +198,7 @@ setMethod("getSolverNames", "EnsembleSolver",
 #'
 #' @examples
 #' \dontrun{
-#' # Load included Alzheimer's data, create an Ensemble object with default solvers, and solve
+#' # Load included Alzheimer data, create an Ensemble object with default solvers, and solve
 #' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
 #' target.gene <- "MEF2C"
 #' tfs <- setdiff(rownames(mtx.sub), target.gene)[1:30]

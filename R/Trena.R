@@ -63,7 +63,7 @@ genome.db.uri <- "postgres://bddsrds.globusgenomics.org/hg38"   # has gtf and mo
 #' trena <- Trena("hg38")
 #'
 #' @seealso \code{\link{getRegulatoryChromosomalRegions}}, \code{\link{getRegulatoryTableColumnNames}},
-#' \code{\link{getGeneModelTableColumnNames}}, \code{\link{createGeneModel}}
+#' \code{\link{getGeneModelTableColumnNames}}
 
 Trena = function(genomeName, quiet=TRUE)
 {

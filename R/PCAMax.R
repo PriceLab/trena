@@ -54,7 +54,7 @@ PCAMax <- function(tbl, tfIdentifierColumnName="tf.hgnc")
 #' @aliases normalizeModel
 #'
 #' @param obj An object of the class PCAMax
-#' @param max numeric, a maximum value for the normalized distrubtions
+#' @param normalizing.max numeric, a maximum value for the normalized distrubtions
 #'
 #' @return a normalized matrix, each column treated separately
 #'
