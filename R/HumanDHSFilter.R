@@ -9,7 +9,8 @@
 #' @include CandidateFilter.R
 #' @import methods
 #' @import BSgenome
-### @importFrom RMySQL dbConnect dbListTables dbGetQuery dbListConnections dbDisconnect
+#' @import RMariaDB
+## @import RMySQL
 #' @import GenomicRanges
 #'
 #' @rdname HumanDHSFilter-class
@@ -348,7 +349,7 @@ setMethod("getRegulatoryRegions", "HumanDHSFilter",
               if(!obj@quiet)
                   printf("connecting to %s/%s/%s as %s", host, dbname, encode.table.name,  user);
 
-              db <- dbConnect(driver, user = user, host = host, dbname = dbname)
+              db <- DBI::dbConnect(driver, user = user, host = host, dbname = dbname)
 
               main.clause <- sprintf("select * from %s where", encode.table.name);
 
@@ -406,7 +407,7 @@ setMethod("getRegulatoryRegions", "HumanDHSFilter",
                   } # small region query, within DHS region
               } # small region, extension search
 
-              dbDisconnect(db)
+              DBI::dbDisconnect(db)
               # lapply(DBI::dbListConnections(driver), dbDisconnect)
 
               tbl.regions$chrom <- as.character(tbl.regions$chrom)
