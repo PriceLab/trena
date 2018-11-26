@@ -1,3 +1,5 @@
 ^.*\.tsv$
 build.makefile
 inst/prep
+
+^\.travis\.yml$
