@@ -175,6 +175,7 @@ test_getSequence <- function(indirect=FALSE)
 #----------------------------------------------------------------------------------------------------
 test_.parseVariantString <- function()
 {
+   if(!interactive()) return () # remove need for huge SNPlocs package
    mm <- MotifMatcher(genomeName="hg38", pfms=list())   # no actual pfms needed here
 
    tbl.variant <- trena:::.parseVariantString(mm, "rs13384219")
@@ -305,6 +306,8 @@ test_.injectSnp <- function()
 #  chr2:57907323:A:G
 test_getSequenceWithVariants <- function()
 {
+   if(!interactive()) return()
+
    printf("--- test_getSequenceWithVariants")
 
    mm <- MotifMatcher(genomeName="hg38", pfms=list())
@@ -406,6 +409,8 @@ test_findMatchesByChromosomalRegion <- function()
 #----------------------------------------------------------------------------------------------------
 test_findMatchesByChromosomalRegion_contrastReferenceWithVariant <- function()
 {
+   if(!interactive()) return()
+
    printf("--- test_findMatchesByChromosomalRegion_contrastReferenceWithVariant")
 
      # the vrk2 promoter snp,  chr2:57907313-57907333

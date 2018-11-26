@@ -305,6 +305,8 @@ test_getProximalPromoterMouse <- function(){
 #----------------------------------------------------------------------------------------------------
 test_assessSnp <- function()
 {
+   if(!interactive()) return()
+
     printf("--- test_assessSnp")
 
     trena <- Trena("hg38")
@@ -375,6 +377,8 @@ test_assessSnp <- function()
 # match level # returns all three kinds of match: in.both. wt.only, mut.only
 test_assessSnp_allTypesWithDeltas <- function()
 {
+    if(!interactive()) return()
+
     printf("--- test_assessSnp_allTypesWithDeltas")
 
     trena <- Trena("hg38")

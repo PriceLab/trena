@@ -295,6 +295,7 @@ test_getFootprintsInRegionWithVariants <- function()
 #----------------------------------------------------------------------------------------------------
 explore_variantsInFootprints <- function()
 {
+   if(!interactive()) return()   # avoid need for huge SNPlocs file
 
    # how does   rs13384219  A->G
    #   gtcagtagtggtggaaccagcatgc[A/G]aattagacaatgtgacttcatagcc, chr2:57907323
