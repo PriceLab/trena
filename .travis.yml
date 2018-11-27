@@ -2,5 +2,6 @@
 
 language: R
 r: bioc-devel
+warnings_are_errors: false
 sudo: false
 cache: packages
