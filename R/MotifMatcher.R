@@ -212,7 +212,7 @@ setMethod("findMatchesByChromosomalRegion", "MotifMatcher",
               max.sequence.chars <- 20
               if(nchar(tbl.out$seq[1]) > max.sequence.chars)
                   tbl.out$seq <- paste(substring(tbl.out$seq, 1, max.sequence.chars-3), "...", sep="")
-              invisible(tbl.out)
+              return(tbl.out)
 
           }) #findMatchesByChromosomalRegion
 #----------------------------------------------------------------------------------------------------
