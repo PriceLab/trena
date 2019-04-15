@@ -1,3 +1,5 @@
+^Meta$
+^doc$
 ^.*\.tsv$
 build.makefile
 inst/prep

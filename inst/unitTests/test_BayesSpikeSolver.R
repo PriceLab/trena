@@ -8,7 +8,7 @@ runTests <- function()
    test_BayesSpikeSolverConstructor()
    test_ampAD.mef2c.154tfs.278samples.bayesSpike()
    test_nOrderings()
-   
+
 } # runTests
 #----------------------------------------------------------------------------------------------------
 test_BayesSpikeSolverConstructor <- function()
@@ -21,9 +21,9 @@ test_BayesSpikeSolverConstructor <- function()
    rownames(mtx) <- c("gene1","gene2","gene3")   
    solver <- BayesSpikeSolver(mtx,targetGene = "gene1",
                             candidateRegulators = c("gene2","gene3"))
-   
-   checkEquals(class(solver)[1], "BayesSpikeSolver")   
-   checkTrue(all(c("BayesSpikeSolver", "Solver") %in% is(solver)))   
+
+   checkEquals(class(solver)[1], "BayesSpikeSolver")
+   checkTrue(all(c("BayesSpikeSolver", "Solver") %in% is(solver)))
 
 } # test_BayesSpikeSolverConstructor
 #----------------------------------------------------------------------------------------------------
@@ -35,7 +35,7 @@ test_ampAD.mef2c.154tfs.278samples.bayesSpike <- function()
 
    set.seed(12415)
    load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
-   
+
    mtx.asinh <- asinh(mtx.sub)
    target.gene <- "MEF2C"
    tfs <- setdiff(rownames(mtx.asinh), "MEF2C")
@@ -62,7 +62,7 @@ test_nOrderings <- function()
 
    set.seed(12415)
    load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
-   
+
    mtx.asinh <- asinh(mtx.sub)
    target.gene <- "MEF2C"
    tfs <- setdiff(rownames(mtx.asinh), "MEF2C")
