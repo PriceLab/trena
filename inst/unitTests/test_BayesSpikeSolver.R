@@ -15,6 +15,8 @@ test_BayesSpikeSolverConstructor <- function()
 {
    printf("--- test_BayesSpikeSolverConstructor")
 
+   if(!interactive()) return()
+   
    mtx <- matrix(1:9,nrow=3)   
    rownames(mtx) <- c("gene1","gene2","gene3")   
    solver <- BayesSpikeSolver(mtx,targetGene = "gene1",
@@ -28,6 +30,8 @@ test_BayesSpikeSolverConstructor <- function()
 test_ampAD.mef2c.154tfs.278samples.bayesSpike <- function()
 {
    printf("--- test_ampAD.mef2c.154tfs.278samples.bayesSpike")
+
+   if(!interactive()) return()
 
    set.seed(12415)
    load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
@@ -53,6 +57,8 @@ test_ampAD.mef2c.154tfs.278samples.bayesSpike <- function()
 test_nOrderings <- function()
 {
    printf("--- test_nOrderings")
+
+   if(!interactive()) return()
 
    set.seed(12415)
    load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))

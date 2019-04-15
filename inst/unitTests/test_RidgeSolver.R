@@ -128,8 +128,8 @@ test_keep.metrics.ridge <- function()
    checkTrue(min(tbl$mtx.beta$beta) > -0.1)
    checkTrue(max(tbl$mtx.beta$beta) < 0.1)
    checkTrue(c("FOXP1") %in% rownames(subset(tbl$mtx.beta, abs(beta) > 0.08)))
-   checkTrue(tbl$lambda < 0.9)
-   checkTrue(tbl$r2 > 0.95)
+   checkTrue(tbl$lambda < 0.95)
+   checkTrue(as.numeric(tbl$r2) > 0.95)
 
 } # test_keep.metrics.ridge
 #----------------------------------------------------------------------------------------------------
