@@ -12,7 +12,7 @@ install:
 	(cd ..; R CMD INSTALL trena)
 
 check:
-	(cd ..; R CMD check `ls -t trena_* | head -1`)
+	(cd ..; R CMD check --no-manual `ls -t trena_* | head -1`)
 
 biocCheck:
 	(cd ..; R CMD BiocCheck `ls -t trena_* | head -1`)

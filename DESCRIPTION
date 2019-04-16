@@ -7,6 +7,7 @@ Author: Seth Ament <seth.ament@systemsbiology.org>, Paul Shannon <pshannon@syste
 Maintainer: Paul Shannon <paul.thurmond.shannon@gmail.com>
 Imports:
     RSQLite,
+    RMySQL,
     lassopv,
     randomForest,
     flare,
