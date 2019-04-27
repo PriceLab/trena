@@ -70,12 +70,10 @@ MotifMatcher <- function(genomeName,
     stopifnot(is.list(pfms))
 
     if(genomeName == "hg38"){
-        # library(BSgenome.Hsapiens.UCSC.hg38) ## Remove the library reference
         reference.genome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
     }
 
     else if(genomeName == "hg19"){
-        # library(BSgenome.Hsapiens.UCSC.hg19) ## Remove the library reference
         reference.genome <- BSgenome.Hsapiens.UCSC.hg19::BSgenome.Hsapiens.UCSC.hg19
     }
 

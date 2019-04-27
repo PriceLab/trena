@@ -3,7 +3,7 @@ title: "A Brief Introduction to TReNA"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{A Brief Introduction to TReNA}
-  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEngine{knitr::knitr}}
   %\VignetteEncoding{UTF-8}
 ---
 

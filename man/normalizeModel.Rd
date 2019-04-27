@@ -11,7 +11,7 @@
 \arguments{
 \item{obj}{An object of the class PCAMax}
 
-\item{max}{numeric, a maximum value for the normalized distrubtions}
+\item{normalizing.max}{numeric, a maximum value for the normalized distrubtions}
 }
 \value{
 a normalized matrix, each column treated separately

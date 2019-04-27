@@ -185,18 +185,17 @@ setMethod("getSolverNames", "EnsembleSolver",
 #'
 #' @return A data frame containing the scores for all solvers and two composite scores
 #' relating the target gene to each transcription factor. The two new scores are:
+#' @details
 #' \itemize{
-#' \item{"concordance": a composite score created similarly to "extreme_score", but with each solver's
-#' score scaled using *atan(x)*. This score scales from 0-1}
-#' \item{"pcaMax": a composite score created using the root mean square of the principal
-#' components of the individual solver scores}
+#'   \item{concordance}{a composite score}
+#'   \item{pcaMax}{a composite of the principal components of the individual solver scores}
 #' }
 #'
 #' @seealso \code{\link{EnsembleSolver}}
 #'
 #' @family solver methods
 #'
-#' @examples
+#' @examples 
 #' \dontrun{
 #' # Load included Alzheimer's data, create an Ensemble object with default solvers, and solve
 #' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
@@ -215,6 +214,8 @@ setMethod("getSolverNames", "EnsembleSolver",
 #' solverNames = c("lasso", "pearson", "ridge"))
 #' tbl <- run(ensemble.solver)
 #' }
+#' 
+#' @export
 
 setMethod("run", "EnsembleSolver",
 
@@ -475,8 +476,8 @@ setMethod("run", "EnsembleSolver",
 #              if(class(tbl.augmented) == "try-error"){
 #                  #browser()
 #                  warning("The signal strength of ensemble of solvers is too weak to support
-#composite scores ('pcaMax' and 'concordance' in the model output table. This is a classic
-#'large n, small m' problem that could be rectified by providing more samples")
+# composite scores ('pcaMax' and 'concordance' in the model output table. This is a classic
+# "large n, small m" problem that could be rectified by providing more samples")
 #                  tbl.all$pcaMax <- NA
 #                  tbl.all$concordance <- NA
 #              } else {

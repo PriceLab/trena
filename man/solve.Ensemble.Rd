@@ -15,12 +15,6 @@
 \value{
 A data frame containing the scores for all solvers and two composite scores
 relating the target gene to each transcription factor. The two new scores are:
-\itemize{
-\item{"concordance": a composite score created similarly to "extreme_score", but with each solver's
-score scaled using *atan(x)*. This score scales from 0-1}
-\item{"pcaMax": a composite score created using the root mean square of the principal
-components of the individual solver scores}
-}
 }
 \description{
 Given a TReNA object with Ensemble as the solver and a list of solvers
@@ -28,6 +22,33 @@ Given a TReNA object with Ensemble as the solver and a list of solvers
 as a predictor of the target gene's expression level. The final scores for the ensemble
 method combine all specified solvers to create a composite score for each transcription factor.
 This method should be called using the \code{\link{solve}} method on an appropriate TReNA object.
+}
+\details{
+\itemize{
+  \item{concordance}{a composite score}
+  \item{pcaMax}{a composite of the principal components of the individual solver scores}
+}
+}
+\examples{
+\dontrun{
+# Load included Alzheimer's data, create an Ensemble object with default solvers, and solve
+load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+target.gene <- "MEF2C"
+tfs <- setdiff(rownames(mtx.sub), target.gene)[1:30]
+ensemble.solver <- EnsembleSolver(mtx.sub, target.gene, tfs)
+tbl <- run(ensemble.solver)
+
+# Solve the same problem, but supply extra arguments that change alpha for LASSO to 0.8 and also
+# Change the gene cutoff from 10\% to 20\%
+ensemble.solver <- EnsembleSolver(mtx.sub, target.gene, tfs, geneCutoff = 0.2, alpha.lasso = 0.8)
+tbl <- run(ensemble.solver)
+
+# Solve the original problem with default cutoff and solver parameters, but use only 4 solvers
+ensemble.solver <- EnsembleSolver(mtx.sub, target.gene, tfs,
+solverNames = c("lasso", "pearson", "ridge"))
+tbl <- run(ensemble.solver)
+}
+
 }
 \seealso{
 \code{\link{EnsembleSolver}}
