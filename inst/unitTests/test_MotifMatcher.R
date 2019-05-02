@@ -24,6 +24,8 @@ runTests <- function()
    test_findMatchesByChromosomalRegion_contrastReferenceWithVariant()
    test_findMatchesByChromosomalRegion.twoAlternateAlleles()
 
+   test_findMatchesByChromosomalRegion.yeast()
+
 } # runTests
 #------------------------------------------------------------------------------------------------------------------------
 test_basicConstructor <- function(reuse=FALSE)
@@ -624,6 +626,25 @@ test_findMatchesByChromosomalRegion.twoAlternateAlleles <- function()
 
 
 } # test_findMatchesByChromosomalRegion.twoAlternateAlleles
+#----------------------------------------------------------------------------------------------------
+test_findMatchesByChromosomalRegion.yeast <- function()
+{
+   printf("--- test_findMatchesByChromosomalRegion.yeast")
+
+   pfms <- as.list(jaspar.yeast.pfms <- query(MotifDb, c("cerevisiae", "jaspar2018")))
+   mm <- MotifMatcher(genomeName="SacCer3", pfms)
+   tbl.regions <- data.frame(chrom="chrI", start=71287, end=71886, stringsAsFactors=FALSE)
+
+   tbl.motifs <- findMatchesByChromosomalRegion(mm, tbl.regions, pwmMatchMinimumAsPercentage=95L)
+   dim(tbl.motifs)
+   checkTrue(nrow(tbl.motifs) > 20 & nrow(tbl.motifs) < 30)
+   checkEquals(ncol(tbl.motifs), 13)
+
+   tfs <- sort(mcols(MotifDb[unique(tbl.motifs$motifName)])$geneSymbol)
+   some.expected <-  c("ABF2", "ACE2",  "ARG80", "FZF1", "HAL9",  "HAP2")
+   checkTrue(all(some.expected %in% tfs))
+
+} # test_findMatchesByChromosomalRegion.yeast
 #----------------------------------------------------------------------------------------------------
 # after finding and fixing and testing the start/end calculation for minus strand hits
 # in .matchPwmForwardAndReverse, this exploratory function now tests that those results

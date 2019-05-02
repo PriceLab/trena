@@ -66,24 +66,27 @@ MotifMatcher <- function(genomeName,
                          pfms,
                          quiet=TRUE)
 {
-
     stopifnot(is.list(pfms))
 
     if(genomeName == "hg38"){
-        reference.genome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
-    }
+       reference.genome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
+       }
 
     else if(genomeName == "hg19"){
-        reference.genome <- BSgenome.Hsapiens.UCSC.hg19::BSgenome.Hsapiens.UCSC.hg19
-    }
+       reference.genome <- BSgenome.Hsapiens.UCSC.hg19::BSgenome.Hsapiens.UCSC.hg19
+        }
 
     else if(genomeName == "mm10"){
-        reference.genome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
-    }
+       reference.genome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
+       }
+
+    else if(tolower(genomeName) == "saccer3"){
+       reference.genome <- BSgenome.Scerevisiae.UCSC.sacCer3::BSgenome.Scerevisiae.UCSC.sacCer3
+       }
 
     else {
-        stop(sprintf("MotifMatch, genomeName not in hg19, hg38: '%s'", genomeName))
-    }
+       stop(sprintf("MotifMatch, genomeName not in hg19, hg38: '%s'", genomeName))
+       }
 
     .MotifMatcher(genome=reference.genome, pfms=pfms, quiet=quiet)
 
