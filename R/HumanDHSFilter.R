@@ -283,7 +283,8 @@ setMethod("getCandidates", "HumanDHSFilter",
                   printf(" and %d motifs", nrow(tbl))
 
               preferred.colnames <- c("motifName", "chrom", "motifStart", "motifEnd", "strand", "motifScore", "motifRelativeScore",
-                                      "match", "regulatoryRegionStart", "regualtoryRegionEnd", "regulatorySequence", "variant")
+                                      "match", "regulatoryRegionStart", "regualtoryRegionEnd", "regulatorySequence", "variant",
+                                      "shortMotif")
               colnames(tbl) <- preferred.colnames
               long.sequences <- which(tbl$regulatorySequence > 20)
               if(length(long.sequences) > 0){
@@ -292,7 +293,7 @@ setMethod("getCandidates", "HumanDHSFilter",
               tbl
           }) # getCandidates
 #----------------------------------------------------------------------------------------------------
-#' Get a tabel of regulatory regions for a Human DHS filter
+#' Get a table of regulatory regions for a Human DHS filter
 #'
 #' @aliases getRegulatoryRegions
 #' @rdname getRegulatoryRegions
@@ -343,7 +344,8 @@ setMethod("getRegulatoryRegions", "HumanDHSFilter",
 
           function(obj, encode.table.name, chromosome, start, end, score.threshold=0) {
 
-              message(sprintf("about to create RMySQL driver, getting regulatory regions"))
+             if(!obj@quiet)
+                message(sprintf("about to create RMySQL driver, getting regulatory regions"))
               driver <- RMySQL::MySQL()
               #driver <- RMariaDB::MariaDB()
               host <- "genome-mysql.cse.ucsc.edu"

@@ -336,10 +336,9 @@ test_getCandidates.vrk2.twoRegions <- function()
                                       quiet=TRUE))
 
    tbl <- getCandidates(hdf)
-   checkEquals(ncol(tbl), 12)
    checkEquals(colnames(tbl),
                c("motifName", "chrom", "motifStart", "motifEnd", "strand", "motifScore", "motifRelativeScore", "match",
-                 "regulatoryRegionStart", "regualtoryRegionEnd", "regulatorySequence", "variant"))
+                 "regulatoryRegionStart", "regualtoryRegionEnd", "regulatorySequence", "variant", "shortMotif"))
 
     # make sure all motifs fall within the specified restions
     # cfSpec$regionsSpec: [1] "chr2:57906700-57906870" "chr2:57907740-57908150"
@@ -364,7 +363,7 @@ test_getCandidates.vrk2.twoRegions <- function()
 
    tbl.conservative <- associateTranscriptionFactors(MotifDb, tbl, source="MotifDb", expand.rows=TRUE)
    motifDb.associated.genes <- c("GATA3","FOXL1","GATA5","RHOXF1","RHOXF1","SPI1","SPI1","ETS1","ETS1","GATA2", "GATA2")
-   checkEquals(tbl.conservative$geneSymbol, motifDb.associated.genes)
+   checkEquals(sort(motifDb.associated.genes), sort(tbl.conservative$geneSymbol))
 
 
       # we used MotifDb as our source of motifs, wherein motifName is, for example,
@@ -410,8 +409,8 @@ test_getCandidates.vrk2.rs13384219.variant <- function()
    tbl.wt <- getCandidates(hdf.wt)
    tbl.var <- getCandidates(hdf.var)
 
-   checkEquals(dim(tbl.wt),  c(53, 12))
-   checkEquals(dim(tbl.var), c(45, 12))
+   checkEquals(dim(tbl.wt),  c(53, 13))
+   checkEquals(dim(tbl.var), c(45, 13))
 
       # many motifs survive, 9 are lost, 2 are gained
       # see trena::assessSnp for close comparison of losses and gains, wherein differing scores are reported
