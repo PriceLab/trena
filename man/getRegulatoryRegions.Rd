@@ -4,7 +4,7 @@
 \name{getRegulatoryRegions,HumanDHSFilter-method}
 \alias{getRegulatoryRegions,HumanDHSFilter-method}
 \alias{getRegulatoryRegions}
-\title{Get a tabel of regulatory regions for a Human DHS filter}
+\title{Get a table of regulatory regions for a Human DHS filter}
 \usage{
 \S4method{getRegulatoryRegions}{HumanDHSFilter}(obj, encode.table.name,
   chromosome, start, end, score.threshold = 0)
@@ -27,7 +27,7 @@ A data frame containing the regulatory regions for the filter, including the
 chromosome, start, and end positions, plus the count and score of each region.
 }
 \description{
-Get a tabel of regulatory regions for a Human DHS filter
+Get a table of regulatory regions for a Human DHS filter
 }
 \examples{
 \dontrun{
