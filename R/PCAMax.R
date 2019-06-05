@@ -173,7 +173,6 @@ setMethod('addStatsSimple', 'PCAMax',
            if(length(col.rm) > 0)
               mtx <- mtx[, -col.rm]
            } # if excludeLasso
-        # browser()
         scoreRow <- function(row){
            zeros <- which(abs(row) < 1e-10)
            if(length(zeros) > 0){

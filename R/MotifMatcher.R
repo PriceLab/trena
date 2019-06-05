@@ -446,7 +446,6 @@ setMethod("getPfms", "MotifMatcher",
     if(nrow(tbl.overlaps) == 0)
         return(tbl.regions)
 
-    #browser()
     regions.without.snps <- setdiff(1:nrow(tbl.regions), tbl.overlaps$region)
     tbl.regions.out <- tbl.regions[regions.without.snps,]
     tbl.regions.out$status <- rep("wt", nrow(tbl.regions.out))

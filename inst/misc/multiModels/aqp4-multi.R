@@ -243,7 +243,6 @@ test.createModel <- function()
    m2 <- createModel("AQP4", "chr18", start, end)
    m2.mut <- createModel("AQP4", "chr18", start, end, variants="rs3875089")
 
-  browser()
   if(length(m$model.fp) > 0){
      head(m$model.dhs$edges)
       #        IncNodePurity  gene.cor
@@ -519,7 +518,6 @@ identifyPerturbedMotifs <- function(chrom="chr18", start=26850565, end=26865469)
                                    start=min(tbl.snp$loc) - 100,
                                    end=max(tbl.snp$loc) + 5000,
                                    stringsAsFactors=FALSE)
-   browser()
    tbl.wt <- getSequence(mm, tbl.regions.noSeq)
    tbl.mut <- getSequence(mm, tbl.regions.noSeq, tbl.snp$snp)
    checkEquals(nchar(tbl.wt$seq), nchar(tbl.mut$seq))
@@ -580,7 +578,6 @@ identifyPerturbedMotifs <- function(chrom="chr18", start=26850565, end=26865469)
     #  G  [ 147  398   21    0    4    0    2    1  206  138 ]
     #  T  [ 314   51   18   32 1132  867   24  291  511  367 ]
 
-   browser()
   tbl.snp
 
     # target.gene chromosome      loc       snp shoulder genome
@@ -703,7 +700,6 @@ runBasic <- function(chrom="chr18", start=26865462, end=26865867, min.motif.scor
    printf("addGraph")
    addGraph(tv, g.lo)
    loadStyle(tv, "style.js")
-   browser()
    xyz <- 99
 
 } # runBasic
@@ -902,8 +898,6 @@ quick <- function()
    printf("addGraph")
    addGraph(tv, g.lo)
    loadStyle(tv, "style.js")
-
-   browser();
 
    chrom <- "chr18"
    start <- tbl.snp$loc[2] - 10

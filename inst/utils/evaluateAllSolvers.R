@@ -5,10 +5,10 @@ library(limma)
 
 #----------------------------------------------------------------------------------------------------
 assess_methodsAgainstDistributions <- function(mtx.sub, target.gene, tfs)
-{    
+{
     #fivenum(mtx.sub)# 0.000000    1.753137   12.346965   43.247467 1027.765854
-    
-    # Transform with log2 
+
+    # Transform with log2
     mtx.tmp <- mtx.sub - min(mtx.sub) + 0.001
     mtx.log2 <- log2(mtx.tmp)
     #fivenum(mtx.log2)  # [1] -9.9657843  0.8107618  3.6262014  5.4345771 10.005297
@@ -19,7 +19,7 @@ assess_methodsAgainstDistributions <- function(mtx.sub, target.gene, tfs)
 
     # Transform via VOOM transformation
     mtx.voom <- voom(mtx.sub)$E
-    #fivenum(mtx.voom) 
+    #fivenum(mtx.voom)
 
     printf("--- Testing LASSO")
 
@@ -27,13 +27,13 @@ assess_methodsAgainstDistributions <- function(mtx.sub, target.gene, tfs)
     lasso1 <- solve(trena, target.gene, tfs)
     lasso1 <- data.frame(gene = rownames(lasso1),
                          lasso.as.is = lasso1$beta)
-   
-    
+
+
     trena <- TReNA(mtx.assay=mtx.log2, solver="lasso", quiet=FALSE)
     lasso2 <- solve(trena, target.gene, tfs)
     lasso2 <- data.frame(lasso.log2 = lasso2$beta,
                          gene = rownames(lasso2))
-    
+
     trena <- TReNA(mtx.assay=mtx.asinh, solver="lasso", quiet=FALSE)
     lasso3 <- solve(trena, target.gene, tfs)
     lasso3 <- data.frame(lasso.asinh = lasso3$beta,
@@ -55,7 +55,7 @@ assess_methodsAgainstDistributions <- function(mtx.sub, target.gene, tfs)
     lasso2.top10 <- lasso2$gene[order(abs(lasso2$lasso.log2), decreasing=TRUE)][1:10]
     lasso3.top10 <- lasso3$gene[order(abs(lasso3$lasso.asinh), decreasing=TRUE)][1:10]
     lasso4.top10 <- lasso4$gene[order(abs(lasso4$lasso.voom), decreasing = TRUE)][1:10]
- 
+
     printf("--- Testing Bayes Spike")
 
     trena <- TReNA(mtx.assay=mtx.sub, solver="bayesSpike", quiet=FALSE)
@@ -82,7 +82,7 @@ assess_methodsAgainstDistributions <- function(mtx.sub, target.gene, tfs)
     bs2$gene <- as.character(bs2$gene)
     bs3$gene <- as.character(bs3$gene)
     bs4$gene <- as.character(bs4$gene)
-    
+
     # Grab the top 10 genes from each
     bs1.top10 <- bs1$gene[order(abs(bs1$bs.as.is), decreasing=TRUE)][1:10]
     bs2.top10 <- bs2$gene[order(abs(bs2$bs.log2), decreasing=TRUE)][1:10]
@@ -119,7 +119,7 @@ assess_methodsAgainstDistributions <- function(mtx.sub, target.gene, tfs)
     # Grab the top 10 genes from each
     rf1.top10 <- rf1$gene[order(abs(rf1$rf.as.is), decreasing=TRUE)][1:10]
     rf2.top10 <- rf2$gene[order(abs(rf2$rf.log2), decreasing=TRUE)][1:10]
-    rf3.top10 <- rf3$gene[order(abs(rf3$rf.asinh), decreasing=TRUE)][1:10]    
+    rf3.top10 <- rf3$gene[order(abs(rf3$rf.asinh), decreasing=TRUE)][1:10]
     rf4.top10 <- rf4$gene[order(abs(rf4$rf.voom), decreasing=TRUE)][1:10]
 
     # Use Square Root LASSO
@@ -129,13 +129,13 @@ assess_methodsAgainstDistributions <- function(mtx.sub, target.gene, tfs)
     sqrt.lasso1 <- solve(trena, target.gene, tfs)
     sqrt.lasso1 <- data.frame(gene = rownames(sqrt.lasso1),
                          sqrt.lasso.as.is = sqrt.lasso1$beta)
-   
-    
+
+
     trena <- TReNA(mtx.assay=mtx.log2, solver="sqrtlasso", quiet=FALSE)
     sqrt.lasso2 <- solve(trena, target.gene, tfs)
     sqrt.lasso2 <- data.frame(sqrt.lasso.log2 = sqrt.lasso2$beta,
                          gene = rownames(sqrt.lasso2))
-    
+
     trena <- TReNA(mtx.assay=mtx.asinh, solver="sqrtlasso", quiet=FALSE)
     sqrt.lasso3 <- solve(trena, target.gene, tfs)
     sqrt.lasso3 <- data.frame(sqrt.lasso.asinh = sqrt.lasso3$beta,
@@ -157,8 +157,8 @@ assess_methodsAgainstDistributions <- function(mtx.sub, target.gene, tfs)
     sqrt.lasso2.top10 <- sqrt.lasso2$gene[order(abs(sqrt.lasso2$sqrt.lasso.log2), decreasing=TRUE)][1:10]
     sqrt.lasso3.top10 <- sqrt.lasso3$gene[order(abs(sqrt.lasso3$sqrt.lasso.asinh), decreasing=TRUE)][1:10]
     sqrt.lasso4.top10 <- sqrt.lasso4$gene[order(abs(sqrt.lasso4$sqrt.lasso.voom), decreasing = TRUE)][1:10]
- 
-    
+
+
     # Take the union of all the genes
     all.genes <- unique(c(lasso1.top10,
                        lasso2.top10,
@@ -224,7 +224,7 @@ assess_methodsAgainstDistributions <- function(mtx.sub, target.gene, tfs)
             rf.result$edges$gene.cor[[which(rownames(rf.result$edges) == gene)]]
     }
 
-    # Order the rows and return it 
+    # Order the rows and return it
     tbl.all <- tbl.all[order(abs(tbl.all$gene.cor), decreasing = TRUE),]
     invisible(tbl.all)
 
@@ -236,7 +236,7 @@ assess_ampAD154AllSolversAndDistributions <- function(){
     load(system.file(package="TReNA", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
     target.gene <- "MEF2C"
     tfs <- setdiff(rownames(mtx.sub), "MEF2C")
-   
+
     tbl.all <- assess_methodsAgainstDistributions(mtx.sub,target.gene,tfs)
 
 
@@ -247,9 +247,8 @@ transform_ampADFromRaw <- function(){
     library(edgeR)
     file.path <- "./inst/extdata/MayoRNAseq_RNAseq_TCX_geneCounts2.tsv"
     transposedCounts <- read.table(file.path, header = TRUE, check.names = FALSE, as.is = TRUE, sep = "\t", stringsAsFactors = TRUE)
-    browser()
     rownames(transposedCounts) <- transposedCounts$ensembl_id
-    
+
     # Make it into a matrix of counts and drop the ENSEMBL IDs
     mtx <- as.matrix(transposedCounts[, -1])
 
@@ -261,9 +260,9 @@ transform_ampADFromRaw <- function(){
 
     # Compute counts per million (returns a matrix)
     normalizedCpm <- cpm(normFactors)
-    
+
     # Organize as a data frame w/ENSEMBL IDs and data values
-    ### Where are the IDs to map to ENSEMBL? 
+    ### Where are the IDs to map to ENSEMBL?
     ids <- as.data.frame(row.names(normalizedCpm))
     colnames(ids) <-c("ensembl_id")
     row.names(normalizedCpm) <- NULL
@@ -272,6 +271,6 @@ transform_ampADFromRaw <- function(){
 
     # Return the normalized data frame
     invisible(newDF)
-    
+
 } #transform_ampADFromRaw
 #----------------------------------------------------------------------------------------------------

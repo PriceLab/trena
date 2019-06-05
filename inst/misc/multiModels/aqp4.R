@@ -242,7 +242,6 @@ test.createModel <- function()
    m2 <- createModel("AQP4", "chr18", start, end)
    m2.mut <- createModel("AQP4", "chr18", start, end, variants="rs3875089")
 
-  browser()
   if(length(m$model.fp) > 0){
      head(m$model.dhs$edges)
       #        IncNodePurity  gene.cor
@@ -579,7 +578,6 @@ identifyMotifs <- function(chrom="chr18", start=26865324, end=26866747)
     #  G  [ 147  398   21    0    4    0    2    1  206  138 ]
     #  T  [ 314   51   18   32 1132  867   24  291  511  367 ]
 
-   browser()
    tbl.snp
 
     # target.gene chromosome      loc       snp shoulder genome
@@ -702,7 +700,6 @@ runBasic <- function(chrom="chr18", start=26865462, end=26865867, min.motif.scor
    printf("addGraph")
    addGraph(tv, g.lo)
    loadStyle(tv, "style.js")
-   browser()
    xyz <- 99
 
 } # runBasic

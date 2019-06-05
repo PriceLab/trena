@@ -195,7 +195,7 @@ setMethod("getSolverNames", "EnsembleSolver",
 #'
 #' @family solver methods
 #'
-#' @examples 
+#' @examples
 #' \dontrun{
 #' # Load included Alzheimer's data, create an Ensemble object with default solvers, and solve
 #' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
@@ -214,7 +214,7 @@ setMethod("getSolverNames", "EnsembleSolver",
 #' solverNames = c("lasso", "pearson", "ridge"))
 #' tbl <- run(ensemble.solver)
 #' }
-#' 
+#'
 #' @export
 
 setMethod("run", "EnsembleSolver",
@@ -474,7 +474,6 @@ setMethod("run", "EnsembleSolver",
 #              # Else, just keep the old table and throw a warning
 #
 #              if(class(tbl.augmented) == "try-error"){
-#                  #browser()
 #                  warning("The signal strength of ensemble of solvers is too weak to support
 # composite scores ('pcaMax' and 'concordance' in the model output table. This is a classic
 # "large n, small m" problem that could be rectified by providing more samples")

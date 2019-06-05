@@ -21,7 +21,7 @@ setGeneric("solve",                    signature="obj", function(obj, target.gen
 #'
 #' @rdname getSolverName
 #' @aliases getSolverName
-#' 
+#'
 #' @param obj An object of class TReNA
 #'
 #' @return The name of the solver subclass object contained by the given TReNA object
@@ -31,7 +31,7 @@ setGeneric("solve",                    signature="obj", function(obj, target.gen
 #' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
 #' solver <- TReNA(mtx.sub, solver = "lasso")
 #' mtx <- getSolverName(solver)
-#' 
+#'
 #' @export
 setGeneric("getSolverName",   signature="obj", function(obj) standardGeneric ("getSolverName"))
 
@@ -52,7 +52,7 @@ setGeneric("getSolverName",   signature="obj", function(obj) standardGeneric ("g
 #' load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
 #' solver <- TReNA(mtx.sub, solver = "lasso")
 #' mtx <- getSolverObject(solver)
-#' 
+#'
 #' @export
 setGeneric("getSolverObject", signature="obj", function(obj) standardGeneric ("getSolverObject"))
 #----------------------------------------------------------------------------------------------------
@@ -88,7 +88,6 @@ setGeneric("getSolverObject", signature="obj", function(obj) standardGeneric ("g
 
 TReNA <- function(mtx.assay=matrix(), solverName="lasso", quiet=TRUE)
 {
-    browser()
     recognized.solvers <- c("lasso", "randomForest", "bayesSpike", "pearson",
                             "spearman","sqrtlasso","lassopv","ridge", "naive", "ensemble")
 
@@ -160,7 +159,7 @@ setMethod("solve", "TReNA",
 #' @describeIn TReNA Retrieve the name of the solver specified in a TReNA object
 #'
 #' @param obj An object of class TReNA
-#' 
+#'
 #' @examples
 #'
 #' # Create a LassoSolver object using the included Alzheimer's data and retrieve the solver name
@@ -189,6 +188,6 @@ setMethod("getSolverObject", "TReNA",
 
           function(obj){
               # Return the solver name stored in the object
-              return(obj@solver)                
+              return(obj@solver)
           })
 #----------------------------------------------------------------------------------------------------
