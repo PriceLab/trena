@@ -25,6 +25,8 @@ runTests <- function()
    test_findMatchesByChromosomalRegion.twoAlternateAlleles()
 
    test_findMatchesByChromosomalRegion.yeast()
+   test_findMatchesByChromosomalRegion.athaliana()
+
 
 } # runTests
 #------------------------------------------------------------------------------------------------------------------------
@@ -632,7 +634,7 @@ test_findMatchesByChromosomalRegion.yeast <- function()
    printf("--- test_findMatchesByChromosomalRegion.yeast")
 
    pfms <- as.list(jaspar.yeast.pfms <- query(MotifDb, c("cerevisiae", "jaspar2018")))
-   mm <- MotifMatcher(genomeName="SacCer3", pfms)
+   mm <- MotifMatcher(genomeName="saccer3", pfms)
    tbl.regions <- data.frame(chrom="chrI", start=71287, end=71886, stringsAsFactors=FALSE)
 
    tbl.motifs <- findMatchesByChromosomalRegion(mm, tbl.regions, pwmMatchMinimumAsPercentage=95L)
@@ -645,6 +647,28 @@ test_findMatchesByChromosomalRegion.yeast <- function()
    checkTrue(all(some.expected %in% tfs))
 
 } # test_findMatchesByChromosomalRegion.yeast
+#----------------------------------------------------------------------------------------------------
+test_findMatchesByChromosomalRegion.athaliana <- function()
+{
+   printf("--- test_findMatchesByChromosomalRegion.athaliana")
+
+   pfms <- as.list(query(MotifDb, c("athaliana", "jaspar2018")))
+   mm <- MotifMatcher(genomeName="tair10", pfms)
+   tbl.regions <- data.frame(chrom="Chr3", start=20438600, end=20438640, stringsAsFactors=FALSE)
+   seq <- getSequence(mm, tbl.regions)
+     # chrom    start      end                                                                                                   seq status
+     #  Chr3 20438539 20438639 CTAAAAATAGGAGAAATAAGTGCAATTTCAAAGGAGACGTTAATGGCAAGTTTTTCTCTTCCAAAATTGACTAGTCGATGATGTTAATTGTTAATGTTGTC     wt
+
+   tbl.motifs <- findMatchesByChromosomalRegion(mm, tbl.regions, pwmMatchMinimumAsPercentage=90L)
+   dim(tbl.motifs)
+   checkTrue(nrow(tbl.motifs) > 5 & nrow(tbl.motifs) < 10)
+   checkEquals(ncol(tbl.motifs), 13)
+
+   tfs <- sort(mcols(MotifDb[unique(tbl.motifs$motifName)])$geneSymbol)
+   some.expected <-  c("AGL42", "WRKY40","WRKY48", "WRKY75", "WRKY8")
+   checkTrue(all(some.expected %in% tfs))
+
+} # test_findMatchesByChromosomalRegion.athaliana
 #----------------------------------------------------------------------------------------------------
 # after finding and fixing and testing the start/end calculation for minus strand hits
 # in .matchPwmForwardAndReverse, this exploratory function now tests that those results
