@@ -45,6 +45,7 @@ Other solver methods: \code{\link{run,BayesSpikeSolver-method}},
   \code{\link{run,PearsonSolver-method}},
   \code{\link{run,RandomForestSolver-method}},
   \code{\link{run,RidgeSolver-method}},
-  \code{\link{run,SpearmanSolver-method}}
+  \code{\link{run,SpearmanSolver-method}},
+  \code{\link{run,XGBoostSolver-method}}
 }
 \concept{solver methods}

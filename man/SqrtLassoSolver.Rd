@@ -51,6 +51,6 @@ Other Solver class objects: \code{\link{BayesSpikeSolver}},
   \code{\link{PearsonSolver}},
   \code{\link{RandomForestSolver}},
   \code{\link{RidgeSolver}}, \code{\link{Solver-class}},
-  \code{\link{SpearmanSolver}}
+  \code{\link{SpearmanSolver}}, \code{\link{XGBoostSolver}}
 }
 \concept{Solver class objects}
