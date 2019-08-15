@@ -1,5 +1,6 @@
 library(trena)
 library(RUnit)
+library(xgboost)
 #----------------------------------------------------------------------------------------------------
 printf <- function(...) print(noquote(sprintf(...)))
 #----------------------------------------------------------------------------------------------------
@@ -36,15 +37,11 @@ test_ampAD.mef2c.154tfs.278samples.XGBoost <- function()
    tfs <- setdiff(rownames(mtx.asinh), "MEF2C")
    #print(fivenum(mtx.asinh)  # [1] 0.000000 1.327453 3.208193 4.460219 7.628290)
 
-   #--------------------------------------------------------------------------------
-   # temporarily disabled, awaiting a real implementation of the XGBoostSolver
-   #--------------------------------------------------------------------------------
-
-   # XGBoost.solver <- XGBoostSolver(mtx.asinh, target.gene, tfs)
-   # tbl <- run(XGBoost.solver)
+   XGBoost.solver <- XGBoostSolver(mtx.asinh, target.gene, tfs)
+   tbl <- run(XGBoost.solver)
 
    # Check for empirical values
-   # checkTrue(nrow(subset(tbl, abs(coefficient) > 0.8)) == 9)
+   checkTrue(nrow(subset(tbl, abs(Importance) > 0.013)) == 9)
 
 } # test_ampAD.mef2c.154tfs.278samples.XGBoost
 #----------------------------------------------------------------------------------------------------
