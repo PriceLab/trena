@@ -1,7 +1,7 @@
 #----------------------------------------------------------------------------------------------------
 #' An S4 class to represent a XGBoost solver
 #'
-#' @import xgboost
+#' @import xgboost    
 #' @include Solver.R
 #' @import methods
 #'
