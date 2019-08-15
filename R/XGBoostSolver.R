@@ -139,10 +139,14 @@ setMethod("run", "XGBoostSolver",
               y = as.vector(t(mtx[target.gene,])) # Make target gene levels into a vector
 
               # call XGBoost here
+              bst <- xgboost(data = x, label = y, eta = 0.1, nrounds = 100)
+              importance <- xgb.importance(feature_names = colnames(x), model = bst)
+              plot.importance <- xgb.plot.importance(importance_matrix = importance)
 
-
-              # Fashingf a dat.frame wtih the selected features with approrpiate scores
-
+              # Fashingf a data.frame wtih the selected features with approrpiate scores
+              tbl <- data.frame(row.names = importance$Feature,
+                                importance[,-1])
+              
               return(tbl)
           })
 #----------------------------------------------------------------------------------------------------
