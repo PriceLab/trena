@@ -18,7 +18,7 @@
 #' with the target gene
 #' @param quiet A logical denoting whether or not the solver should print output
 #'
-#' @return A Solver class object with XGBoost correlation coefficients as the solver
+#' @return A Solver class object with XGBoost Importances (Gain) as the solver
 #'
 #' @seealso  \code{\link{solve.XGBoost}}, \code{\link{getAssayData}}
 #'
@@ -94,12 +94,12 @@ setMethod('show', 'XGBoostSolver',
 #' @aliases run.XGBoostSolver solve.XGBoost
 #'
 #' @description Given a TReNA object with XGBoost as the solver, use the \code{\link{cor}}
-#' function with \code{method = "XGBoost"} to esimate coefficients for each transcription factor
+#' function with \code{method = "XGBoost"} to esimate importances for each transcription factor
 #' as a predictor of the target gene's expression level.
 #'
 #' @param obj An object of class XGBoostSolver
 #'
-#' @return The set of XGBoost Correlation Coefficients between each transcription factor and the target gene.
+#' @return The set of XGBoost relative importances between each transcription factor and the target gene.
 #'
 #' @seealso \code{\link{cor}}, \code{\link{XGBoostSolver}}
 #'
@@ -144,7 +144,7 @@ setMethod("run", "XGBoostSolver",
               importance <- xgb.importance(feature_names = colnames(x), model = bst)
               plot.importance <- xgb.plot.importance(importance_matrix = importance)
 
-              # Fashingf a data.frame wtih the selected features with approrpiate scores
+              # Fashion a data.frame with Gain, Cover, and Frequency for each transcription factor
               tbl <- data.frame(row.names = importance$Feature,
                                 importance[,-1])
               
