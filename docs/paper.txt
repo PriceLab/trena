@@ -1,0 +1,154 @@
+*------------------------------------------------------------------------------------------------------------------------
+* fresh flours cafe (28 aug 2019)
+
+gene regulation plays an important role in deterimining cell fate.  since cell state is an intensely
+dynamic process, either to establish and maintan equilibiriu, or to differentiate into successive
+states, so therefor muse gene regulation be a highly dynamic process.
+
+Historical limiations ni determining ro prediction gene gegulatory relationships have been loosened
+recently due to the incresing availability of ChIP-se, scATAC-seq, RNA-seq, single-cell
+transcriptomics, SRM, epigenomics and proteomics.  These assays open up dynamic apsects of cell
+state permitting (enabling) inference and deduction of gene regulation with ever-incresing
+fidelity, producing candidate regulatory relationships worthy of attempts at laboratory validation.
+of course many cell types, differentiation trajectories, tissues and organisms cannot yet be assayed
+in such fine detail.
+
+any boradly useful computational tool to elucidate gene regulatory relatinships should support
+information densisty at all points along this spectrum, from simple static data (e.g., buk RNA,
+static genome sequence and generic promoter definition) to multi-dimensional and
+multi-stage/timepoint measurements of gene expression, protein counts and chomatin modification.
+
+the trena software package (https://bioconductor.org/packages/release/bioc/html/trena.html)
+addresses this spectur of analytical possibilities, as we will demonstrate in successive sections of
+this paper.
+
+Let us begin with some observations.  to a first approximation, eukaryotic gene regulation depends
+
+- upon the presence in the nucleues of protein transcription factors
+- open chromatin
+- binding partners, either DNA or other protein factors and co-factors
+- the recruitment of transcription machiner to the target genes' TSS by some combination of TFs and
+- co-factors
+
+In its simplest mode ofoperation, trena uses only bulk gene expression data, which serves as a proxy
+for TF protein abundance;  a generically defined promoter region (a proxy for gene- and
+cell-state-specific open chromatin in promoters and enhancers); and high-scoring motif matching fo
+these TFs to promoter sequence.
+
+In its (current) most nuanced operation we use scATAC-seq to identifies stage-specific open chromatin, 
+cell-type specific RNA-seq backed up by sc proteomics (SRM) to provide TF abundance, and a
+combinaton of DNA sequence & DNA shape matching, cross-references to ChIP-seq, intersected with
+cell- or tissue-type specific HiC, eqtl and enhancer expression.
+
+Trena has two well-separated, independetn stages which handily supports this broad spectrum of
+information density.
+
+The first stage selects candidate TFs
+The scond stage uses a variety of well-established feature selection regression (or regression-like)
+algorithms operating on gene expression, to idenify from among the TFs identified in stage one,
+those TFs whose quantities are correlated or anti-correlated with that of the target gene.   This
+stage operates upon quantitative expression data.  Among the mostly linear feature selectors are
+spearman and pearson correlation, lasso, ridge, random forest, XGBoost.  The net result of this
+ensemble of "solvers" is a table of scores, per TF per method, of those TFs whose motifs match DNA
+sequence in teh designated regulatory region of th etarget gene, however defined.  This table
+provides candidate TFs pointed to by two orthogonal kinds of evidence: co-expression, probability of
+binding, for closer examination and possibly attempts at laboratory validation.
+
+A degenerate verions of stage one - candidate TF selction - can also be useful.  We sometimes choose
+the full set of GO:00037000 "DNA-binding transcription factor activity" annotated genes as
+candidates for feature selection, almost half of which have no associated DNA-binding motif.  This
+degernerate maximally simple strategy will sometimes suggest co-facts not otherwise avaialble for
+scruting which, if correlated or anti-correlated in gene expression, will emerge as high-ranked
+regulatory candiations in stage two.
+
+progressive examples: degenerate, generic promoter, add footprints, bulk RNA, GeneHancer,
+scATAC-seq, hint-atac, srm,
+
+regulation of GATA2?
+of hamid's mouse TCEx tcl7?
+
+
+
+
+
+
+
+*------------------------------------------------------------------------------------------------------------------------
+* on ferry to bainbridge (27 aug 2019) v2
+
+ transcription factor binding leading to subsequent gene transcription and translation play a crucial
+role in the regulation of many gene processes.  It is, at present, incompletely understood.  to a
+first approximation however TF binding can be characterized by judicious combination of data from three assays: 
+of gene exspression, of DNA sequence, and of open chromatin.
+presence of transcription factor proteins in the nucleus of the cell, which have a reasonable match
+in open chromatin to the DNA sequence of the TFs' cognate binding motif, in chromosomal regions
+proximal to the target gene's transcription start site.  Though actual regulatory processes in
+metazoans are complex and dynamicm - involving co-factors which do not bind DNA, direct binding
+guided more by DNA shape than DNA sequence, epigenetics and pervasive stochasticity - the trena
+software package provides a spectrum of analytical approaches, with which to predict gene regulatory
+relationships.  the most basic strategy reports which genes annotatedas regulatory are correlated or
+anti-correlated in gene expression to a target gene.  At present, the most nuanced strategy uses
+time series scATAC-seq and RNA-seq along with ChIP-seq and flexible motif and DNA shape matching
+algorithms.  trena will incorporate new assays and data type as they emerge.
+
+
+
+*------------------------------------------------------------------------------------------------------------------------
+* on ferry to bainbridge (27 aug 2019)
+
+transcription factor binding leading to subsequent gene transcription and translation play a crucial
+role in the regulation of many gene processes.  It is, at present, incompletely understood.  to a
+first approximation however TF binding can be characterized by judicious combination of data from three assays: 
+of gene exspression, of DNA sequence, and of open chromatin.
+presence of transcription factor proteins in the nucleus of the cell, which have a reasonable match
+in open chromatin to the DNA sequence of the TFs' cognate binding motif, in chromosomal regions
+proximal to the target gene's transcription start site.  Though actual regulatory processes in
+metazoans are complex and dynamicm - involving co-factors which do not bind DNA, direct binding
+guided more by DNA shape than DNA sequence, epigenetics and pervasive stochasticity - the trena
+software package provides a spectrum of analytical approaches, with which to predict gene regulatory
+relationships.  the most basic strategy reports which genes annotatedas regulatory are correlated or
+anti-correlated in gene expression to a target gene.  At present, the most nuanced strategy uses
+time series scATAC-seq and RNA-seq along with ChIP-seq and flexible motif and DNA shape matching
+algorithms.  trena will incorporate new assays and data type as they emerge.
+
+
+
+ As  ;schemeproteomics 
+target gene to the entire set of DNA-binding regulatory genes
+Nonetheless, significant insight into the dynamics of gene regulation can be obtained from data
+readily available today, and with the increasingly specific data likely to come.
+
+The trena software package combines established computational techniques to predict gene regulatory
+relationships.  Two high FDR methods, when combined, reproduce known regulatory relationships, and predict novel ones
+worthy of further experimentation.
+
+
+The trena software package combines several established computational methods in order to predict gene regulatory
+relationships.  Two high FDR methods - motif sequence match, and gene co-expression -  when combined 
+reproduce known regulatory relationships, and predict novel ones worthy of further experimentation.
+
+
+
+combine to Specifically  - several regression methods
+for feature selection, and motif-matching producing unexpected
+accuracy in reproducing known gene regulatory relationships and predicting new ones.  Neither transcription
+factor/target gene mRNA or protein co-expression, nor high quality ChIP-seq assays in themselves indicate actual gene
+regulation.  In the "trena gambit", we combine various instances of these computational methods and/or assays (gene
+activity, sequence matching) to create single gene and whole genome regulatory models.  The weakest form of this
+combination is bulk RNA tf/tg co-expression, and tf motif matching in an unverified "classical" promoter region, +2000,
+-500 bp of the tg's TSS.  In a stronger (and increasingly available) form, tissue- and or celltype-speciric RNA-seq is
+combined with single-cell, stage specific ATAC-seq to predict the shifting regulation of target genes under varying
+conditions or across a time series.
+
+Gene regulation is intrinsically dynamic.  Experimental data 
+
+the discernment of gene regulatory relationships is a computational
+challenege that will not soon end.  Software can assist in this
+discernment and the ideal software for the task will
+
+ - offer standard versions of algorithms which will be used   long-lasting
+ - support easy addition incorporation of new algorithms and (especially) new kinds of data
+
+these principles have guided the design of trena
+
+
