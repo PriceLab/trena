@@ -1,7 +1,144 @@
 *------------------------------------------------------------------------------------------------------------------------
+* friday (30 aug 2019)
+
+Gene regulation via transcription factor binding, leading to transcription and translation, plays a
+crucial role in the regulation of many gene processes.  Gene regulation plays the central role both
+in physiological responses in terminally differentiated cells, and in controlling cell fate in 
+differentiation.
+
+Actual regulatory processes in eukaryotic cells are complex and dynamic - involving simple TF
+binding, co-factors which do not bind DNA, DNA binding sometimes determined more by DNA shape than
+DNA sequence, chromatin architecture, dosage effects and stochasticity.  Despite recent progress in
+single-cell assays, and cell sorting (CyTOF, for example), we will work with incomplete information
+for these processes for many years to come.
+
+The trena software package provides a spectrum of analytical approaches with which to predict gene
+regulatory relationships using fine-grained data when it is available, yet it can also provide
+insight when such data is lacking.  trena's most basic, minimal data strategy simply reports which
+regulatory genes are correlated or anti-correlated in gene expression to a target gene.  trena's
+most nuanced strategy uses time series scATAC-seq, tissue-specific RNA-seq, ChIP-seq, enhancers, and
+flexible motif and DNA shape matching algorithms.  trena will incorporate new assays and data type
+as they emerge.
+
+trena has two stages.  The first consists of many different strategies for selecting
+candidate transcription factors from among the ~1500 described in the human geneome (footnote GO).
+In the degenerate case, no selection is made: all TFs are considered.  More commonly we query a
+database of tissue-specific DNASE I footprints (footnote: Cory's paper).  Recently we have used
+scATAC-seq over a differentiation timecourse.   An example of each of these will be presented below.
+
+The second stage runs a (growing) collection of mostly linear feature selecting algorithms to detect
+relationships in gene expression between the transcription factor genes produced by stage one, and
+the target gene whose regulation is being modeled.
+
+We have evolved a suite of "trena ecosystem" software tools and data resources, mostly within the
+Bioconductor project.  These include public databases of tissue-specific DNASE I footprints, MotifDb
+(a compendium of TF motifs from many sources), a javascript genome browser (igvR) connected to an R
+programming session which provides indispensable visualization of regulatory regions, motif
+matching, and gene models.  trena may be run on the web via a multi-faceted shiny app, trenaViz.
+Docker images are provided for human, mouse and a few other model systems.
+
+In the three examples (all of which may be run interactively as trenaViz shiny apps on the web) we
+demonstrate the use of trena with three levels of data:
+
+  1) establish that SPI1 regulates TREM2 in neocortex (using DNASE footprints to constrain
+     possible binding sites)
+  2) identify a possible cofactor with no motif (the degenerate case, in which no constraints
+     are provided on TFs)
+  3) propose a novel regulator of GATA2 in erythropiesis, using scATAC-seq and bulk RNA
+  
+Some unorganized notes:
+
+Motif matching often plays a role in predicting gene regulation.   Mariam working with me will
+produce data for a section of the paper, showing (we think) that a strict match threshold misses
+important binding events.  She does this by finding motif matching scores in high quality ChIP-seq.
+
+Jocelyn recommends 4 papers (all out of the stam lab?) c 2012, which among other things establish
+that solid ChIP-seq in prime regulatory regions are at least sometimes non-functional.   This is
+part of my account of the "trena gambit" to include in the paper somehow, maybe only implicitly:
+
+  - actual TF binding does not reliably predict functional regulation
+  - motif matching is necessary (sort of, see Mariam's project above, and see recent flurry
+    of papers and software on DNA shape "binding") but has huge FDR.
+  - combining these two with progressively more specific information, with tissue specificity
+    and single-cell data, of chromatin architecture, starts to get truly useful.
+
+some papers:
+
+physiological responses in terminally differentiated cells, and in controlling cell fate in 
+differentiation.
+
+Actual regulatory processes in eukaryotic cells are complex and dynamic - involving simple TF
+binding, co-factors which do not bind DNA, DNA binding sometimes determined more by DNA shape than
+DNA sequence, chromatin architecture, dosage effects and stochasticity.  Despite recent progress in
+single-cell assays, and cell sorting (CyTOF, for example), we will work with incomplete information
+for these processes for many years to come.
+
+The trena software package provides a spectrum of analytical approaches with which to predict gene
+regulatory relationships using fine-grained data when it is available, yet it can also provide
+insight when such data is lacking.  trena's most basic, minimal data strategy simply reports which
+regulatory genes are correlated or anti-correlated in gene expression to a target gene.  trena's
+most nuanced strategy uses time series scATAC-seq, tissue-specific RNA-seq, ChIP-seq, enhancers, and
+flexible motif and DNA shape matching algorithms.  trena will incorporate new assays and data type
+as they emerge.
+
+trena has two stages.  The first consists of many different strategies for selecting
+candidate transcription factors from among the ~1500 described in the human geneome (footnote GO).
+In the degenerate case, no selection is made: all TFs are considered.  More commonly we query a
+database of tissue-specific DNASE I footprints (footnote: Cory's paper).  Recently we have used
+scATAC-seq over a differentiation timecourse.   An example of each of these will be presented below.
+
+The second stage runs a (growing) collection of mostly linear feature selecting algorithms to detect
+relationships in gene expression between the transcription factor genes produced by stage one, and
+the target gene whose regulation is being modeled.
+
+We have evolved a suite of "trena ecosystem" software tools and data resources, mostly within the
+Bioconductor project.  These include public databases of tissue-specific DNASE I footprints, MotifDb
+(a compendium of TF motifs from many sources), a javascript genome browser (igvR) connected to an R
+programming session which provides indispensable visualization of regulatory regions, motif
+matching, and gene models.  trena may be run on the web via a multi-faceted shiny app, trenaViz.
+Docker images are provided for human, mouse and a few other model systems.
+
+In the three examples (all of which may be run interactively as trenaViz shiny apps on the web) we
+demonstrate the use of trena with three levels of data:
+
+  1) establish that SPI1 regulates TREM2 in neocortex (using DNASE footprints to constrain
+     possible binding sites)
+  2) identify a possible cofactor with no motif (the degenerate case, in which no constraints
+     are provided on TFs)
+  3) propose a novel regulator of GATA2 in erythropiesis, using scATAC-seq and bulk RNA
+  
+Some unorganized notes:
+
+Motif matching often plays a role in predicting gene regulation.   Mariam working with me will
+produce data for a section of the paper, showing (we think) that a strict match threshold misses
+important binding events.  She does this by finding motif matching scores in high quality ChIP-seq.
+
+Jocelyn recommends 4 papers (all out of the stam lab?) c 2012, which among other things establish
+that solid ChIP-seq in prime regulatory regions are at least sometimes non-functional.   This is
+part of my account of the "trena gambit" to include in the paper somehow, maybe only implicitly:
+
+  - actual TF binding does not reliably predict functional regulation
+  - motif matching is necessary (sort of, see Mariam's project above, and see recent flurry
+    of papers and software on DNA shape "binding") but has huge FDR.
+  - combining these two with progressively more specific information, with tissue specificity
+    and single-cell data, of chromatin architecture, starts to get truly useful.
+
+some papers:
+Cusanovich: The Functional Consequences of Variation in Transcription Factor Binding
+Rothenberg: Causal Gene Regulatory Network Modeling and Genomics: Second-Generation Challenges (2019)
+Buenrostro: Integrated Single-Cell Analysis Maps the Continuous Regulatory Landscape of Human
+                Hematorpoeietic Differentiation (2018)
+Brand & Ranish: Absolute quantification of transcription factors in human erythropoiesis reveals
+                principles underlying transcriptional regulation (in preparation)
+                This provides the data for the TBX15 repression of GATA2 - which if
+                Marjorie's knockdown validation works out, will be a dramatic trena story.
+                
+
+
+*------------------------------------------------------------------------------------------------------------------------
 * fresh flours cafe (28 aug 2019)
 
-gene regulation plays an important role in deterimining cell fate.  since cell state is an intensely
+gene regulation plays an important role in deterimining cell state.  since cell state is an intensely
 dynamic process, either to establish and maintan equilibiriu, or to differentiate into successive
 states, so therefor muse gene regulation be a highly dynamic process.
 
@@ -76,7 +213,7 @@ of hamid's mouse TCEx tcl7?
 *------------------------------------------------------------------------------------------------------------------------
 * on ferry to bainbridge (27 aug 2019) v2
 
- transcription factor binding leading to subsequent gene transcription and translation play a crucial
+transcription factor binding leading to subsequent gene transcription and translation play a crucial
 role in the regulation of many gene processes.  It is, at present, incompletely understood.  to a
 first approximation however TF binding can be characterized by judicious combination of data from three assays: 
 of gene exspression, of DNA sequence, and of open chromatin.

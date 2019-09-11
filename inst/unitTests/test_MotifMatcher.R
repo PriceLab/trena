@@ -700,3 +700,5 @@ test_bugInStartEndOfMinusStrandHits <- function()
 
 } # test_bugInStartEndOfMinusStrandHits
 #----------------------------------------------------------------------------------------------------
+if(!interactive())
+   runTests()
