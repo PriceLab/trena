@@ -6,9 +6,10 @@ printf <- function(...) print(noquote(sprintf(...)))
 runTests <- function()
 {
    test_EnsembleSolverConstructor()
-   test_ampAD.mef2c.154tfs.278samples.ensemble()
-   test_selectedSolversOnly()
    test_getSolverNames()
+   test_ampAD.mef2c.154tfs.278samples.ensemble()
+   test_ampAD.mef2c.154tfs.278samples.randomForestAndXGBoost()
+   test_selectedSolversOnly()
    test_oneSolver()
    test_invalidSolvers()
 
@@ -18,38 +19,57 @@ test_EnsembleSolverConstructor <- function()
 {
     printf("--- test_EnsembleSolverConstructor")
 
-    # Construct the EnsembleSolver and check that it's correct
-
-    #solver <- EnsembleSolver()
     mtx <- matrix(1:9,nrow=3)
     rownames(mtx) <- c("gene1","gene2","gene3")
-    solver <- EnsembleSolver(mtx,targetGene = "gene1",
-                             candidateRegulators = c("gene2","gene3"))
+    solver <- EnsembleSolver(mtx,targetGene = "gene2", candidateRegulators = c("gene1","gene3"))
     checkEquals(class(solver)[1], "EnsembleSolver")
     checkTrue(all(c("EnsembleSolver", "Solver") %in% is(solver)))
-}
 
-# test_EnsembleSolverConstructor
+} # test_EnsembleSolverConstructor
 #----------------------------------------------------------------------------------------------------
 test_ampAD.mef2c.154tfs.278samples.ensemble <- function()
 {
    printf("--- test_ampAD.mef2c.154tfs.278samples.ensemble")
 
    set.seed(122113)
-   # Load matrix and transform via arcsinh
    load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
-    mtx.asinh <- asinh(mtx.sub)
-   #print(fivenum(mtx.asinh)  # [1] 0.000000 1.327453 3.208193 4.460219 7.628290)
+   mtx.asinh <- asinh(mtx.sub)
 
    target.gene <- "MEF2C"
    tfs <- setdiff(rownames(mtx.asinh), "MEF2C")
    solver <- EnsembleSolver(mtx.asinh,target.gene,tfs)
-   tbl <- run(solver)
+   system.time(tbl <- run(solver))
 
-   # Check for empirical values
    checkTrue(c("HLF") %in% tbl$gene)
+       #
+   expected.colnames <- c("gene", "betaLasso", "lassoPValue", "pearsonCoeff", "rfScore", "betaRidge", "spearmanCoeff", "xgboost")
+   checkTrue(all(expected.colnames %in% colnames(tbl)))
+   checkTrue(nrow(tbl) >= 10)
 
 } # test_ampAD.mef2c.154tfs.278samples.ensemble
+#----------------------------------------------------------------------------------------------------
+test_ampAD.mef2c.154tfs.278samples.randomForestAndXGBoost <- function()
+{
+   printf("--- test_ampAD.mef2c.154tfs.278samples.randomForestAndXGBoost")
+
+   set.seed(122113)
+   load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
+   mtx.asinh <- asinh(mtx.sub)
+
+   target.gene <- "MEF2C"
+   tfs <- setdiff(rownames(mtx.asinh), "MEF2C")
+   solver <- EnsembleSolver(mtx.asinh,target.gene,tfs, solverNames=c("randomForest", "xgboost"))
+   system.time(tbl <- run(solver))
+
+   checkTrue(c("HLF") %in% tbl$gene)
+       #
+   expected.colnames <- c("gene", "rfScore", "xgboost")
+   checkTrue(all(expected.colnames %in% colnames(tbl)))
+   checkTrue(nrow(tbl) >= 10)
+
+   checkTrue(with(tbl, cor(rfScore, xgboost)) > 0.85)
+
+} # test_ampAD.mef2c.154tfs.278samples.randomForestAndXGBoost
 #----------------------------------------------------------------------------------------------------
 test_selectedSolversOnly <- function()
 {
@@ -131,13 +151,11 @@ test_getSolverNames <- function(){
     load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
     targetGene <- "MEF2C"
     candidateRegulators <- setdiff(rownames(mtx.sub), targetGene)
-    solver <- EnsembleSolver(mtx.sub, targetGene, candidateRegulators,
-                             solverNames = c("lasso","randomForest"))
+    desired.solvers <- c("lasso","randomForest", "xgboost")
+    solver <- EnsembleSolver(mtx.sub, targetGene, candidateRegulators, solverNames=desired.solvers)
 
-    solver.names <- getSolverNames(solver)
+    checkTrue(all(desired.solvers %in% getSolverNames(solver)))
 
-    # Test that it's what we want
-    checkEquals(solver.names, c("lasso","randomForest"))
 } # test_getSolverNames
 #----------------------------------------------------------------------------------------------------
 test_oneSolver <- function(){

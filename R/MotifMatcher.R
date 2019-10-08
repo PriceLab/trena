@@ -66,7 +66,10 @@ MotifMatcher <- function(genomeName,
                          pfms,
                          quiet=TRUE)
 {
+    genomeName <- tolower(genomeName)
+
     stopifnot(is.list(pfms))
+    stopifnot(genomeName %in% c("hg19", "hg38", "saccer3", "tair10"))
 
     if(genomeName == "hg38"){
        reference.genome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
@@ -82,6 +85,10 @@ MotifMatcher <- function(genomeName,
 
     else if(tolower(genomeName) == "saccer3"){
        reference.genome <- BSgenome.Scerevisiae.UCSC.sacCer3::BSgenome.Scerevisiae.UCSC.sacCer3
+       }
+
+    else if(tolower(genomeName) == "tair10"){
+       reference.genome <- BSgenome.Athaliana.TAIR.TAIR9::BSgenome.Athaliana.TAIR.TAIR9
        }
 
     else {

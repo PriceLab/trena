@@ -71,7 +71,8 @@ EnsembleSolver <- function(mtx.assay=matrix(), targetGene, candidateRegulators,
                                            "pearson",
                                            "randomForest",
                                            "ridge",
-                                           "spearman"),
+                                           "spearman",
+                                           "xgboost"),
                            geneCutoff = 0.1,
                            alpha.lasso = 0.9,
                            alpha.ridge = 0.0,
@@ -232,7 +233,7 @@ setMethod("run", "EnsembleSolver",
 
               # Intersect with the accepted solvers
               accepted.solvers <- c("bayesspike", "lassopv", "lasso", "pearson",
-                                    "ridge", "randomforest", "spearman", "sqrtlasso")
+                                    "ridge", "randomforest", "spearman", "sqrtlasso", "xgboost")
               not.accepted <- setdiff(solver.list, accepted.solvers)
               solver.list <- intersect(solver.list, accepted.solvers)
 
@@ -267,7 +268,9 @@ setMethod("run", "EnsembleSolver",
                                                                  lambda = obj@lambda.sqrt, nCores = obj@nCores.sqrt),
                                    "lassopv" = LassoPVSolver(mtx, target.gene, tfs),
                                    "ridge" = RidgeSolver(mtx, target.gene, tfs,
-                                                         alpha = obj@alpha.ridge, lambda = obj@lambda.ridge))
+                                                         alpha = obj@alpha.ridge, lambda = obj@lambda.ridge),
+                                   "xgboost" =  XGBoostSolver(mtx, target.gene, tfs))
+
 
                   # Send a specific warning message
                   warn.message <- sprintf("Only one solver(%s) was provided. Running %s instead",
@@ -279,7 +282,7 @@ setMethod("run", "EnsembleSolver",
 
                   # Return the output of the solver
                   return(tbl.single)
-              }
+              } # if length == 1
 
 
               for(i in 1:length(solver.list)){
@@ -296,9 +299,11 @@ setMethod("run", "EnsembleSolver",
                                                                  lambda = obj@lambda.sqrt, nCores = obj@nCores.sqrt),
                                    "lassopv" = LassoPVSolver(mtx, target.gene, tfs),
                                    "ridge" = RidgeSolver(mtx, target.gene, tfs,
-                                                         alpha = obj@alpha.ridge, lambda = obj@lambda.ridge))
+                                                         alpha = obj@alpha.ridge, lambda = obj@lambda.ridge),
+                                   "xgboost" =  XGBoostSolver(mtx, target.gene, tfs)
+                                   )
 
-                  # Solve each Solver object and save it to the output list
+                   # Solve each Solver object and save it to the output list
                   out.list[[i]] <- run(solver)
                   names(out.list)[i] <- paste("out",tolower(solver.list[[i]]),sep=".")
               }
@@ -323,6 +328,16 @@ setMethod("run", "EnsembleSolver",
                   randomforest.scale <- sqrt(mean(
                       out.list$out.randomforest$rfScore*out.list$out.randomforest$rfScore))
               }
+
+                 # use xgboost Importance column
+              if("xgboost" %in% tolower(solver.list)){
+                  out.list$out.xgboost$gene <- rownames(out.list$out.xgboost)
+                  out.list$out.xgboost <- out.list$out.xgboost[, c("Importance","gene")]
+                  rownames(out.list$out.xgboost) <- NULL
+                  names(out.list$out.xgboost) <- c("xgboost", "gene")
+                  #xgboost.med <- stats::median(out.list$out.xgboost$rfScore)
+                  #xgboost.scale <- sqrt(mean(out.list$out.xgboost$rfScore*out.list$out.xgboost$rfScore))
+                  }
 
               # Output the z-score from bayesspike
               if("bayesspike" %in% tolower(solver.list)){
@@ -381,7 +396,7 @@ setMethod("run", "EnsembleSolver",
                   names(out.list$out.ridge) <- c("betaRidge", "gene")
                   ridge.med <- stats::median(out.list$out.ridge$betaRidge)
                   ridge.scale <- stats::mad(out.list$out.ridge$betaRidge)
-              }
+                  }
 
               # Grab all genes for each solver to start with
               how.many <- length(tfs)

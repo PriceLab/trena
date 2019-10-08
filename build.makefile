@@ -11,7 +11,7 @@ build:
 	(cd ..; R CMD build --no-build-vignettes trena)
 
 install:
-	(cd ..; R CMD INSTALL trena)
+	(cd ..; R CMD INSTALL --no-test-load trena)
 
 check:
 	(cd ..; R CMD check --no-manual `ls -t trena_* | head -1`)

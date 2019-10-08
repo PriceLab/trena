@@ -19,7 +19,7 @@ Trena(genomeName, quiet = TRUE)
 An object of the Trena class
 }
 \description{
-The Trena class provides a convenient wrapper for the most commonly used filters and solver in the \code{trena}
+The Trena class provides a convenient wrapper for the most commonly used filters and solvers in the \code{trena}
 package. Given a particular genome (one of \code{c("hg38","mm10")}, the Trena class provides methods to
 retrieve information about possible regulators for a target gene, assess the effects of SNPs, and create gene models
 using the flexible \code{\link{EnsembleSolver}} class.

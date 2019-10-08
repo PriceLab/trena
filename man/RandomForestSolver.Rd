@@ -41,6 +41,7 @@ Other Solver class objects: \code{\link{BayesSpikeSolver}},
   \code{\link{LassoPVSolver}}, \code{\link{LassoSolver}},
   \code{\link{PearsonSolver}}, \code{\link{RidgeSolver}},
   \code{\link{Solver-class}}, \code{\link{SpearmanSolver}},
-  \code{\link{SqrtLassoSolver}}
+  \code{\link{SqrtLassoSolver}},
+  \code{\link{XGBoostSolver}}
 }
 \concept{Solver class objects}

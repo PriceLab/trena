@@ -71,7 +71,7 @@ FootprintFinder <- function(genome.database.uri, project.database.uri, quiet=TRU
     genome.db.info <- parseDatabaseUri(genome.database.uri)
     project.db.info <- parseDatabaseUri(project.database.uri)
     stopifnot(genome.db.info$brand %in% c("postgres","sqlite"))
-    
+
     # open the genome database
     if(genome.db.info$brand == "postgres"){
         host <- genome.db.info$host
@@ -88,10 +88,10 @@ FootprintFinder <- function(genome.database.uri, project.database.uri, quiet=TRU
             row.count <- DBI::dbGetQuery(genome.db, "select count(*) from gtf")[1,1]
             printf("%s: %d rows", sprintf("%s/gtf", genome.database.uri), row.count)
             row.count <- DBI::dbGetQuery(genome.db, "select count(*) from motifsgenes")[1,1]
-            printf("%s: %d rows", sprintf("%s/motifsgenes", genome.database.uri), row.count)            
+            printf("%s: %d rows", sprintf("%s/motifsgenes", genome.database.uri), row.count)
         }
     } # if postgres
-    
+
     # open the project database
     if(project.db.info$brand == "postgres"){
         host <- project.db.info$host
@@ -109,7 +109,7 @@ FootprintFinder <- function(genome.database.uri, project.database.uri, quiet=TRU
             printf("%s: %d rows", sprintf("%s/regions", project.database.uri), row.count)
         }
     } # if postgres
-    
+
     # open the genome database
     if(genome.db.info$brand == "sqlite"){
         dbname <- paste(genome.db.info$host, genome.db.info$name, sep = "/")
@@ -122,10 +122,10 @@ FootprintFinder <- function(genome.database.uri, project.database.uri, quiet=TRU
             row.count <- DBI::dbGetQuery(genome.db, "select count(*) from gtf")[1,1]
             printf("%s: %d rows", sprintf("%s/gtf", genome.database.uri), row.count)
             row.count <- DBI::dbGetQuery(genome.db, "select count(*) from motifsgenes")[1,1]
-            printf("%s: %d rows", sprintf("%s/motifsgenes", genome.database.uri), row.count)            
+            printf("%s: %d rows", sprintf("%s/motifsgenes", genome.database.uri), row.count)
         }
     } # if sqlite
-    
+
     # open the project database
     if(project.db.info$brand == "sqlite"){
         dbname <- paste(project.db.info$host, project.db.info$name, sep = "/")
@@ -139,9 +139,9 @@ FootprintFinder <- function(genome.database.uri, project.database.uri, quiet=TRU
             printf("%s: %d rows", sprintf("%s/regions", project.database.uri), row.count)
         }
     } # if sqlite
-    
+
     .FootprintFinder(genome.db=genome.db, project.db=project.db, quiet=quiet)
-    
+
 } # FootprintFinder, the constructor
 #----------------------------------------------------------------------------------------------------
 #' Close a Footprint Database Connection
@@ -161,7 +161,7 @@ FootprintFinder <- function(genome.database.uri, project.database.uri, quiet=TRU
 #' @return Closes the specified database connection
 
 setMethod("closeDatabaseConnections", "FootprintFinder",
-          
+
           function(obj){
               if(!obj@quiet) printf("-- FootprintFinder::closeDataConnections")
               if("DBIConnection" %in% is(obj@genome.db)){
@@ -200,7 +200,7 @@ setMethod("closeDatabaseConnections", "FootprintFinder",
 #' biotypes <- getGtfGeneBioTypes(fp)
 
 setMethod("getGtfGeneBioTypes", "FootprintFinder",
-          
+
           function(obj){
               sort(DBI::dbGetQuery(obj@genome.db, "select distinct gene_biotype from gtf")[,1])
           })
@@ -231,7 +231,7 @@ setMethod("getGtfGeneBioTypes", "FootprintFinder",
 #' mol.types <- getGtfMoleculeTypes(fp)
 
 setMethod("getGtfMoleculeTypes", "FootprintFinder",
-          
+
           function(obj){
               sort(DBI::dbGetQuery(obj@genome.db, "select distinct moleculetype from gtf")[,1])
           })
@@ -266,7 +266,7 @@ setMethod("getGtfMoleculeTypes", "FootprintFinder",
 #' chrom.locs <- getChromLoc(fp, name = "MEF2C")
 
 setMethod("getChromLoc", "FootprintFinder",
-          
+
           function(obj, name, biotype="protein_coding", moleculetype="gene"){
               query <- paste("select gene_id, gene_name, chr, start, endpos, strand from gtf where ",
                              sprintf("(gene_name='%s' or gene_id='%s') ", name, name),
@@ -311,20 +311,20 @@ setMethod("getChromLoc", "FootprintFinder",
 #' prom.region <- getGenePromoterRegion(fp, gene = "MEF2C")
 
 setMethod("getGenePromoterRegion", "FootprintFinder",
-          
+
           function(obj, gene, size.upstream=1000, size.downstream=0, biotype="protein_coding", moleculetype="gene"){
-              
+
               tbl.loc <- getChromLoc(obj, gene, biotype=biotype, moleculetype=moleculetype)
               if(nrow(tbl.loc) < 1){
                   warning(sprintf("no chromosomal location for %s (%s, %s)", gene, biotype, moleculetype))
                   return(NA)
               }
-              
+
               chrom <- tbl.loc$chr[1]
               start.orig <- tbl.loc$start[1]
               end.orig   <- tbl.loc$endpos[1]
               strand     <- tbl.loc$strand[1]
-              
+
               if(strand == "-"){ # reverse (minus) strand.  TSS is at "end" position
                   start.loc <- end.orig - size.downstream
                   end.loc   <- end.orig + size.upstream
@@ -369,7 +369,7 @@ setMethod("getGenePromoterRegion", "FootprintFinder",
 #' footprints <- getFootprintsForGene(fp, gene = "MEF2C")
 
 setMethod("getFootprintsForGene", "FootprintFinder",
-          
+
           function(obj,  gene, size.upstream=1000, size.downstream=0,
                    biotype="protein_coding", moleculetype="gene"){
               stopifnot(length(gene) == 1)
@@ -409,7 +409,7 @@ setMethod("getFootprintsForGene", "FootprintFinder",
 #' start = 88903305, end = 88903319 )
 
 setMethod("getFootprintsInRegion", "FootprintFinder",
-          
+
           function(obj, chromosome, start, end){
               query.p0 <- "select loc, chrom, start, endpos from regions"
               query.p1 <- sprintf("where chrom='%s' and start >= %d and endpos <= %d", chromosome, start, end)
@@ -461,9 +461,9 @@ setMethod("getPromoterRegionsAllGenes","FootprintFinder",
               query <-
                   paste( "select gene_name, gene_id, chr, start, endpos, strand from gtf where" ,
                         "gene_biotype='protein_coding' and moleculetype='gene'" , sep=" " )
-              
+
               genes = DBI::dbGetQuery( obj@genome.db , query )
-              
+
               # function to get each transcript's TSS
               get_tss <-
                   function( t ) {
@@ -471,7 +471,7 @@ setMethod("getPromoterRegionsAllGenes","FootprintFinder",
                       start.orig <- genes$start[t]
                       end.orig   <- genes$endpos[t]
                       strand     <- genes$strand[t]
-                      
+
                       if(strand == "-"){ # reverse (minus) strand.  TSS is at "end" position
                           tss <- end.orig
                       }
@@ -482,7 +482,7 @@ setMethod("getPromoterRegionsAllGenes","FootprintFinder",
                   }
               # apply get_tss to all transcripts
               tss = sapply( 1:nrow(genes) , get_tss )
-              
+
               # assemble a bed file for the TSSs
               promoter_regions = unique( data.frame(
                   chr = genes$chr ,
