@@ -10,7 +10,7 @@ runTests <- function()
 #----------------------------------------------------------------------------------------------------
 test_XGBoostSolverConstructor <- function()
 {
-    message(printf("--- test_XGBoostSolverConstructor"))
+    message(sprintf("--- test_XGBoostSolverConstructor"))
 
     mtx <- matrix(1:9,nrow=3)
     rownames(mtx) <- c("gene1","gene2","gene3")
@@ -24,7 +24,7 @@ test_XGBoostSolverConstructor <- function()
 #----------------------------------------------------------------------------------------------------
 test_ampAD.mef2c.154tfs.278samples.XGBoost <- function()
 {
-   message(printf("--- test_ampAD.mef2c.154tfs.278samples.XGBoost"))
+   message(sprintf("--- test_ampAD.mef2c.154tfs.278samples.XGBoost"))
 
    # Load matrix and transform via arcsinh
    load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
