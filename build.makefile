@@ -21,3 +21,6 @@ biocCheck:
 
 unitTests:
 	 for x in inst/unitTests/test_*.R; do echo ============== $$x; R -f $$x; done
+
+site:
+	R -e "devtools::build_site()"

@@ -18,7 +18,11 @@ with the target gene}
 \item{quiet}{A logical denoting whether or not the solver should print output}
 }
 \value{
+<<<<<<< HEAD
 A Solver class object with XGBoost Importances (Gain) as the solver
+=======
+A Solver class object with XGBoost correlation coefficients as the solver
+>>>>>>> 8d33e66d26e8fbc869dc761396e8c1d552a6508c
 }
 \description{
 Create a Solver class using gradient boosting (a regression technique) and the XGBoost library
