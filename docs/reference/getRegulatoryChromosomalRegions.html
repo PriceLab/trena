@@ -69,7 +69,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">trena</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.7.11</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.7.12</span>
       </span>
     </div>
 
@@ -181,18 +181,16 @@ the list is converted into a data frame.</p>
 <span class='no'>loc.start</span> <span class='kw'>&lt;-</span> <span class='no'>mef2c.tss</span> - <span class='fl'>1000</span>
 <span class='no'>loc.end</span>   <span class='kw'>&lt;-</span> <span class='no'>mef2c.tss</span> + <span class='fl'>1000</span>
 
-<span class='no'>regions</span> <span class='kw'>&lt;-</span> <span class='fu'>getRegulatoryChromosomalRegions</span>(<span class='no'>trena</span>, <span class='no'>chromosome</span>, <span class='no'>mef2c.tss</span>-<span class='fl'>1000</span>, <span class='no'>mef2c.tss</span>+<span class='fl'>1000</span>,
-<span class='no'>sources</span>, <span class='st'>"MEF2C"</span>, <span class='no'>mef2c.tss</span>)</div><div class='output co'>#&gt; [1] calling footprintFilter with source = 'sqlite:///private/var/folders/qw/f4r8_r9513548zsbzxv17wg40000gq/T/RtmpkoxXNM/temp_libpathab4023931048/trena/extdata/mef2c.neigborhood.hg38.footprints.db', span: 2001</div><div class='output co'>#&gt; <span class='error'>Error in postgresqlNewConnection(drv, ...): RS-DBI driver: (could not connect trena@khaleesi.systemsbiology.net:5432 on dbname "hg38": could not connect to server: Operation timed out</span>
-#&gt; <span class='error'>	Is the server running on host "khaleesi.systemsbiology.net" (174.127.185.140) and accepting</span>
-#&gt; <span class='error'>	TCP/IP connections on port 5432?</span>
-#&gt; <span class='error'>)</span></div><div class='input'>
+<span class='co'>#regions &lt;- getRegulatoryChromosomalRegions(trena, chromosome, mef2c.tss-1000, mef2c.tss+1000,</span>
+<span class='co'>#                                           sources, "MEF2C", mef2c.tss)</span>
+
 <span class='co'># Get regulatory regions for AQP4 from a Human DHS source</span>
 <span class='no'>trena</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='Trena-class.html'>Trena</a></span>(<span class='st'>"hg38"</span>)
 <span class='no'>aqp4.tss</span> <span class='kw'>&lt;-</span> <span class='fl'>26865884</span>
 <span class='no'>chromosome</span> <span class='kw'>&lt;-</span> <span class='st'>"chr18"</span>
 <span class='no'>sources</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"encodeHumanDHS"</span>)
 
-<span class='no'>regions</span> <span class='kw'>&lt;-</span> <span class='fu'>getRegulatoryChromosomalRegions</span>(<span class='no'>trena</span>, <span class='no'>chromosome</span>, <span class='no'>aqp4.tss</span>-<span class='fl'>1</span>, <span class='no'>aqp4.tss</span>+<span class='fl'>3</span>, <span class='no'>sources</span>, <span class='st'>"AQP4"</span>, <span class='no'>aqp4.tss</span>)</div><div class='output co'>#&gt; [1] calling HumanDHSFilter, span: 5</div><div class='output co'>#&gt; <span class='error'>Error in .local(drv, ...): Failed to connect to database: Error: Can't connect to MySQL server on 'genome-mysql.cse.ucsc.edu' (36)</span></div></pre>
+<span class='co'>#regions &lt;- getRegulatoryChromosomalRegions(trena, chromosome, aqp4.tss-1, aqp4.tss+3, sources, "AQP4", aqp4.tss)</span></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
