@@ -1,11 +1,5 @@
 library(trena)
 library(RUnit)
-<<<<<<< HEAD
-=======
-library(xgboost)
-#----------------------------------------------------------------------------------------------------
-printf <- function(...) print(noquote(sprintf(...)))
->>>>>>> 8d33e66d26e8fbc869dc761396e8c1d552a6508c
 #----------------------------------------------------------------------------------------------------
 runTests <- function()
 {
@@ -16,11 +10,7 @@ runTests <- function()
 #----------------------------------------------------------------------------------------------------
 test_XGBoostSolverConstructor <- function()
 {
-<<<<<<< HEAD
     message(sprintf("--- test_XGBoostSolverConstructor"))
-=======
-    printf("--- test_XGBoostSolverConstructor")
->>>>>>> 8d33e66d26e8fbc869dc761396e8c1d552a6508c
 
     mtx <- matrix(1:9,nrow=3)
     rownames(mtx) <- c("gene1","gene2","gene3")
@@ -34,11 +24,8 @@ test_XGBoostSolverConstructor <- function()
 #----------------------------------------------------------------------------------------------------
 test_ampAD.mef2c.154tfs.278samples.XGBoost <- function()
 {
-<<<<<<< HEAD
+
    message(sprintf("--- test_ampAD.mef2c.154tfs.278samples.XGBoost"))
-=======
-   printf("--- test_ampAD.mef2c.154tfs.278samples.XGBoost")
->>>>>>> 8d33e66d26e8fbc869dc761396e8c1d552a6508c
 
    # Load matrix and transform via arcsinh
    load(system.file(package="trena", "extdata/ampAD.154genes.mef2cTFs.278samples.RData"))
