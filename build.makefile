@@ -1,8 +1,8 @@
-quick: docs install
+quick: roxy install
 
-all:  docs vig build  check biocCheck
+all:  roxy vig build check
 
-docs:
+roxy:
 	R -e "devtools::document()"
 vig:
 	R -e "devtools::build_vignettes()"

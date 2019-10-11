@@ -47,8 +47,8 @@ mef2c.tss <- 88904257
 loc.start <- mef2c.tss - 1000
 loc.end   <- mef2c.tss + 1000
 
-regions <- getRegulatoryChromosomalRegions(trena, chromosome, mef2c.tss-1000, mef2c.tss+1000,
-sources, "MEF2C", mef2c.tss)
+#regions <- getRegulatoryChromosomalRegions(trena, chromosome, mef2c.tss-1000, mef2c.tss+1000,
+#                                           sources, "MEF2C", mef2c.tss)
 
 # Get regulatory regions for AQP4 from a Human DHS source
 trena <- Trena("hg38")
@@ -56,5 +56,5 @@ aqp4.tss <- 26865884
 chromosome <- "chr18"
 sources <- c("encodeHumanDHS")
 
-regions <- getRegulatoryChromosomalRegions(trena, chromosome, aqp4.tss-1, aqp4.tss+3, sources, "AQP4", aqp4.tss)
+#regions <- getRegulatoryChromosomalRegions(trena, chromosome, aqp4.tss-1, aqp4.tss+3, sources, "AQP4", aqp4.tss)
 }

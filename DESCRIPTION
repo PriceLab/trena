@@ -28,7 +28,7 @@ Imports:
     biomaRt,
     AnnotationDbi
 Depends:
-    R (>= 3.4.0),
+    R (>= 3.5.0),
     utils,
     glmnet (>= 2.0.3),
     MotifDb (>= 1.19.17)
@@ -39,6 +39,8 @@ Suggests:
     BiocGenerics,
     rmarkdown,
     BSgenome.Scerevisiae.UCSC.sacCer3
+URL: https://pricelab.github.io/trena/
+BugReports: https://github.com/PriceLab/trena/issues
 VignetteBuilder:
     knitr
 Description: Methods for reconstructing transcriptional regulatory networks, especially in species

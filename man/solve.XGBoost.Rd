@@ -13,19 +13,11 @@
 \item{obj}{An object of class XGBoostSolver}
 }
 \value{
-<<<<<<< HEAD
 The set of XGBoost relative importances between each transcription factor and the target gene.
 }
 \description{
 Given a TReNA object with XGBoost as the solver, use the \code{\link{cor}}
 function with \code{method = "XGBoost"} to esimate importances for each transcription factor
-=======
-The set of XGBoost Correlation Coefficients between each transcription factor and the target gene.
-}
-\description{
-Given a TReNA object with XGBoost as the solver, use the \code{\link{cor}}
-function with \code{method = "XGBoost"} to esimate coefficients for each transcription factor
->>>>>>> 8d33e66d26e8fbc869dc761396e8c1d552a6508c
 as a predictor of the target gene's expression level.
 }
 \examples{
