@@ -14,12 +14,14 @@ install:
 	(cd ..; R CMD INSTALL --no-test-load trena)
 
 check:
-	(cd ..; R CMD check --no-manual `ls -t trena_* | head -1`)
+	(cd ..; R CMD check --no-manual --no-build-vignettes --ignore-vignettes `ls -t trena_* | head -1`)
 
 biocCheck:
 	(cd ..; R CMD BiocCheck `ls -t trena_* | head -1`)
 
-unitTests:
+unitTests: test
+
+test:
 	 for x in inst/unitTests/test_*.R; do echo ============== $$x; R -f $$x; done
 
 site:

@@ -177,8 +177,8 @@ test_checkSampleOfEncodeTables <- function(quiet=TRUE)
    #  rs13384219 at chr2:57907073-57907573
    chrom <- "chr2"
    rs13384219.loc <- 57907323
-   start <- rs13384219.loc - 10
-   end <- rs13384219.loc + 10
+   start <- rs13384219.loc - 10000
+   end <- rs13384219.loc + 10000
 
    selectedTableNames <- tableNames[sample(1:length(tableNames), size=10)]
 
@@ -189,7 +189,6 @@ test_checkSampleOfEncodeTables <- function(quiet=TRUE)
       checkTrue(nrow(tbl) >= 0)
       checkEquals(colnames(tbl), c("chrom", "chromStart", "chromEnd",  "count",  "score"))
       }
-
 
 } # test_checkSampleOfEncodeTables
 #----------------------------------------------------------------------------------------------------
