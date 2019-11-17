@@ -67,29 +67,40 @@ build.with.tfs.with.matching.fimo.motifs <- function()
    phast.score <- 0.95
 
    tbl.fimo.strong <- subset(tbl.fimoMotifs, p.value <= fimo.score & phast7 >= phast.score)
+   dim(tbl.fimo.strong)
    tfs <- sort(unique(tbl.fimo.strong$tf))
    length(tfs)  # 209
 
    tbl.fimo.weak <- subset(tbl.fimoMotifs, p.value <= 1e-4 & phast7 >= 0.5)
-
+   dim(tbl.fimo.weak)
 
    solver <- EnsembleSolver(mtx.blood.lps, target.gene, tfs, geneCutoff=1.0)
    tbl <- run(solver)
+   length(tbl$gene)
    dim(tbl)
    new.order <- order(abs(tbl$pearsonCoeff), decreasing=TRUE)
    tbl <- tbl[new.order,]
    rownames(tbl) <- NULL
    tbl.lps.fimo <- tbl
+   dim(tbl.lps.fimo)
 
-   tbl.tfbs.counts <- as.data.frame(sort(table(tbl.fimo.strong$tf)))
-   bindingSiteCount <- merge(tbl.lps.fimo, tbl.tfbs.counts, by.x="gene", by.y="Var1")$Freq
-   tbl.lps.fimo.fimo$tfbs.strong <- bindingSiteCount
+   tfs.in.model <- tbl.lps.fimo$gene
+   length(tfs.in.model)
+   tbl.fimo.strong.filtered <- subset(tbl.fimo.strong, tf %in% tfs.in.model)
+   length(unique(tbl.fimo.strong.filtered$tf))
 
-   tbl.tfbs.counts <- as.data.frame(sort(table(tbl.fimo.weak$tf)))
+   tbl.tfbs.counts <- as.data.frame(sort(table(tbl.fimo.strong.filtered$tf)))
+   dim(tbl.tfbs.counts)
+
    bindingSiteCount <- merge(tbl.lps.fimo, tbl.tfbs.counts, by.x="gene", by.y="Var1")$Freq
+   length(bindingSiteCount)
+   dim(tbl.lps.fimo)
+   tbl.lps.fimo$tfbs.strong <- bindingSiteCount
+
+   tbl.fimo.weak.filtered <- subset(tbl.fimo.weak, tf %in% tfs.in.model)
+   tbl.tfbs.counts <- as.data.frame(sort(table(tbl.fimo.weak.filtered$tf)))
+   bindingSiteCount <- merge(tbl.lps.fimo, tbl.tfbs.counts, by.x="gene", by.y="Var1", all.x=TRUE)$Freq
    tbl.lps.fimo$tfbs.weak <- bindingSiteCount
-
-
 
    match(c("GATA1", "TAL1", "KLF1"), tbl.lps.fimo$gene)   # 43 88 94
 
