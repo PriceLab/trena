@@ -3,6 +3,28 @@ library(TrenaProjectErythropoiesis)
 library(GenomicScores)
 library(phastCons7way.UCSC.hg38); phast.7 <- phastCons7way.UCSC.hg38
 library(trenaSGM)
+if(!exists("tbl.benchmark")){
+   tbl.benchmark <- get(load(system.file(package="TrenaValidator", "extdata", "tbl.A.RData")))
+   tbl.benchmark$pubmed.count <- unlist(lapply(strsplit(tbl.benchmark$pubmedID_from_curated_resources, ","), length))
+   as.data.frame(t(subset(tbl.benchmark, TF=="GATA1" & target=="NFE2")))
+   }
+
+#  TF                                          GATA1
+#  target                                       NFE2
+#  effect                                          0
+#  score                                           A
+#  is_evidence_curateddatabase                  TRUE
+#  is_evidence_chipSeq                         FALSE
+#  is_evidence_TFbindingMotif                   TRUE
+#  is_evidence_coexpression                     TRUE
+#  which_curateddatabase               HTRIdb,trrust
+#  which_chipSeq                                none
+#  which_TFbindingMotif                 hocomoco_v11
+#  which_coexpression                    ARACNe-GTEx
+#  pubmedID_from_curated_resources 16648487,20564185
+#  kegg_pathway                                    -
+#  pubmed.count                                    2
+
 #------------------------------------------------------------------------------------------------------------------------
 # TF                                          GATA1
 # target                                       NFE2
@@ -27,7 +49,7 @@ library(trenaSGM)
 # Hsapiens-HOCOMOCOv10-TFCP2_HUMAN.H10MO.D
 # Hsapiens-jaspar2018-TFCP2-MA0145.3
 
-# We observed that binding sites for the ubiquitously expressed transcription factor CP2 were
+# We observed that binding sites for the ubiquitously expressed transcription factor CP2 [TFCP2] were
 # present in regulatory regions of multiple erythroid genes. In these regions, the CP2 binding site
 # was adjacent to a site for the erythroid factor GATA-1. Using three such regulatory regions (from
 # genes encoding the transcription factors GATA-1, EKLF, and p45 NF-E2), we demonstrated the
@@ -112,16 +134,50 @@ library(trenaSGM)
 # the promoter 1a and reporter gene, in an arrangement that resembles the natural one, it acts as an
 # enhancer to stimulate the activity of the upstream promoter la.
 
-igv <- igvR()
-setGenome(igv, "hg38")
-showGenomicRegion(igv, "NFE2")
-tp <- TrenaProjectErythropoiesis()
-setTargetGene(tp, "NFE2")
-tbl.gh <- getEnhancers(tp)
-tbl.gh$width <- with(tbl.gh, 1 + end - start)
-tbl.gh <- subset(tbl.gh, width < 5000)
-track <- DataFrameQuantitativeTrack("gh", tbl.gh[, c(1,2,3,11)], color="blue", autoscale=FALSE, min=0, max=50)
-displayTrack(igv, track)
+# previous two articles mentioned in plos 2011
+#  Hierarchical Differentiation of Myeloid Progenitors Is Encoded in the Transcription Factor Network
+#
+# we examplarily discuss five such cases. (i) NF-E2 is regulated by GATA-1 and SCL (TAL1), but specifically
+# important for megakaryocytic development [23]–[25].
+#
+if(!exists("igv")){
+   igv <- igvR()
+   setGenome(igv, "hg38")
+   showGenomicRegion(igv, "NFE2")
+   tp <- TrenaProjectErythropoiesis()
+   setTargetGene(tp, "NFE2")
+   tbl.gh <- getEnhancers(tp)
+   tbl.gh$width <- with(tbl.gh, 1 + end - start)
+   tbl.gh <- subset(tbl.gh, width < 5000)
+   track <- DataFrameQuantitativeTrack("gh", tbl.gh[, c(1,2,3,11)], color="blue", autoscale=FALSE, min=0, max=50)
+   displayTrack(igv, track)
+   showGenomicRegion(igv, "chr12:54,289,590-54,311,542")
+   showGenomicRegion(igv, "chr12:54,282,156-54,326,061")
+   showGenomicRegion(igv, "chr12:54,290,497-54,315,164")
+   }
+#------------------------------------------------------------------------------------------------------------------------
+round.numeric.columns.in.dataframe <- function(tbl, digits=2, pvalColumnNames="lassoPValue")
+{
+   tbl.pvals <- data.frame()
+   tbl.main <- tbl
+
+   if(!(all(is.na(pvalColumnNames)))){
+     pval.cols <- grep(pvalColumnNames, colnames(tbl))
+     stopifnot(length(pval.cols) == length(pvalColumnNames))
+     tbl.pvals <- tbl[, pval.cols, drop=FALSE]
+     tbl.main <- tbl[, -pval.cols, drop=FALSE]
+     }
+   numeric_columns <- sapply(tbl.main, mode) == 'numeric'
+   tbl.main[numeric_columns] <-  round(tbl.main[numeric_columns], digits)
+   if(ncol(tbl.pvals) > 0){
+   tbl.pvals <- apply(tbl.pvals, 2, function(col) as.numeric(formatC(col, format = "e", digits = 2)))
+   }
+
+  tbl.out <- cbind(tbl.main, tbl.pvals)[, colnames(tbl)]
+  tbl.out
+
+   } # round.numeric.columns.in.dataframe
+
 #------------------------------------------------------------------------------------------------------------------------
 conservationTrack <- function()
 {
@@ -133,12 +189,12 @@ conservationTrack <- function()
    tbl.cons7 <- as.data.frame(gscores(phast.7, GRanges(tbl.blocks)), stringsAsFactors=FALSE)
    tbl.cons7$chrom <- as.character(tbl.cons7$seqnames)
    tbl.cons7 <- tbl.cons7[, c("chrom", "start", "end", "default")]
-   track <- DataFrameQuantitativeTrack("cons7", tbl.cons7, autoscale=TRUE, color="red")
+   track <- DataFrameQuantitativeTrack("phast7", tbl.cons7, autoscale=TRUE, color="red")
    displayTrack(igv, track)
 
 } # conservationTrack
 #------------------------------------------------------------------------------------------------------------------------
-fimoTrack <- function()
+fimoConservationTable <- function()
 {
   source("~/github/fimoService/batchMode/fimoBatchTools.R")   # works on hagfish & khaleesi
   meme.file <- "jaspar2018-hocomoco.meme"
@@ -148,17 +204,17 @@ fimoTrack <- function()
 
   roi <- getGenomicRegion(igv)
   tbl.regions <- with(roi, data.frame(chrom=chrom, start=start, end=end, stringsAsFactors=FALSE))
-  fimo.threshold <- 1e-4
+  fimo.threshold <- 1e-5
   tbl.match <- fimoBatch(tbl.regions, matchThreshold=fimo.threshold, genomeName="hg38", pwmFile=meme.file)
   dim(tbl.match)
 
   tbl.matchCons <- as.data.frame(gscores(phast.7, GRanges(tbl.match)), stringsAsFactors=FALSE)
   dim(tbl.matchCons)
-  tbl.matchCons <- subset(tbl.matchCons, default > 0.9)
+  tbl.matchCons <- subset(tbl.matchCons, default > 0.95)
   dim(tbl.matchCons)
   return(tbl.matchCons)
 
-} # fimoTrack
+} # fimoConservationTable
 #------------------------------------------------------------------------------------------------------------------------
 demo_NFE2_models <- function()
 {
@@ -180,14 +236,34 @@ demo_NFE2_models <- function()
    tbl.regions <- data.frame(chrom=chromosome, start=start, end=end, stringsAsFactors=FALSE)
    file <- system.file(package="TrenaProjectLymphocyte", "extdata", "expression","GTEX.wholeBlood.rna-seq-geneSymbols.22330x407.RData")
    mtx.blood <- get(load(file))
+
+   file <- system.file(package="TrenaProjectLymphocyte", "extdata", "expression",
+                       "GTEX.lymphocyte.rna-seq-geneSymbols.21415x130.RData")
+   mtx.lymphocyte <- get(load(file))
+
    file <- system.file(package="TrenaProjectErythropoiesis", "extdata", "expression", "brandLabDifferentiationTimeCourse-27171x28.RData")
    mtx.marjorie <- get(load(file))
-   tbl.matchCons <- fimoTrack()
+
+   file <- "~/github/TrenaProjectErythropoiesis/prep/import/buenrostro/GSE74246_RNAseq_All_Counts.txt"
+   file.exists(file)
+   tbl <- read.table(file, sep="\t", as.is=TRUE, header=TRUE,nrow=-1)
+   rownames(tbl) <- tbl[, 1]
+   tbl <- tbl[, -1]
+   mtx.buenrosto <- asinh(as.matrix(tbl))
+   fivenum(mtx.buenrosto)
+
+
+
+   tbl.matchCons <- fimoConservationTable()
    candidate.tfs <- unique(tbl.matchCons$tf)
+   length(candidate.tfs)  # 57
 
    noDNA.recipe <- list(title="noDNA.matchCons",
                         type="noDNA.tfsSupplied",
                         matrix=mtx.marjorie,
+                        #matrix=mtx.blood,
+                        #matrix=mtx.lymphocyte,
+                        #matrix=mtx.buenrosto,
                         candidateTFs=candidate.tfs,
                         tfPool=allKnownTFs(),
                         tfPrefilterCorrelation=0.2,
@@ -197,6 +273,19 @@ demo_NFE2_models <- function()
                         quiet=TRUE)
    builder <- NoDnaModelBuilder(genome, targetGene,  noDNA.recipe, quiet=TRUE)
    x <- build(builder)
+   tbl.model <- x$model[order(abs(x$model$pearsonCoeff), decreasing=TRUE),]
+   tbl.tfbs.counts <- as.data.frame(sort(table(tbl.matchCons$tf)))
+   bindingSiteCount <- merge(tbl.model, tbl.tfbs.counts, by.x="gene", by.y="Var1")$Freq
+   tbl.model$bindingSites <- bindingSiteCount
+
+   tbl.model.strong <- subset(tbl.model, abs(pearsonCoeff) > 0.5)
+   displayBindingSites(tbl.model.strong, tbl.matchCons)
+   mtx.model <- as.matrix(tbl.model.strong[, -1])
+   rownames(mtx.model) <- tbl.model.strong$gene
+
+   tbl.model.trimmed <- as.data.frame(round.numeric.columns.in.dataframe(mtx.model))
+   save(tbl.model.trimmed, file="brand.tbl.model.trimmed")
+
 
 
    recipe.all <- noDNA.recipe
@@ -248,4 +337,114 @@ demo_NFE2_models <- function()
       )
 
 } # demo_NFE2_models
+#------------------------------------------------------------------------------------------------------------------------
+displayBindingSites <- function(tbl.model, tbl.matchCons)
+{
+   tfs <- subset(tbl.model, abs(pearsonCoeff) > 0.5)$gene
+
+   for(one.tf in tfs){
+      tbl.bs <- subset(tbl.matchCons, tf==one.tf)[, c("seqnames", "start", "end", "matched_sequence")]
+      colnames(tbl.bs) <- c("chrom", "start", "end", "seq")
+      tbl.bs$chrom <- as.character(tbl.bs$chrom)
+      track <- DataFrameAnnotationTrack(one.tf, tbl.bs, color="random", trackHeight=25, displayMode="EXPANDED")
+      displayTrack(igv, track)
+      }
+
+} # displayBindingSites
+#------------------------------------------------------------------------------------------------------------------------
+getATACseq <- function()
+{
+   roi <- getGenomicRegion(igv)
+   chromosome <- roi$chrom
+   start.loc <- roi$start
+   end.loc <- roi$end
+
+   directory <- "~/github/TrenaProjectErythropoiesis/prep/import/atacPeaks"
+   files <- grep("narrowPeak$", list.files(directory), value=TRUE)
+   result <- list()
+
+   for(file in files){
+      full.path <- file.path(directory, file)
+      track.name <- sub("_hg38_macs2_.*$", "", sub("ATAC_Cord_", "", file))
+      tbl.atac <- read.table(full.path, sep="\t", as.is=TRUE)
+      colnames(tbl.atac) <- c("chrom", "start", "end", "name", "c5", "strand", "c7", "c8", "c9", "c10")
+      tbl.atac.region <- subset(tbl.atac, chrom==chromosome & start >= start.loc & end <= end.loc)
+      if(nrow(tbl.atac.region) > 0){
+         tbl.atac.region$sample <- track.name
+         result[[track.name]] <- tbl.atac.region
+         }
+      } # files
+
+   tbl.out <- do.call(rbind, result)
+   rownames(tbl.out) <- NULL
+
+   tbl.out
+
+} # getATACseq
+#------------------------------------------------------------------------------------------------------------------------
+displayATACseq <- function()
+{
+   library (RColorBrewer)
+   totalColorCount <- 12
+   colors <- brewer.pal(8, "Dark2")
+   currentColorNumber <- 0
+
+   tbl.all <- getATACseq()
+   samples <- unique(tbl.all$sample)
+   current.day.string <- ""
+   color <- colors[1]
+
+   for(current.sample in samples){
+      this.day.string <- strsplit(current.sample, "_")[[1]][1]
+      if(this.day.string != current.day.string){
+         currentColorNumber <- (currentColorNumber %% totalColorCount) + 1
+         color <- colors[currentColorNumber]
+         current.day.string <- this.day.string
+         }
+      tbl.atac.sub <- subset(tbl.all, sample == current.sample)
+      track.name <- current.sample
+      track <- DataFrameQuantitativeTrack(track.name, tbl.atac.sub[, c("chrom", "start", "end", "c10")],
+                                          color, autoscale=FALSE, min=0, max=430, trackHeight=30)
+      displayTrack(igv, track)
+      } # for samples
+
+   tbl.regions.condensed <- as.data.frame(union(GRanges(tbl.all[, c("chrom", "start", "end")]),
+                                                GRanges(tbl.all[, c("chrom", "start", "end")])))[, c("seqnames", "start", "end")]
+   colnames(tbl.regions.condensed) <- c("chrom", "start", "end")
+   tbl.regions.condensed$chrom <- as.character(tbl.regions.condensed$chrom)
+   lapply(tbl.regions.condensed, class)
+
+   #state$tbl.regions.condensed <- tbl.regions.condensed
+   track <- DataFrameAnnotationTrack("atac combined", tbl.regions.condensed, color="black")
+   displayTrack(igv, track)
+
+} # displayATACseq
+#------------------------------------------------------------------------------------------------------------------------
+# oddly, no methylation data in the immediate vicinity of nfe2.
+addMethylationTracks <- function()
+{
+  library(AnnotationHub)
+  ah <- AnnotationHub()
+  ah.human <- subset(ah, species == "Homo sapiens")
+  histone.tracks <- query(ah.human, c("H3K4me3", "Gm12878", "Peak", "narrow"))  # 3 tracks
+  descriptions <- histone.tracks$description
+  titles <- histone.tracks$title
+  colors <- rep(terrain.colors(6), 4)
+  color.index <- 0
+
+  tbl.roi <- as.data.frame(getGenomicRegion(igv), stringsAsFactors=FALSE)
+
+  for(i in seq_len(length(histone.tracks))){
+     name <- names(histone.tracks)[i]
+     color.index <- color.index + 1
+     gr <- histone.tracks[[name]]
+     ov <- findOverlaps(gr, GRanges(tbl.roi))
+     roi.histones <- gr[queryHits(ov)]
+     track.histones <- GRangesQuantitativeTrack(titles[i], roi.histones[, "pValue"],
+                                              color=colors[color.index], trackHeight=50,
+                                              autoscale=TRUE)
+     displayTrack(igv, track.histones)
+     } # for track
+
+} # addMethylationTracks
 #------------------------------------------------------------------------------------------------------------------------
