@@ -37,8 +37,8 @@ There are two stages in every trena analysis:
 
   1. Some subset of transcription factors is selected
   2. An ensemble of independent feature selectors (lasso, ridge, xgboost, randomForest
-     pearson & spearan correlation) score the association between each transcription
-     factor and the target gene across an expression matrix.
+     pearson & spearan correlation) score the association in gene expresssion between
+     each transcription factor and the target gene.
 
 ### Step One: select candidate transcription factors
 
@@ -100,16 +100,15 @@ to aggregate these scores.   Individucal analysts evolve their own informal aggr
 example:  giving weight and preference to the random forest score while also heeding spearman correlation.
 Quite commonly, as will be seen in the case studies, the various methods produce compatible predictions.
 
-### Case Studies
 
-#### Case Study 1:  trena reproduces known regulation of NFE2 by GATA1 in erythropoiesis
+### [Case Study 1:  trena reproduces known regulation of NFE2 by GATA1 in erythropoiesis](caseStudyOne.html)
 
 The first criterion of value for a computational tool such as trena is its ability to reliably reproduce
-known knowledge.   Here (follow the link) we accomplish that.
+existing knowledge.   Here (follow the link) we accomplish that, in these steps:
 
    1. A summary of the publications which establish this regulatory relationship
-   2. Reproduce the finding  using GTEx blood RNA-seq, multiple TF selection strategies
-   3. Reproduce the finding use Corces et al, 2016, RNA-seq on FACS-separated erythropoiesis stages, GSE74246
+   2. Weakly reproduce the finding  using GTEx blood RNA-seq, multiple TF selection strategies
+   3. Credibly reproduce the finding use Corces et al, 2016, RNA-seq on FACS-separated erythropoiesis stages, GSE74246
    4. As with 3, but this time with Brand lab GSE118537
 
 #### Case Study 2:  Identify a novel regulator of GATA2 in erythropoesis, with preliminary laboratory validation

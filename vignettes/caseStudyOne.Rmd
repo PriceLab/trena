@@ -1,0 +1,16 @@
+---
+title: "Case Study One: reproduce known regulation of NFE2 by GATA1 in erythropoiesis"
+output: html_document
+vignette: >
+  %\VignetteIndexEntry{"Case Study One: reproduce known regulation of NFE2 by GATA1 in erythropoiesis"}
+  %\VignetteEngine{knitr::knitr}
+  %\VignetteEncoding{UTF-8}
+---
+
+# Introduction
+
+The regulation of target genes by their transcription factors is complex and incompletely
+understood.  Multiple signals involving core promoters, distal enhancers, epigenetic controls
+on chromatin accessibility, stochastic and cooperative binding on different times scales are
+all involved.
+
