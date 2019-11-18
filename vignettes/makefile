@@ -1,8 +1,8 @@
 nfe2:
-	R -e "rmarkdown::render('nfe2-regulation.Rmd')"
-	open nfe2-regulation.html
+	R -e "rmarkdown::render('overview.Rmd')"
+	open overview.html
 
 
 vigExtract:
-	R -e "library(knitr); purl('nfe2-regulation.Rmd')"
+	R -e "library(knitr); purl('overview.Rmd')"
 

@@ -1,8 +1,8 @@
 ---
-title: "Predicting TF Regulators of NFE2 in Erythropoiesis"
+title: "TRENA: computational prediction of gene regulation"
 output: html_document
 vignette: >
-  %\VignetteIndexEntry{"Predicting TF Regulators of NFE2 in Erythropoiesis"}
+  %\VignetteIndexEntry{"TRENA: computational prediction of gene regulation"}
   %\VignetteEngine{knitr::knitr}
   %\VignetteEncoding{UTF-8}
 ---
@@ -40,7 +40,7 @@ There are two stages in every trena analysis:
      pearson & spearan correlation) score the association between each transcription
      factor and the target gene across an expression matrix.
 
-## Step One: select candidate transcription factors
+### Step One: select candidate transcription factors
 
 Step one can be accomplished in many ways.  A naive approach uses all 1663 human genes currently
 annotated by the GeneOntology project to the molecular function, "DNA-binding transcription factor activity".
@@ -81,7 +81,7 @@ gene has a median TF count of 35, that high fidelity motif match in highly conse
 chromatin identifies at least some TFs of interest - and, we speculate, that these will often include the
 oldest and most central TFs for each target gene.
 
-## Step Two: Run the ensemble of feature selectors
+### Step Two: Run the ensemble of feature selectors
 
 After appropriate normalization, the expression of the TFs selected in step one are used to predict
 the expression of the target gene, using a variety of algorithms:
@@ -95,48 +95,38 @@ the expression of the target gene, using a variety of algorithms:
    - xgboost
 
 The resulting "trena model" is an R data.frame containing the score using each algorithm of each TF
-as a predictor of the gene expression of the target gene.   We as yet have no heuristic method
-to aggregate these scores.   Individucal analysts evolve their own informal aggregation scheme, for
-example, favoring random forest score while also heeding spearman correlation.
+as a predictor of the gene expression of the target gene.   We as yet have no single settled heuristic method
+to aggregate these scores.   Individucal analysts evolve their own informal aggregation scheme. For
+example:  giving weight and preference to the random forest score while also heeding spearman correlation.
+Quite commonly, as will be seen in the case studies, the various methods produce compatible predictions.
 
-trena operates at many points along a continuum bounded at each end by two modes:
+### Case Studies
 
-  1. **low-res mode**: uses bulk mRNA data, generalized predictions of regulatory regions,
-     computational matching of TF to DNA sequence in those regions
+#### Case Study 1:  trena reproduces known regulation of NFE2 by GATA1 in erythropoiesis
 
-  2. **high-res mode**: uses single cell RNA-seq, scATAC-seq or DNase regions, timecourse or
-     well-discriminated environmental conditions, 3C, scChIP-seq, other recently emerging binding assays.
+The first criterion of value for a computational tool such as trena is its ability to reliably reproduce
+known knowledge.   Here (follow the link) we accomplish that.
 
-The low-resolution mode is useful when gene regulatory relationships are little known, or in
-which a coarse-grained result is adequate.  A prime example of this is in the creation of
-genome scale regulatory models by aggregating thousands of low-res single-gene models.
+   1. A summary of the publications which establish this regulatory relationship
+   2. Reproduce the finding  using GTEx blood RNA-seq, multiple TF selection strategies
+   3. Reproduce the finding use Corces et al, 2016, RNA-seq on FACS-separated erythropoiesis stages, GSE74246
+   4. As with 3, but this time with Brand lab GSE118537
 
-The high-resolution mode can predict relationships which can approach mechanistic accuracy, and
-which justify attempts at laboratory validation.  We propose that trena's ability to recapitulate
-known relations in well-studied systems predicts that it will make useful predictions in
-less-studied, less understood systems.
+#### Case Study 2:  Identify a novel regulator of GATA2 in erythropoesis, with preliminary laboratory validation
 
-In this paper we demonstrate trena at several points along this low-to-high resolution
-continuum by analyzing GATA2 regulation in erythropoiesis.  We conclude by demonstrating the
-application of trena at genome scale in low resolution mode in AD and PTB, arriving at better
-estimates of gene expression than is possible with existing methods, using by K-fold cross
-validation to make that case.
+Using bulk RNA-seq across a cell-sorted staged erythropoiesis study, accompanied by single cell
+ATAC-seq at each stage, we identify TBX15 as a likely regulatory of GATA2, with subsequent (confusing)
+functional validation by siRNA experiments.
 
-In this vignette we present several successive attempts to identify transcription factors which
-regulate the NFE2 (Nuclear Factor, Erythroid 2) gene in erythropoiesis.  NFE2 is itself a
-transcription factor with a role in erythroid and megakaryocytic maturation and differentiation.
+#### Case Study 3: Human Placenta Genome-scale transcriptional regulatory network to predict gene expression, with cross-validation
 
-# Multiple Analyses Demonstrate Wide Range of Applicability (and the benefits of high-resolution data)
+Short introduction goes here
 
-We begin with a high-res mode analysis, using timecourse RNA-seq and accompanying scATAC-seq, DNA conservation,
-and stringent motif matching.  In this mode, with these data, trena reproduces known regulatory relationships.
+#### Case Study 4: Cory's genome-scale models in Alzheimers?
 
-Such data is often not avaiable, so we then proceed upwards from the through a series of analyses,
-demonstrating the weaknesses and strengths of each stage.
+Short introduction goes here
 
-
-## High-res mode 
-
+<!--
 This image summarizes the NFE2 genome neighborhood and binding sites for putative regulators identified
 by trena:
 
@@ -212,3 +202,4 @@ sessionInfo()
 
 
 ![knitr logo](http://yihui.name/knitr/images/knit-logo.png)
+-->
