@@ -1,0 +1,147 @@
+---
+title: "Regulating NFE2 in Erythropoiesis"
+output:
+   BiocStyle::html_document
+vignette: >
+  %\VignetteIndexEntry{"Regulating NFE2 in Erythropoiesis"}
+  %\VignetteEngine{knitr::knitr}
+  %\VignetteEncoding{UTF-8}
+---
+
+<style>
+.main-container { width: 1200px; max-width:2800px;}
+</style>
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Overview
+
+The regulation of target genes by their transcription factors is complex and incompletely
+understood.  Multiple signals involving core promoters, distal enhancers, epigenetic controls
+on chromatin accessibility, stochastic and cooperative binding on different times scales are
+all involved.  Predictive modeling of these processes in fine detail and at scale is beyond
+our current capabilities.
+
+We know, however, that gene regulation usually includes two gross features which on their own
+are poor predictors, but which together have predictive power:
+
+   1) somewhat correlated gene expression of TF and target gene
+   2) actual or predicted DNA binding of the TF in regulatory DNA regions associated with
+      the target gene
+
+trena combines these two predictors to create (at minimum) "broad brush" or "low-resolution"
+gene regulatory predictions.  inasmuch as trena may be used with a wide range of genomic,
+eptigenetic and expression data "high resolution" predictions can be made as well.  trena
+thus operates at many points along this continuum:
+
+low-res mode: uses bulk mRNA data, generalized predictions of regulatory regions,
+computational matching of TF to DNA sequence in those regions
+
+high-res mode: uses single cell RNA-seq, scATAC-seq or DNase regions, timecourse or
+well-discriminated environmental conditions, 3C, scChIP-seq, other recently emerging binding assays.
+
+The low-resolution mode is useful when gene regulatory relationships are little known, or in
+which a coarse-grained result is adequate.  A prime example of this is in the creation of
+genome scale regulatory models by aggregating thousands of low-res single-gene models.
+
+The high-resolution mode can predict relationships which can approach mechanistic accuracy, and
+which justify attempts at laboratory validation.
+
+In this paper we demonstrate trena at several points along this low-to-high resolution
+continuum by analyzing GATA2 regulation in erythropoiesis.  We conclude by demonstrating the
+application of trena at genome scale in low resolution mode in AD and PTB, arriving at better
+estimates of gene expression than is possible with existing methods, using by K-fold cross
+validation to make that case.
+
+In this vignette we present several successive attempts to identify transcription factors
+which regulate the NFE2 (Nuclear Factor, Erythroid 2) gene.  NFE2 is itself a transcription factor
+which a role in erythroid and megakaryocytic maturation and differentiation.
+
+Erythropoieis has been studied at depth for many years, and many TF/target gene relationhsips have
+been documented.   Our goal in this vignette is to demonstrate that trena, using 
+progressively more highly-resolved data, can identify some of these relationships. Evidence of novel
+previously unreported relationships, some of them worthy of attempts at experimental validation, will be
+suggested as well.  We propose that trena's ability to recapitulate known relations in well-studied
+systems predicts that it will make useful predictions in less-studied, less understood systems.
+
+# Journal Articles Reporting Regulators of NFE2  
+
+  - Bose, Francesca, et al. "Functional interaction of CP2 with GATA-1 in the regulation of erythroid promoters."
+    Molecular and cellular biology 26.10 (2006): 3942-3954.
+
+  - Ding, Ya‐li, et al. "Over‐expression of EDAG in the myeloid cell line 32D: Induction of GATA‐1 expression
+    and erythroid/megakaryocytic phenotype." Journal of cellular biochemistry 110.4 (2010): 866-874.
+
+  - many more to be added...
+
+# Use the regulatory landscape
+
+Here is a preview of the final context we use to predict transcription factor/target gene relationships, including:
+
+  1. phast7: conserved DNA sequence, in red, on a scale of 0-1, across 7 species: opossum, dog, rat, mouse, rhesus
+     monkey, chimpanzee and human.  Highly conserved sequence in non-coding regions is likely to be functional,
+     that is, to play a role in regulating a nearby gene, and possibly a TF binding site.
+
+  2. atac combined: the union of 12 scATAC-seq datasets, collected in an erythropoiesis time course
+     Gillespie et al, https://www.biorxiv.org/content/10.1101/812123v1
+
+  3. TAL1, KLF1, GATA1,  etc:  high-scoring motif matches for top regulating TFs predicted by trena
+     using RNA-seq expression data from Gillespie et al.
+
+In this vignette we will show how the progress of analysis from naive to informed:
+
+  1. correlated gene expression, using bulk tissue GTEx blood RNA-seq, all possible TFs
+  2. restrict candidate TFs to only those with strong FIMO (or PWMmatch) scores
+  3. further restrict TFs to those which fall in highly conserved (phast7 >= 0.5) regions
+  4. as above, but with RNA collected from multiple stages of erythropoiesis
+  5. use RNA-seq and scATAC-seq from Gillespie et al.  The ATAC-seq track is the union of
+    for 20 samples across 12 erythropoiesis development timepoints.
+
+```{r, eval=TRUE, echo=FALSE}
+knitr::include_graphics("igvR-nfe2-regulation.png")
+```
+
+# Analysis 1: GTEx blood RNA-seq, no genome information: simple co-expression
+```{r read_expression_matrices, echo=FALSE, results=FALSE}
+library(TrenaProjectLymphocyte)
+library(TrenaProjectErythropoiesis)
+file <- system.file(package="TrenaProjectLymphocyte", "extdata", "expression","GTEX.wholeBlood.rna-seq-geneSymbols.22330x407.RData")
+mtx.blood <- get(load(file))
+
+file <- system.file(package="TrenaProjectLymphocyte", "extdata", "expression",
+                    "GTEX.lymphocyte.rna-seq-geneSymbols.21415x130.RData")
+mtx.lymphocyte <- get(load(file))
+
+file <- system.file(package="TrenaProjectErythropoiesis", "extdata", "expression", "brandLabDifferentiationTimeCourse-27171x28.RData")
+mtx.marjorie <- get(load(file))
+```
+# get a list of all TFs
+```{r get_all_tf_geneSymbols, echo=TRUE, results='hide'}
+library(org.Hs.eg.db)
+allTFsymbols <- suppressMessages(
+                   sort(unique(
+                      select(org.Hs.eg.db, keys="GO:0003700", keytype="GOALL", columns="SYMBOL")$SYMBOL)))
+```
+
+# Build a "no-genome" model with GTEx blood
+```{r}
+library(trena)
+candidate.tfs <- intersect(allTFsymbols, rownames(mtx.blood))
+cat(sprintf("%d candidate.tfs\n", length(candidate.tfs)))
+es <- EnsembleSolver(mtx.blood, "NFE2", candidate.tfs)
+tbl.model <-  run(es)
+tbl.model <- tbl.model[order(abs(tbl.model$pearsonCoeff), decreasing=TRUE),]
+rownames(tbl.model) <- NULL
+grep("GATA1", tbl.model$gene) # 122
+head(tbl.model, n=20)
+```
+
+# Session Info
+
+```{r sessionInfo}
+sessionInfo()
+````
+

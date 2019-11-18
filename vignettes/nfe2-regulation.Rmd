@@ -1,0 +1,214 @@
+---
+title: "Predicting TF Regulators of NFE2 in Erythropoiesis"
+output: html_document
+vignette: >
+  %\VignetteIndexEntry{"Predicting TF Regulators of NFE2 in Erythropoiesis"}
+  %\VignetteEngine{knitr::knitr}
+  %\VignetteEncoding{UTF-8}
+---
+
+# Introduction
+
+The regulation of target genes by their transcription factors is complex and incompletely
+understood.  Multiple signals involving core promoters, distal enhancers, epigenetic controls
+on chromatin accessibility, stochastic and cooperative binding on different times scales are
+all involved.
+
+Many hundreds of human TF/target gene relationships *are* known, however.  These relationships
+are primarily from  well-studied systems and from research into human diseases.  Hundreds of
+thousands of TF/target gene relationships exist in human cells.  There is an urgent need
+for laboratory and computational methods which predict and validate the many that remain unknown.
+
+*trena* is one such computational method.  It's predictive success depends upon the judicious
+combination of two predictors, each of which is in isolation quite useless:
+
+   1) correlated gene expression of TF and target gene
+   2) actual or predicted DNA binding of the TF in regulatory DNA regions associated with
+      the target gene
+
+When applied in tandem to high quality gene expression, genomic and epigenomic data, trena can
+1) recapitulate known TF/target gene relationships, and 2) predict new ones sufficiently plausible to
+warrant small-scale laboratory valdidation, and 3) the creation of genome-scale tissue-specific
+regulatory networks.  We will demonstrate these three capabilities in this paper.
+
+# Methodological Overview
+
+There are two stages in every trena analysis:
+
+  1. Some subset of transcription factors is selected
+  2. An ensemble of independent feature selectors (lasso, ridge, xgboost, randomForest
+     pearson & spearan correlation) score the association between each transcription
+     factor and the target gene across an expression matrix.
+
+## Step One: select candidate transcription factors
+
+Step one can be accomplished in many ways.  A naive approach uses all 1663 human genes currently
+annotated by the GeneOntology project to the molecular function, "DNA-binding transcription factor activity".
+A more conservative choice is to use the 558 human genes for which Jaspar2018 and HOCOMOCO provide
+binding motifs.  We will demonstrate these two annotation-based strategies below and then proceed
+to use more discriminating approaches:
+
+  1.  Assume a traditional cis-regulatory promoter region for the target gene (say, +/-
+      5kb from the TSS).
+  2.  Obtain cis-regulatory promoters and enhancers from public databaes or - best of all -
+      by cell type specific experimental data for the system under study
+  3.  Select transcription factors with motifs which match DNA sequence in these regulatory regions.
+      Each match can be quantified in (at least) two ways:  but motif/sequence match, and by
+      the evolutionary conservation of that matching sequence.
+
+Each of these strategies has virtues and deficiencies.  The naive 1663 GO annotation gene strategy
+will pick up TFs which may be active and functional but for which no binding motif is known.  The
+558 motif TF strategy makes no assumptions about regulatory regions; in the absence of good data
+about the target genes's actual regulatory regions,  this inclusive approach can be useful.
+
+However, there is an emerging consensus (Cusanovich 2014 & etc) that a great deal of actually bound
+TFs, as detected by ChIP-seq, in known regulatory regions, are not functional.  Their
+knockdown or silencing has no effect on the expression of the target gene.  Thus the primary challenge
+for the first stage of trena - TF selection - is how to avoid considering too many TF candidates.
+
+We adopt these strategies for TF selection:
+
+  1) select only TFs with motifs with very high DNA matching scores
+  2) occuring in non-coding DNA sequence that is highly conserved over 100 million years
+  3) when avaiable, as with the increasingly available single-cell ATAC-seq, further
+     filter the TFs by requring that condition-specific chromatin is open
+
+The stringency of strategies 1 and 2 will, in any given study, exclude functional and relevant
+binding sites, and their cognate TFs from consideration in the trena regulatory model.  This loss is
+more than offset, as we will show, by the credibility of the models which emerge from that
+stringency, based on the assumption that (again, following Cusanovich 2014) that since each human
+gene has a median TF count of 35, that high fidelity motif match in highly conserved regions of open
+chromatin identifies at least some TFs of interest - and, we speculate, that these will often include the
+oldest and most central TFs for each target gene.
+
+## Step Two: Run the ensemble of feature selectors
+
+After appropriate normalization, the expression of the TFs selected in step one are used to predict
+the expression of the target gene, using a variety of algorithms:
+
+   - lasso
+   - lassoPValue
+   - ridge regression
+   - pearson correlation
+   - spearman correlation
+   - random forest
+   - xgboost
+
+The resulting "trena model" is an R data.frame containing the score using each algorithm of each TF
+as a predictor of the gene expression of the target gene.   We as yet have no heuristic method
+to aggregate these scores.   Individucal analysts evolve their own informal aggregation scheme, for
+example, favoring random forest score while also heeding spearman correlation.
+
+trena operates at many points along a continuum bounded at each end by two modes:
+
+  1. **low-res mode**: uses bulk mRNA data, generalized predictions of regulatory regions,
+     computational matching of TF to DNA sequence in those regions
+
+  2. **high-res mode**: uses single cell RNA-seq, scATAC-seq or DNase regions, timecourse or
+     well-discriminated environmental conditions, 3C, scChIP-seq, other recently emerging binding assays.
+
+The low-resolution mode is useful when gene regulatory relationships are little known, or in
+which a coarse-grained result is adequate.  A prime example of this is in the creation of
+genome scale regulatory models by aggregating thousands of low-res single-gene models.
+
+The high-resolution mode can predict relationships which can approach mechanistic accuracy, and
+which justify attempts at laboratory validation.  We propose that trena's ability to recapitulate
+known relations in well-studied systems predicts that it will make useful predictions in
+less-studied, less understood systems.
+
+In this paper we demonstrate trena at several points along this low-to-high resolution
+continuum by analyzing GATA2 regulation in erythropoiesis.  We conclude by demonstrating the
+application of trena at genome scale in low resolution mode in AD and PTB, arriving at better
+estimates of gene expression than is possible with existing methods, using by K-fold cross
+validation to make that case.
+
+In this vignette we present several successive attempts to identify transcription factors which
+regulate the NFE2 (Nuclear Factor, Erythroid 2) gene in erythropoiesis.  NFE2 is itself a
+transcription factor with a role in erythroid and megakaryocytic maturation and differentiation.
+
+# Multiple Analyses Demonstrate Wide Range of Applicability (and the benefits of high-resolution data)
+
+We begin with a high-res mode analysis, using timecourse RNA-seq and accompanying scATAC-seq, DNA conservation,
+and stringent motif matching.  In this mode, with these data, trena reproduces known regulatory relationships.
+
+Such data is often not avaiable, so we then proceed upwards from the through a series of analyses,
+demonstrating the weaknesses and strengths of each stage.
+
+
+## High-res mode 
+
+This image summarizes the NFE2 genome neighborhood and binding sites for putative regulators identified
+by trena:
+
+  1. phast7: conserved DNA sequence, in red, on a scale of 0-1, across 7 species: opossum, dog, rat, mouse, rhesus
+     monkey, chimpanzee and human.  Highly conserved sequence in non-coding regions is likely to be functional,
+     that is, to play a role in regulating a nearby gene, and possibly a TF binding site.
+
+  2. atac combined: the union of 12 scATAC-seq datasets, collected in an erythropoiesis time course
+     Gillespie et al, https://www.biorxiv.org/content/10.1101/812123v1
+
+  3. TAL1, KLF1, GATA1,  etc:  high-scoring motif matches for top regulating TFs predicted by trena
+     using RNA-seq expression data from Gillespie et al.
+
+Here is the high-res model as scored by trena, followed by the genome view.
+
+
+```{r load brand model, echo=FALSE}
+tbl.model <- get(load("brand.tbl.model.trimmed"))
+knitr::kable(tbl.model)
+```
+
+
+```{r, eval=TRUE, echo=FALSE}
+knitr::include_graphics("igvR-nfe2-regulation-noGeneHancer.png")
+```
+
+
+## Correlated gene expression of all known TFs to the target gene
+
+We do this with three (four) sources of gene expression data
+
+ 1.  GTEx Whole Blood
+
+### GTEx Blood
+
+
+### Corces et al; Lineage-specific and single-cell chromatin accessibility charts human hematopoiesis and leukemia evolution.
+in 13 human proimary blood cell types that span the hamatopoietic hierarchy"
+
+see al
+    https://www.ncbi.nlm.nih.gov/pubmed/27526324
+
+see also: Integrated Single-Cell Analysis Maps the Continuous Regulatory Landscape of Human Hematopoietic Differentiation
+Jason D.Buenrostro et al
+
+### Brand erythropoiesis time-course
+
+## Further restrict TFs to those which fall in highly conserved (phast7 >= 0.5) regions
+
+##  as above, but with RNA collected from multiple stages of erythropoiesis
+  5. use RNA-seq and scATAC-seq from Gillespie et al.  The ATAC-seq track is the union of
+    for 20 samples across 12 erythropoiesis development timepoints.
+
+
+# Journal Articles Reporting Regulators of NFE2  
+
+  - Bose, Francesca, et al. "Functional interaction of CP2 with GATA-1 in the regulation of erythroid promoters."
+    Molecular and cellular biology 26.10 (2006): 3942-3954.
+
+  - Ding, Ya‐li, et al. "Over‐expression of EDAG in the myeloid cell line 32D: Induction of GATA‐1 expression
+    and erythroid/megakaryocytic phenotype." Journal of cellular biochemistry 110.4 (2010): 866-874.
+
+  - many more to be added...
+
+
+
+
+# Session Info
+
+```{r sessionInfo}
+sessionInfo()
+````
+
+
+![knitr logo](http://yihui.name/knitr/images/knit-logo.png)
