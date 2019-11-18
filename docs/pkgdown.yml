@@ -3,4 +3,11 @@ pkgdown: 1.4.1
 pkgdown_sha: ~
 articles:
   TReNA_Vignette: TReNA_Vignette.html
+  caseStudyFour: caseStudyFour.html
+  caseStudyOne: caseStudyOne.html
+  caseStudyThree: caseStudyThree.html
+  caseStudyTwo: caseStudyTwo.html
+  overview: overview.html
+  simple: simple.html
+  tiny: tiny.html
 

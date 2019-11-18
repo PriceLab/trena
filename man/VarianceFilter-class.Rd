@@ -7,8 +7,7 @@
 \alias{VarianceFilter}
 \title{Create a VarianceFilter object}
 \usage{
-VarianceFilter(mtx.assay = matrix(), targetGene, varSize = 0.5,
-  quiet = TRUE)
+VarianceFilter(mtx.assay = matrix(), targetGene, varSize = 0.5, quiet = TRUE)
 }
 \arguments{
 \item{mtx.assay}{An assay matrix of gene expression data}
@@ -37,6 +36,7 @@ variance.filter <- VarianceFilter(mtx.assay = mtx.sub, targetGene = "MEF2C")
 \seealso{
 \code{\link{getCandidates-VarianceFilter}}
 
-Other Filtering Objects: \code{\link{FootprintFilter-class}}
+Other Filtering Objects: 
+\code{\link{FootprintFilter-class}}
 }
 \concept{Filtering Objects}

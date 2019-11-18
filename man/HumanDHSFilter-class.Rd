@@ -7,9 +7,16 @@
 \alias{HumanDHSFilter}
 \title{Create a HumanDHSFilter object}
 \usage{
-HumanDHSFilter(genomeName, encodeTableName = "wgEncodeRegDnaseClustered",
-  pwmMatchPercentageThreshold, geneInfoDatabase.uri, regions,
-  variants = NA_character_, pfms, quiet = TRUE)
+HumanDHSFilter(
+  genomeName,
+  encodeTableName = "wgEncodeRegDnaseClustered",
+  pwmMatchPercentageThreshold,
+  geneInfoDatabase.uri,
+  regions,
+  variants = NA_character_,
+  pfms,
+  quiet = TRUE
+)
 }
 \arguments{
 \item{genomeName}{A character string indicating the reference genome; currently, the only
@@ -60,14 +67,17 @@ if(interactive()) { # takes too long in the bioc windows build
 \seealso{
 \code{\link{getCandidates-HumanDHSFilter}},
 
-Other Solver class objects: \code{\link{BayesSpikeSolver}},
-  \code{\link{EnsembleSolver}},
-  \code{\link{LassoPVSolver}}, \code{\link{LassoSolver}},
-  \code{\link{PearsonSolver}},
-  \code{\link{RandomForestSolver}},
-  \code{\link{RidgeSolver}}, \code{\link{Solver-class}},
-  \code{\link{SpearmanSolver}},
-  \code{\link{SqrtLassoSolver}},
-  \code{\link{XGBoostSolver}}
+Other Solver class objects: 
+\code{\link{BayesSpikeSolver}},
+\code{\link{EnsembleSolver}},
+\code{\link{LassoPVSolver}},
+\code{\link{LassoSolver}},
+\code{\link{PearsonSolver}},
+\code{\link{RandomForestSolver}},
+\code{\link{RidgeSolver}},
+\code{\link{Solver-class}},
+\code{\link{SpearmanSolver}},
+\code{\link{SqrtLassoSolver}},
+\code{\link{XGBoostSolver}}
 }
 \concept{Solver class objects}

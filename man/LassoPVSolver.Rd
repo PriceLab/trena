@@ -4,8 +4,12 @@
 \alias{LassoPVSolver}
 \title{Create a Solver class object using the LASSO P-Value solver}
 \usage{
-LassoPVSolver(mtx.assay = matrix(), targetGene, candidateRegulators,
-  quiet = TRUE)
+LassoPVSolver(
+  mtx.assay = matrix(),
+  targetGene,
+  candidateRegulators,
+  quiet = TRUE
+)
 }
 \arguments{
 \item{mtx.assay}{An assay matrix of gene expression data}
@@ -32,14 +36,17 @@ lassopv.solver <- LassoPVSolver(mtx.sub, target.gene, tfs)
 \seealso{
 \code{\link{solve.LassoPV}}, \code{\link{getAssayData}}
 
-Other Solver class objects: \code{\link{BayesSpikeSolver}},
-  \code{\link{EnsembleSolver}},
-  \code{\link{HumanDHSFilter-class}},
-  \code{\link{LassoSolver}}, \code{\link{PearsonSolver}},
-  \code{\link{RandomForestSolver}},
-  \code{\link{RidgeSolver}}, \code{\link{Solver-class}},
-  \code{\link{SpearmanSolver}},
-  \code{\link{SqrtLassoSolver}},
-  \code{\link{XGBoostSolver}}
+Other Solver class objects: 
+\code{\link{BayesSpikeSolver}},
+\code{\link{EnsembleSolver}},
+\code{\link{HumanDHSFilter-class}},
+\code{\link{LassoSolver}},
+\code{\link{PearsonSolver}},
+\code{\link{RandomForestSolver}},
+\code{\link{RidgeSolver}},
+\code{\link{Solver-class}},
+\code{\link{SpearmanSolver}},
+\code{\link{SqrtLassoSolver}},
+\code{\link{XGBoostSolver}}
 }
 \concept{Solver class objects}

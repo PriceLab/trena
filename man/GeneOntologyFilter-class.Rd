@@ -7,8 +7,11 @@
 \alias{GeneOntologyFilter}
 \title{Create a GeneOntologyFilter object}
 \usage{
-GeneOntologyFilter(organismDatabase = org.Hs.eg.db::org.Hs.eg.db,
-  GOTerm = "GO:0006351", quiet = TRUE)
+GeneOntologyFilter(
+  organismDatabase = org.Hs.eg.db::org.Hs.eg.db,
+  GOTerm = "GO:0006351",
+  quiet = TRUE
+)
 }
 \arguments{
 \item{organismDatabase}{An organism-specific database of type 'OrgDb'}

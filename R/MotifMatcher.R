@@ -254,7 +254,8 @@ setMethod("getPfms", "MotifMatcher",
 {
    xyz <- .matchPwmForwardAndReverse
 
-    min.match.as.string <- sprintf("%02d%%", min.match.percentage)
+   min.match.as.string <- sprintf("%02d%%",
+                                  min.match.percentage)
 
     hits.fwd <- Biostrings::matchPWM(pfm, sequence, with.score=TRUE, min.score=min.match.as.string)
     hits.rev <- Biostrings::matchPWM(Biostrings::reverseComplement(pfm),

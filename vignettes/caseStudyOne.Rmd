@@ -1,16 +1,228 @@
 ---
-title: "Case Study One: reproduce known regulation of NFE2 by GATA1 in erythropoiesis"
+title: "Case Study One: attempt to reproduce known regulation of NFE2 by GATA1 in bulk RNA-seq"
 output: html_document
 vignette: >
-  %\VignetteIndexEntry{"Case Study One: reproduce known regulation of NFE2 by GATA1 in erythropoiesis"}
+  %\VignetteIndexEntry{"Case Study One: reproduce known regulation of NFE2 by GATA1 in bulk RNA-seq"}
   %\VignetteEngine{knitr::knitr}
   %\VignetteEncoding{UTF-8}
 ---
 
 # Introduction
 
-The regulation of target genes by their transcription factors is complex and incompletely
-understood.  Multiple signals involving core promoters, distal enhancers, epigenetic controls
-on chromatin accessibility, stochastic and cooperative binding on different times scales are
-all involved.
+The recently published [Benchmark and integration of resources for the estimation of human
+transcription factor
+activities](https://genome.cshlp.org/content/early/2019/07/24/gr.240663.118.abstract) provides a useful
+curation of TF/target gene relations divided into five confidence categories.  We chose one high
+confidence (score "A") relation from this dataset for this case study: the regulation of NFE2 by
+GATA1 in erythropoiesis.  We will use trena to "discover" this relationship, a necessary but not
+sufficient proof of trena's value.
+
+Hematopoiesis (the production of blood cells) involves two subprocesses: erythropoiesis (red blood
+cell biogenesis) and megakaryopoiesis (megakaryocytes and platelets).  These processes have been
+intensively studied for decades, and much has been learned about the complex and hierarchical
+regulation of these processes of differentiation.  GATA1, TALl, KLF1 and the p45 isoform of NFE2 are
+some of the transcription factors involved.
+
+The Benchmark dataset reports two studies[ref1, ref2] reporting transcriptional regulation of NFE2
+by GATA1.  In addition, [Takayama et al, 2010](https://mcb.asm.org/content/30/11/2668.short) report
+that "In megakaryocytes, GATA1 deficiency reduces p45 expression by approximately 50%, indicating
+the presence of GATA1-dependent and -independent regulation of the p45 gene."   We lack
+precise knowledge of the intricacies of regulatory networks in erythropoieis, but the cited research
+in combination strongly suggests the regulation by GATA1 of NFE2 in erythropoieis.
+
+# GTEx Blood
+
+The GTEx project provides RNA-seq count expression data for 25k genes and 755 samples.  These data
+are highly heterogeneous, derived from a mix of red blood cells, white blood cells and platelets
+from many subjects.  It should be no surprise therefore that our trena analysis fails to retrieve a
+regulatory relationship between GATA1 and NFE2 from this dataset.  This exercise introduces the
+trena technique and the dangers of bulk heterogeneous data.
+
+## Expression and all known transcription factors
+
+The GeneOntology project annotates 1663 human genes to the molecular function 
+[DNA-binding transcription factor activity](https://www.ebi.ac.uk/QuickGO/term/GO:0003700):
+
+<pre>
+> tfs.all <- sort(unique(select(org.Hs.eg.db, keys="GO:0003700", keytype="GOALL",  columns="SYMBOL")$SYMBOL))
+> tfs <- intersect(tfs.all, rownames(mtx.gtex.blood)
+> solvers <-  c("lasso", "lassopv", "pearson", "randomForest", "ridge", "spearman", "xgboost")
+> trenaEnsemble <- EnsembleSolver(mtx.gtex.blood, "NFE2", tfs, solvers)
+> tbl.model <- run(trenaEnsemble)
+> head(tbl.model, n=20)
+      gene  betaLasso   lassoPValue pearsonCoeff     rfScore   betaRidge spearmanCoeff      xgboost
+1   ZNF467 0.04554979 8.102352e-270    0.8974169 179.4721705 0.017900579     0.9059445 5.378471e-01
+2     GAS7 0.04214837 5.185498e-254    0.8928340 138.1390796 0.009325281     0.8954556 1.856330e-01
+3   ZNF438 0.12869763 1.108818e-216    0.8868706  81.0674620 0.017991204     0.8905471 6.816107e-02
+4     SPI1 0.18316329 1.786604e-114    0.8748366  44.8748867 0.016571769     0.8931940 2.611708e-02
+5     MXD3 0.15625475 9.154617e-181    0.8743369  46.8945593 0.010499558     0.8840492 8.380720e-03
+6    MLLT1 0.04897373  8.023350e-44    0.8719094  36.9168331 0.007973757     0.8826423 8.462997e-03
+7     RFX2 0.03938209  2.781065e-39    0.8611165  32.4493142 0.010776699     0.8703952 1.977503e-03
+8     ATF6 0.00000000  1.315896e-01    0.8198707   0.3438544 0.014297394     0.8249904 2.738534e-05
+9    CREB5 0.00000000  4.501187e-02    0.8198528   9.6779565 0.016295689     0.8085946 2.863106e-02
+10   CEBPD 0.00000000  1.000000e+00    0.8142818   0.1316654 0.008440315     0.8224173 3.893420e-05
+11   CEBPA 0.00000000  2.317224e-02    0.8130808   8.6251990 0.016003815     0.8356710 3.202592e-04
+12 SUPT4H1 0.00000000  1.000000e+00    0.8105414   3.4865286 0.006986417     0.8311199 1.528261e-03
+13    HHEX 0.00000000  1.000000e+00    0.8087241   1.0232650 0.003709475     0.8092507 2.668327e-07
+14  ZBTB7B 0.00000000  1.000000e+00    0.8079335   7.7857724 0.011015725     0.8368950 7.776020e-04
+15   STK16 0.00000000  7.855677e-01    0.8056880   1.0425907 0.006133720     0.8150958 1.706304e-03
+16    TFEB 0.00000000  1.000000e+00    0.7994628   0.2934284 0.004787306     0.8206329 3.367513e-05
+17  ZNF787 0.00000000  1.000000e+00    0.7940764   1.2943307 0.011087230     0.8239310 4.486712e-04
+18     HLX 0.06593066  3.088806e-41    0.7876786   4.2640642 0.020916575     0.8083032 6.963889e-03
+19  ZNF746 0.00000000  1.000000e+00    0.7875233   0.4593815 0.011661213     0.7901268 2.914801e-05
+20   MLXIP 0.00000000  1.000000e+00    0.7871229   0.4650622 0.002449240     0.7988580 8.521462e-05
+</pre>
+
+We hope to see the three erythropoiesis transcription factors somewhere in the trena
+model.  In this one, they are not prominent, found at positions 125, 225 and 252 when
+the model is sorted by the absolute value of the pearson coefficient:
+
+<pre>
+> match(c("GATA1", "TAL1", "KLF1"), tbl.lps$gene)   # 125, 225, 252
+[1] 371 725 824
+> 
+</pre>
+
+## Expression and only transcription factors with known motifs
+
+The JASPAR 2018 and Hocomoco transcription factor compendia, when combine, identify
+780 annotated transcription factor motif.  In building the next model, candidate transcription
+factors are limited to this set.
+
+<pre>
+> tfs.withMotifs <- mcols(query(MotifDb, c("sapiens"), c("jaspar2018", "hocomoo")))$geneSymbol
+> tfs <- intersect(tfs.withMotifs, rownames(mtx.gtex.blood)
+> solvers <-  c("lasso", "lassopv", "pearson", "randomForest", "ridge", "spearman", "xgboost")
+> trenaEnsemble <- EnsembleSolver(mtx.gtex.blood, "NFE2", tfs, solvers)
+> tbl.model <- run(trenaEnsemble)
+> head(tbl.model, n=20)
+     gene  betaLasso   lassoPValue pearsonCoeff     rfScore   betaRidge spearmanCoeff      xgboost
+1    SPI1 0.39179921 3.105960e-239    0.8748366 173.1813469 0.038256090     0.8931940 4.484164e-01
+2    RFX2 0.13283782 1.236616e-203    0.8611165 113.7966516 0.028434701     0.8703952 2.578767e-01
+3   CREB5 0.01020744  4.215279e-27    0.8198528  29.3836851 0.022581439     0.8085946 2.582643e-02
+4   CEBPD 0.00000000  7.806114e-01    0.8142818   9.8128799 0.012064964     0.8224173 2.684192e-05
+5   CEBPA 0.04856000 4.918991e-124    0.8130808  24.5906707 0.020001647     0.8356710 9.968208e-04
+6  ZBTB7B 0.00000000  7.570965e-01    0.8079335  63.6673040 0.019478331     0.8368950 2.942618e-02
+7    TFEB 0.00000000  9.128677e-01    0.7994628  11.5517782 0.016902326     0.8206329 3.371606e-05
+8    BATF 0.05800616  1.182795e-77    0.7799541   5.0297895 0.022430686     0.7874306 3.195642e-03
+9    RARA 0.00000000  1.432931e-04    0.7768149  15.1423384 0.024408500     0.8108477 3.022155e-03
+10    SP1 0.00000000  2.669736e-01    0.7766227   1.1118820 0.022444381     0.7866711 1.295055e-04
+11  KLF14 0.00000000  9.461310e-01    0.7733890  59.8682708 0.014609629     0.8102489 3.570402e-03
+12  NR2E1 0.07466256 1.645394e-128    0.7674846  73.1777412 0.031161125     0.8166762 5.374055e-02
+13   IRF2 0.00000000  1.147759e-01    0.7457406   0.2705582 0.022106204     0.7481861 2.877418e-04
+14  MEF2A 0.00000000  7.640160e-01    0.7310054   0.4375018 0.016944211     0.7305359 1.044375e-05
+15  GLIS2 0.00000000  8.645402e-01    0.7198283   0.9845279 0.007047398     0.7382333 3.208840e-05
+16   JDP2 0.00000000  6.085086e-01    0.7195525   0.1852113 0.002444830     0.7269272 1.237316e-04
+17   TFE3 0.00000000  3.867438e-08    0.7144317   1.7343149 0.026801329     0.7308633 7.625371e-04
+18   BCL6 0.00000000  2.100360e-08    0.7088486   4.5882372 0.020731165     0.6988929 1.135068e-03
+19    SRF 0.00000000  8.907811e-01    0.7074436   0.5702123 0.013987309     0.7270949 4.228163e-04
+20 PKNOX1 0.00000000  7.175965e-01    0.7052011   0.2088824 0.013225756     0.7120145 8.979636e-05
+</pre>
+
+The three TFs score higher in this model, but can not be said, in any strong sense, to be predicted
+by it as regulators of NFE2.
+
+> match(c("GATA1", "TAL1", "KLF1"), tbl.model$gene)   # 125, 225, 252
+[1]  125 225 252
+<pre>
+
+## Expression and highly-conserved, high-scoring transcription factors in a 20kb regulatory region
+
+We hypothesize that transcription factors with well-matched motifs found in highly conserved regulatory
+regions within +/- 10kb of the target gene's TSS are more likely than random to be functional
+binding sites.   When found, and when tf/target gene expression is also correlated, these may be
+viewed as possibly sound trena predictions.
+
+Here we use a precalculated table of FIMO and phast7 scores for 20kb surrounding the NFE2
+transcription start site, extracting only those TFs with very high match and conservation:
+
+<pre>
+tbl.tfs.elite <- subset(tbl.fimoMotifs, p.value <= fimo.score & phast7 >= phast.score)
+dim(tbl.tfs.elite)
+tfs <- sort(unique(tbl.tbs.elite)$tf)
+length(tfs)  # 52
+match(c("GATA1", "TAL1", "KLF1"), tfs.elite)   # 13 41 16
+solver <- EnsembleSolver(mtx.blood.lps, target.gene, tfs, geneCutoff=1.0, solverNames=solverNames)
+tbl <- run(solver)
+new.order <- order(abs(tbl$pearsonCoeff), decreasing=TRUE)
+tbl <- tbl[new.order,]
+rownames(tbl) <- NULL
+tbl.fimo.phast.stringent <- tbl
+match(c("GATA1", "TAL1", "KLF1"), tbl.fimo.phast.stringent)   # NA NA NA
+</pre>
+
+## Expression and somewhat-conserved, FIMO default matched  transcription factors in a 20kb regulatory region
+
+Here we see that loosening the FIMO match threshold to its traditional default value (1e-4) and
+phast7 conservation to 20% does not increase our ability to predict the regulation of NFE2 by GATA1:
+
+<pre>
+tbl.tfs.weak <- subset(tbl.fimoMotifs, p.value <= 1e-4 & phast7 > 0.2)
+dim(tbl.tfs.weak)   # 2846
+tfs.weak <- unique(tbl.tfs.weak$tf)
+length(tfs.weak)  # 525
+match(c("GATA1", "TAL1", "KLF1"), tfs.weak)   # 281 282 330
+
+solver <- EnsembleSolver(mtx.blood.lps, target.gene, tfs.weak, geneCutoff=1.0, solverNames=solverNames)
+tbl <- run(solver)
+dim(tbl)  # 378
+new.order <- order(abs(tbl$pearsonCoeff), decreasing=TRUE)
+tbl <- tbl[new.order,]
+rownames(tbl) <- NULL
+tbl.fimo.phast.weak <- tbl
+match(c("GATA1", "TAL1", "KLF1"), tbl.fimo.phast.stringent)   # NA NA NA
+head(tbl.fimo.phast.weak, n=20)
+
+     gene   betaLasso pearsonCoeff     rfScore    betaRidge spearmanCoeff      xgboost
+1    SPI1  0.37925044    0.8748366 173.3335617  0.048503015     0.8931940 4.866324e-01
+2    RFX2  0.13351525    0.8611165 148.3728199  0.033019631     0.8703952 2.471701e-01
+3   CEBPD  0.00000000    0.8142818  14.1532996  0.017885322     0.8224173 6.461158e-05
+4   CEBPA  0.06400950    0.8130808  48.0292068  0.030222210     0.8356710 3.197183e-03
+5    BATF  0.06772117    0.7799541   8.7910003  0.032610855     0.7874306 3.573105e-03
+6    RARA  0.00000000    0.7768149  19.7713182  0.029306674     0.8108477 3.475518e-03
+7     SP1  0.00000000    0.7766227   6.5621383  0.026881993     0.7866711 1.750126e-04
+8   KLF14  0.00000000    0.7733890  57.5545230  0.015930889     0.8102489 9.025739e-04
+9   NR2E1  0.08100175    0.7674846  79.9225143  0.037686012     0.8166762 6.480617e-02
+10   IRF2  0.00000000    0.7457406   0.5893363  0.025511229     0.7481861 1.858361e-04
+11  MEF2A  0.00000000    0.7310054   0.5754763  0.019650713     0.7305359 1.326880e-04
+12  GLIS2  0.00000000    0.7198283   1.6554741  0.006859244     0.7382333 2.377722e-05
+13   JDP2  0.00000000    0.7195525   0.3562898  0.001063041     0.7269272 3.631474e-04
+14   BCL6  0.00000000    0.7088486   8.9160346  0.029732369     0.6988929 2.176104e-03
+15    SRF  0.00000000    0.7074436   0.9801356  0.019549681     0.7270949 2.524539e-04
+16 PKNOX1  0.00000000    0.7052011   0.2873513  0.013340846     0.7120145 1.490372e-05
+17   RXRA  0.00000000    0.7036052   1.3152228  0.020967989     0.7148850 4.554199e-04
+18    JUN -0.08756301   -0.7030002  26.9067254 -0.015677627    -0.6639774 7.007604e-02
+19  NR4A1 -0.01683527   -0.7025484   8.3418147 -0.017519536    -0.7020151 1.222394e-03
+20 ZNF282  0.00000000    0.6916040   2.5692101  0.025967945     0.7208917 2.445573e-03
+
+</pre>
+
+## Conclusion
+
+None of the four strategies used above recapitulate the known regulation of NFE2 by GATA1 in
+erythropoiesis.  This probably reflects two factors:
+
+  1. heterogeneous bulk data carries little regulatory signal
+  2. erythropoiesis (is this true, Cory et al?) is essentially complete by the time
+     blood is circulating, have reached terminal differentiation states?
+
+
+# References
+
+  - Genetic Analysis of Hierarchical Regulation for Gata1 and NF-E2 p45 Gene Expression in Megakaryopoiesis
+    https://mcb.asm.org/content/30/11/2668.short
+
+  - The transcriptional program controlled by the stem cell leukemia gene Scl/
+    Tal1 during early embryonic hematopoietic development. Blood 113:5456–5465
+
+  - Chen, Z., M. Hu, and R. A. Shivdasani. 2007. Expression analysis of primary
+    mouse megakaryocyte differentiation and its application in identifying stagespecific molecular markers and a novel transcriptional target of NF-E2.
+    Blood 109:1451–1459.
+
+  - Bose, Francesca, et al. "Functional interaction of CP2 with GATA-1 in the regulation of erythroid promoters."
+    Molecular and cellular biology 26.10 (2006): 3942-3954.
+
+  - Ding, Ya‐li, et al. "Over‐expression of EDAG in the myeloid cell line 32D: Induction of GATA‐1 expression
+    and erythroid/megakaryocytic phenotype." Journal of cellular biochemistry 110.4 (2010): 866-874.
+
 

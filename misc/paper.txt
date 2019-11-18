@@ -1,4 +1,59 @@
 *------------------------------------------------------------------------------------------------------------------------
+* a spectrum of models (16 oct 2019)
+
+  using bulk rna from marjorie  27171 x 28 rna-seq 
+
+  --- degenerate
+  cd ~/github/TrenaProjectErythropoiesis/prep/trenaPaper/degenerate/degenerate.R results in
+       ~/github/TrenaProjectErythropoiesis/prep/trenaPaper/degenerate/tbl.erythropoiesis.RData
+
+  --- +/- 5kb from TSS, fimo batch
+  
+
+
+*------------------------------------------------------------------------------------------------------------------------
+* a la cormac mccarthy (15 oct 2019)
+
+  --- decide on your paper's theme and two or three points you want every reader to remember
+    
+The regulation of target genes by their transcription factors is complex and incompletely
+understood.  Multiple signals involving core promoters, distal enhancers, epigenetic controls
+on chromatin accessibility, stochastic and cooperative binding on different times scales are
+all involved.  Predictive modeling of these processes in fine detail and at scale is beyond
+our current capabilities.
+
+We know, however, that gene regulation usually includes two gross features which, independently,
+are poor predictors, but which together have predictive power:
+
+   1) somewhat correlated gene expression of TF and target gene
+   2) actual or predicted DNA binding of the TF in regulatory DNA regions associated with
+      the target gene
+
+trena combines these two predictors to create (at minimum) "broad brush" or "low-resolution"
+gene regulatory predictions.  inasmuch as trena may be used with a wide range of genomic,
+eptigenetic and expression data "high resolution" predictions can be made as well.  trena
+thus operates at many points along this continuum:
+
+  low-res mode: uses bulk mRNA data, generalized predictions of regulatory regions,
+  computational matching of TF to DNA sequence in those regions
+
+  high-res mode: uses single cell RNA-seq, scATAC-seq or DNase regions, timecourse or
+   well-discriminated environmental conditions, 3C, scChIP-seq, other recently emerging binding assays.
+
+The low-resolution mode is useful when gene regulatory relationships are little known, or in
+which a coarse-grained result is adequate.  A prime example of this is in the creation of
+genome scale regulatory models by aggregating thousands of low-res single-gene models.
+
+The high-resolution mode can predict relationships which can approach mechanistic accuracy, and
+which justify attempts at laboratory validation.
+
+In this paper we demonstrate trena at several points along this low-to-high resolution
+continuum by analyzing GATA2 regulation in erythropoiesis.  We conclude by demonstrating the
+application of trena at genome scale in low resolution mode in AD and PTB, arriving at better
+estimates of gene expression than is possible with existing methods, using by K-fold cross
+validation to make that case.
+
+*------------------------------------------------------------------------------------------------------------------------
 * friday (30 aug 2019)
 
 Gene regulation via transcription factor binding, leading to transcription and translation, plays a

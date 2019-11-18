@@ -7,8 +7,7 @@
 \alias{Solver}
 \title{Define an object of class Solver}
 \usage{
-Solver(mtx.assay = matrix(), targetGene, candidateRegulators,
-  quiet = TRUE)
+Solver(mtx.assay = matrix(), targetGene, candidateRegulators, quiet = TRUE)
 }
 \arguments{
 \item{mtx.assay}{An assay matrix of gene expression data}
@@ -38,14 +37,17 @@ solver <- Solver(mtx.sub, targetGene, candidateRegulators) # Create a simple Sol
 \seealso{
 \code{\link{getAssayData}}, \code{\link{getTarget}}, \code{\link{getRegulators}}
 
-Other Solver class objects: \code{\link{BayesSpikeSolver}},
-  \code{\link{EnsembleSolver}},
-  \code{\link{HumanDHSFilter-class}},
-  \code{\link{LassoPVSolver}}, \code{\link{LassoSolver}},
-  \code{\link{PearsonSolver}},
-  \code{\link{RandomForestSolver}},
-  \code{\link{RidgeSolver}}, \code{\link{SpearmanSolver}},
-  \code{\link{SqrtLassoSolver}},
-  \code{\link{XGBoostSolver}}
+Other Solver class objects: 
+\code{\link{BayesSpikeSolver}},
+\code{\link{EnsembleSolver}},
+\code{\link{HumanDHSFilter-class}},
+\code{\link{LassoPVSolver}},
+\code{\link{LassoSolver}},
+\code{\link{PearsonSolver}},
+\code{\link{RandomForestSolver}},
+\code{\link{RidgeSolver}},
+\code{\link{SpearmanSolver}},
+\code{\link{SqrtLassoSolver}},
+\code{\link{XGBoostSolver}}
 }
 \concept{Solver class objects}

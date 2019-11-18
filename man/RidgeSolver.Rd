@@ -4,9 +4,16 @@
 \alias{RidgeSolver}
 \title{Create a Solver class object using the Ridge solver}
 \usage{
-RidgeSolver(mtx.assay = matrix(), targetGene, candidateRegulators,
-  regulatorWeights = rep(1, length(candidateRegulators)), alpha = 0,
-  lambda = numeric(0), keep.metrics = FALSE, quiet = TRUE)
+RidgeSolver(
+  mtx.assay = matrix(),
+  targetGene,
+  candidateRegulators,
+  regulatorWeights = rep(1, length(candidateRegulators)),
+  alpha = 0,
+  lambda = numeric(0),
+  keep.metrics = FALSE,
+  quiet = TRUE
+)
 }
 \arguments{
 \item{mtx.assay}{An assay matrix of gene expression data}
@@ -48,14 +55,17 @@ Create a Solver class object using the Ridge solver
 \seealso{
 \code{\link{solve.Ridge}}, \code{\link{getAssayData}}
 
-Other Solver class objects: \code{\link{BayesSpikeSolver}},
-  \code{\link{EnsembleSolver}},
-  \code{\link{HumanDHSFilter-class}},
-  \code{\link{LassoPVSolver}}, \code{\link{LassoSolver}},
-  \code{\link{PearsonSolver}},
-  \code{\link{RandomForestSolver}},
-  \code{\link{Solver-class}}, \code{\link{SpearmanSolver}},
-  \code{\link{SqrtLassoSolver}},
-  \code{\link{XGBoostSolver}}
+Other Solver class objects: 
+\code{\link{BayesSpikeSolver}},
+\code{\link{EnsembleSolver}},
+\code{\link{HumanDHSFilter-class}},
+\code{\link{LassoPVSolver}},
+\code{\link{LassoSolver}},
+\code{\link{PearsonSolver}},
+\code{\link{RandomForestSolver}},
+\code{\link{Solver-class}},
+\code{\link{SpearmanSolver}},
+\code{\link{SqrtLassoSolver}},
+\code{\link{XGBoostSolver}}
 }
 \concept{Solver class objects}

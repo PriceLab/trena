@@ -71,7 +71,7 @@ expression level." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">trena</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.7.12</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.7.14</span>
       </span>
     </div>
 
@@ -95,6 +95,27 @@ expression level." />
   <ul class="dropdown-menu" role="menu">
     <li>
       <a href="../articles/TReNA_Vignette.html">A Brief Introduction to TReNA</a>
+    </li>
+    <li>
+      <a href="../articles/caseStudyFour.html">Case Study Four: a novel regulator of GATA2 in erythropoieis?</a>
+    </li>
+    <li>
+      <a href="../articles/caseStudyOne.html">Case Study One: attempt to reproduce known regulation of NFE2 by GATA1 in bulk RNA-seq</a>
+    </li>
+    <li>
+      <a href="../articles/caseStudyThree.html">Case Study Three attempt to reproduce known regulation of NFE2 by GATA1 in bulk RNA-seq</a>
+    </li>
+    <li>
+      <a href="../articles/caseStudyTwo.html">Case Study Two reproduces known regulation of NFE2 by GATA1 in bulk RNA-seq</a>
+    </li>
+    <li>
+      <a href="../articles/overview.html">TRENA: computational prediction of gene regulation</a>
+    </li>
+    <li>
+      <a href="../articles/simple.html">Knitr/R Markdown: explore output controls</a>
+    </li>
+    <li>
+      <a href="../articles/tiny.html">An example Knitr/R Markdown document</a>
     </li>
   </ul>
 </li>
@@ -144,15 +165,16 @@ estimates the relationship between the candidates and the target gene.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><code>randomForest</code>, <code><a href='RandomForestSolver.html'>RandomForestSolver</a></code></p>
-<p>Other solver methods: <code><a href='solve.BayesSpike.html'>run,BayesSpikeSolver-method</a></code>,
-  <code><a href='solve.Ensemble.html'>run,EnsembleSolver-method</a></code>,
-  <code><a href='solve.LassoPV.html'>run,LassoPVSolver-method</a></code>,
-  <code><a href='solve.Lasso.html'>run,LassoSolver-method</a></code>,
-  <code><a href='solve.Pearson.html'>run,PearsonSolver-method</a></code>,
-  <code><a href='solve.Ridge.html'>run,RidgeSolver-method</a></code>,
-  <code><a href='solve.Spearman.html'>run,SpearmanSolver-method</a></code>,
-  <code><a href='solve.SqrtLasso.html'>run,SqrtLassoSolver-method</a></code>,
-  <code><a href='solve.XGBoost.html'>run,XGBoostSolver-method</a></code></p></div>
+<p>Other solver methods: 
+<code><a href='solve.BayesSpike.html'>run,BayesSpikeSolver-method</a></code>,
+<code><a href='solve.Ensemble.html'>run,EnsembleSolver-method</a></code>,
+<code><a href='solve.LassoPV.html'>run,LassoPVSolver-method</a></code>,
+<code><a href='solve.Lasso.html'>run,LassoSolver-method</a></code>,
+<code><a href='solve.Pearson.html'>run,PearsonSolver-method</a></code>,
+<code><a href='solve.Ridge.html'>run,RidgeSolver-method</a></code>,
+<code><a href='solve.Spearman.html'>run,SpearmanSolver-method</a></code>,
+<code><a href='solve.SqrtLasso.html'>run,SqrtLassoSolver-method</a></code>,
+<code><a href='solve.XGBoost.html'>run,XGBoostSolver-method</a></code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># Load included Alzheimer's data, create a TReNA object with Random Forest as solver, and solve</span>

@@ -4,9 +4,15 @@
 \alias{SqrtLassoSolver}
 \title{Create a Solver class object using the Square Root LASSO solver}
 \usage{
-SqrtLassoSolver(mtx.assay = matrix(), targetGene, candidateRegulators,
+SqrtLassoSolver(
+  mtx.assay = matrix(),
+  targetGene,
+  candidateRegulators,
   regulatorWeights = rep(1, length(candidateRegulators)),
-  lambda = numeric(0), nCores = 4, quiet = TRUE)
+  lambda = numeric(0),
+  nCores = 4,
+  quiet = TRUE
+)
 }
 \arguments{
 \item{mtx.assay}{An assay matrix of gene expression data}
@@ -44,13 +50,17 @@ sqrt.solver <- SqrtLassoSolver(mtx.sub, target.gene, tfs)
 \seealso{
 \code{\link{solve.SqrtLasso}}, \code{\link{getAssayData}}
 
-Other Solver class objects: \code{\link{BayesSpikeSolver}},
-  \code{\link{EnsembleSolver}},
-  \code{\link{HumanDHSFilter-class}},
-  \code{\link{LassoPVSolver}}, \code{\link{LassoSolver}},
-  \code{\link{PearsonSolver}},
-  \code{\link{RandomForestSolver}},
-  \code{\link{RidgeSolver}}, \code{\link{Solver-class}},
-  \code{\link{SpearmanSolver}}, \code{\link{XGBoostSolver}}
+Other Solver class objects: 
+\code{\link{BayesSpikeSolver}},
+\code{\link{EnsembleSolver}},
+\code{\link{HumanDHSFilter-class}},
+\code{\link{LassoPVSolver}},
+\code{\link{LassoSolver}},
+\code{\link{PearsonSolver}},
+\code{\link{RandomForestSolver}},
+\code{\link{RidgeSolver}},
+\code{\link{Solver-class}},
+\code{\link{SpearmanSolver}},
+\code{\link{XGBoostSolver}}
 }
 \concept{Solver class objects}

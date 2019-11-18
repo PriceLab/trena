@@ -7,8 +7,7 @@
 \alias{FootprintFilter}
 \title{Create a FootprintFilter object}
 \usage{
-FootprintFilter(genomeDB, footprintDB, regions = data.frame(),
-  quiet = TRUE)
+FootprintFilter(genomeDB, footprintDB, regions = data.frame(), quiet = TRUE)
 }
 \arguments{
 \item{genomeDB}{A connection to a database that contains genome information}
@@ -50,6 +49,7 @@ that match footprint motifs for a supplied target gene.
 \seealso{
 \code{\link{getCandidates-FootprintFilter}}
 
-Other Filtering Objects: \code{\link{VarianceFilter-class}}
+Other Filtering Objects: 
+\code{\link{VarianceFilter-class}}
 }
 \concept{Filtering Objects}

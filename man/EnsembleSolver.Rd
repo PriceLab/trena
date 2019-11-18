@@ -4,12 +4,22 @@
 \alias{EnsembleSolver}
 \title{Create a Solver class object using an ensemble of solvers}
 \usage{
-EnsembleSolver(mtx.assay = matrix(), targetGene, candidateRegulators,
-  solverNames = c("lasso", "lassopv", "pearson", "randomForest", "ridge",
-  "spearman", "xgboost"), geneCutoff = 0.1, alpha.lasso = 0.9,
-  alpha.ridge = 0, lambda.lasso = numeric(0),
-  lambda.ridge = numeric(0), lambda.sqrt = numeric(0),
-  nCores.sqrt = 4, nOrderings.bayes = 10, quiet = TRUE)
+EnsembleSolver(
+  mtx.assay = matrix(),
+  targetGene,
+  candidateRegulators,
+  solverNames = c("lasso", "lassopv", "pearson", "randomForest", "ridge", "spearman",
+    "xgboost"),
+  geneCutoff = 0.1,
+  alpha.lasso = 0.9,
+  alpha.ridge = 0,
+  lambda.lasso = numeric(0),
+  lambda.ridge = numeric(0),
+  lambda.sqrt = numeric(0),
+  nCores.sqrt = 4,
+  nOrderings.bayes = 10,
+  quiet = TRUE
+)
 }
 \arguments{
 \item{mtx.assay}{An assay matrix of gene expression data}
@@ -65,14 +75,17 @@ ensemble.solver <- EnsembleSolver(mtx.sub, target.gene, tfs)
 \seealso{
 \code{\link{solve.Ensemble}}, \code{\link{getAssayData}}
 
-Other Solver class objects: \code{\link{BayesSpikeSolver}},
-  \code{\link{HumanDHSFilter-class}},
-  \code{\link{LassoPVSolver}}, \code{\link{LassoSolver}},
-  \code{\link{PearsonSolver}},
-  \code{\link{RandomForestSolver}},
-  \code{\link{RidgeSolver}}, \code{\link{Solver-class}},
-  \code{\link{SpearmanSolver}},
-  \code{\link{SqrtLassoSolver}},
-  \code{\link{XGBoostSolver}}
+Other Solver class objects: 
+\code{\link{BayesSpikeSolver}},
+\code{\link{HumanDHSFilter-class}},
+\code{\link{LassoPVSolver}},
+\code{\link{LassoSolver}},
+\code{\link{PearsonSolver}},
+\code{\link{RandomForestSolver}},
+\code{\link{RidgeSolver}},
+\code{\link{Solver-class}},
+\code{\link{SpearmanSolver}},
+\code{\link{SqrtLassoSolver}},
+\code{\link{XGBoostSolver}}
 }
 \concept{Solver class objects}

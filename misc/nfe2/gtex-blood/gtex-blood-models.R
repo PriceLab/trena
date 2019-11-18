@@ -15,6 +15,28 @@ if(!exists("mtx.blood.counts")){
    }
 
 #------------------------------------------------------------------------------------------------------------------------
+build.with.all.GO.tfs <- function()
+{
+   tfs.all <- sort(unique(select(org.Hs.eg.db, keys="GO:0003700", keytype="GOALL", columns="SYMBOL")$SYMBOL))
+   length(tfs.all)  # 1663
+
+   target.gene <- "NFE2"
+   tfs <- intersect(tfs.all, rownames(mtx.blood.lps))
+   length(tfs)  # 1652
+
+   solver <- EnsembleSolver(mtx.blood.lps, target.gene, tfs, geneCutoff=1.0)
+   tbl <- run(solver)
+   dim(tbl)
+   new.order <- order(abs(tbl$pearsonCoeff), decreasing=TRUE)
+   tbl <- tbl[new.order,]
+   rownames(tbl) <- NULL
+   tbl.lps.goAll <- tbl # [1:100,]
+   match(c("GATA1", "TAL1", "KLF1"), tbl.lps.goAll$gene)   # 371 725 824
+
+
+
+} # build.with.all.GO.tfs
+#------------------------------------------------------------------------------------------------------------------------
 build.with.tfs.with.motifs <- function()
 {
       # use the log+scale normalizer
@@ -32,24 +54,25 @@ build.with.tfs.with.motifs <- function()
    new.order <- order(abs(tbl$pearsonCoeff), decreasing=TRUE)
    tbl <- tbl[new.order,]
    rownames(tbl) <- NULL
-   tbl.lps <- tbl # [1:100,]
+   tbl.lps.motifs <- tbl # [1:100,]
 
-   match(c("GATA1", "TAL1", "KLF1"), tbl.lps$gene)   # 125, 225, 252
+   match(c("GATA1", "TAL1", "KLF1"), tbl.lps.motifs$gene)   # 125, 225, 252
 
-   motifdb.tfs <- mcols(query(MotifDb, c("sapiens"), c("jaspar2018", "hocomoo")))$geneSymbol
-   no.motifs <- setdiff(head(tbl.lps$gene, n=20), motifdb.tfs)
-   length(no.motifs)
-   match(no.motifs, tbl.lps$gene)
 
-     # use the asinh normalizer
 
-   fivenum(mtx.blood.asinh)
+   motifdb.tfs <- mcols(query(MotifDb, c("sapiens"), c("jaspar2018", "hocomoco")))$geneSymbol
+   tfs <- intersect(motifdb.tfs, rownames(mtx.blood.lps))
+   length(tfs)
+      # no.motifs <- setdiff(head(tbl.lps$gene, n=20), motifdb.tfs)
+      # length(no.motifs)
+      # match(no.motifs, tbl.lps$gene)
 
-   solver <- EnsembleSolver(mtx.blood.asinh, target.gene, tfs)
-   tbl.asinh <- run(solver)
-   new.order <- order(abs(tbl.asinh$pearsonCoeff), decreasing=TRUE)
-   tbl.asinh <- tbl.asinh[new.order,]
-   match(c("GATA1", "TAL1", "KLF1"), tbl.asinh$gene)   # NA 33 34
+   solver <- EnsembleSolver(mtx.blood.lps, target.gene, tfs, geneCutoff=1.0)
+   tbl.lps <- run(solver)
+   dim(tbl.lps)
+   new.order <- order(abs(tbl.lps$pearsonCoeff), decreasing=TRUE)
+   tbl.lps <- tbl.lps[new.order,]
+   match(c("GATA1", "TAL1", "KLF1"), tbl.lps$gene)   # 125 225 252
 
    save(tbl.lps, tbl.asinh, file="trena.models.noDNA")
 
@@ -109,4 +132,58 @@ build.with.tfs.with.matching.fimo.motifs <- function()
 
 } # build.with.tfs.with.matching.fimo.motifs
 #------------------------------------------------------------------------------------------------------------------------
+build.with.fimo.and.phast <- function()
+{
+   load("../tbls.motifs.RData")
+   fimo.score <- 1e-5
+   phast.score <- 0.90
 
+   tbl.tfs.elite <- subset(tbl.fimoMotifs, p.value <= fimo.score & phast7 >= phast.score)
+   dim(tbl.tfs.elite)
+   tfs.elite <- sort(unique(tbl.tfs.elite$tf))
+   length(tfs.elite)  # 52
+   match(c("GATA1", "TAL1", "KLF1"), tfs.elite)   # 13 41 16
+
+
+   solver <- EnsembleSolver(mtx.blood.lps, target.gene, tfs, geneCutoff=1.0, solverNames=solverNames)
+   tbl <- run(solver)
+   dim(tbl)
+   new.order <- order(abs(tbl$pearsonCoeff), decreasing=TRUE)
+   tbl <- tbl[new.order,]
+   rownames(tbl) <- NULL
+   tbl.fimo.phast.stringent <- tbl
+   match(c("GATA1", "TAL1", "KLF1"), tbl.fimo.phast.stringent)   # NA NA NA
+
+
+   tbl.tfs.weak <- subset(tbl.fimoMotifs, p.value <= 1e-4 & phast7 > 0.2)
+   dim(tbl.tfs.weak)   # 2846
+   tfs.weak <- unique(tbl.tfs.weak$tf)
+   length(tfs.weak)  # 525
+   match(c("GATA1", "TAL1", "KLF1"), tfs.weak)   # 281 282 330
+
+   solver <- EnsembleSolver(mtx.blood.lps, target.gene, tfs.weak, geneCutoff=1.0, solverNames=solverNames)
+   tbl <- run(solver)
+   dim(tbl)  # 378
+   new.order <- order(abs(tbl$pearsonCoeff), decreasing=TRUE)
+   tbl <- tbl[new.order,]
+   rownames(tbl) <- NULL
+   tbl.fimo.phast.weak <- tbl
+   match(c("GATA1", "TAL1", "KLF1"), tbl.fimo.phast.stringent)   # NA NA NA
+
+   tbl.tfbs.counts <- as.data.frame(sort(table(tbl.fimo.strong$tf)))
+   bindingSiteCount <- merge(tbl.blood.lps.fimo, tbl.tfbs.counts, by.x="gene", by.y="Var1")$Freq
+   tbl.blood.lps.fimo$tfbs.strong <- bindingSiteCount
+
+   tbl.tfbs.counts <- as.data.frame(sort(table(tbl.fimo.weak$tf)))
+   bindingSiteCount <- merge(tbl.blood.lps.fimo, tbl.tfbs.counts, by.x="gene", by.y="Var1")$Freq
+   tbl.blood.lps.fimo$tfbs.weak <- bindingSiteCount
+
+   match(c("GATA1", "TAL1", "KLF1"), tbl.blood.lps.fimo$gene)   # 8 4 5
+
+   save(tbl.blood.lps.fimo, file="trena.model.fimo.phast7.RData")
+
+
+
+
+} # build.with.fimo.and.phast
+#------------------------------------------------------------------------------------------------------------------------

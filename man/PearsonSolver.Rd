@@ -4,8 +4,12 @@
 \alias{PearsonSolver}
 \title{Create a Solver class object using  Pearson correlation coefficients as the solver}
 \usage{
-PearsonSolver(mtx.assay = matrix(), targetGene, candidateRegulators,
-  quiet = TRUE)
+PearsonSolver(
+  mtx.assay = matrix(),
+  targetGene,
+  candidateRegulators,
+  quiet = TRUE
+)
 }
 \arguments{
 \item{mtx.assay}{An assay matrix of gene expression data}
@@ -32,14 +36,17 @@ pearson.solver <- PearsonSolver(mtx.sub, target.gene, tfs)
 \seealso{
 \code{\link{solve.Pearson}}, \code{\link{getAssayData}}
 
-Other Solver class objects: \code{\link{BayesSpikeSolver}},
-  \code{\link{EnsembleSolver}},
-  \code{\link{HumanDHSFilter-class}},
-  \code{\link{LassoPVSolver}}, \code{\link{LassoSolver}},
-  \code{\link{RandomForestSolver}},
-  \code{\link{RidgeSolver}}, \code{\link{Solver-class}},
-  \code{\link{SpearmanSolver}},
-  \code{\link{SqrtLassoSolver}},
-  \code{\link{XGBoostSolver}}
+Other Solver class objects: 
+\code{\link{BayesSpikeSolver}},
+\code{\link{EnsembleSolver}},
+\code{\link{HumanDHSFilter-class}},
+\code{\link{LassoPVSolver}},
+\code{\link{LassoSolver}},
+\code{\link{RandomForestSolver}},
+\code{\link{RidgeSolver}},
+\code{\link{Solver-class}},
+\code{\link{SpearmanSolver}},
+\code{\link{SqrtLassoSolver}},
+\code{\link{XGBoostSolver}}
 }
 \concept{Solver class objects}

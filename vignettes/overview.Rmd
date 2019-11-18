@@ -20,25 +20,25 @@ thousands of TF/target gene relationships exist in human cells.  There is an urg
 for laboratory and computational methods which predict and validate the many that remain unknown.
 
 *trena* is one such computational method.  It's predictive success depends upon the judicious
-combination of two predictors, each of which is in isolation quite useless:
+combination of two predictors, each of which in isolation has little predictive value:
 
    1) correlated gene expression of TF and target gene
    2) actual or predicted DNA binding of the TF in regulatory DNA regions associated with
       the target gene
 
-When applied in tandem to high quality gene expression, genomic and epigenomic data, trena can
-1) recapitulate known TF/target gene relationships, and 2) predict new ones sufficiently plausible to
-warrant small-scale laboratory valdidation, and 3) the creation of genome-scale tissue-specific
-regulatory networks.  We will demonstrate these three capabilities in this paper.
+We will show that these predictors, when applied in tandem to high quality gene expression, genomic
+and epigenomic data, can 1) recapitulate known TF/target gene relationships, and 2) predict new ones
+sufficiently plausible to warrant small-scale laboratory valdidation, and 3) specify useful
+genome-scale tissue-specific regulatory networks.  
 
 # Methodological Overview
 
 There are two stages in every trena analysis:
 
-  1. Some subset of transcription factors is selected
-  2. An ensemble of independent feature selectors (lasso, ridge, xgboost, randomForest
-     pearson & spearan correlation) score the association in gene expresssion between
-     each transcription factor and the target gene.
+  1. Select a relevant set of transcription factors
+  2. Score the gene expression association of each TF with the target gene using an ensemble of
+     the independent feature selectors trena provides: lasso, ridge, xgboost, randomForest
+     pearson & spearman correlation.
 
 ### Step One: select candidate transcription factors
 
@@ -53,18 +53,19 @@ to use more discriminating approaches:
   2.  Obtain cis-regulatory promoters and enhancers from public databaes or - best of all -
       by cell type specific experimental data for the system under study
   3.  Select transcription factors with motifs which match DNA sequence in these regulatory regions.
-      Each match can be quantified in (at least) two ways:  but motif/sequence match, and by
+      Each match can be quantified in (at least) two ways:  by motif/sequence match, and by
       the evolutionary conservation of that matching sequence.
 
-Each of these strategies has virtues and deficiencies.  The naive 1663 GO annotation gene strategy
-will pick up TFs which may be active and functional but for which no binding motif is known.  The
-558 motif TF strategy makes no assumptions about regulatory regions; in the absence of good data
-about the target genes's actual regulatory regions,  this inclusive approach can be useful.
+Each of these strategies has both strengths weaknesses.  The naive 1663 GO annotation gene strategy
+will identify TFs (or co-factors) which may be active and functional but for which a binding motif
+is not neccesarily known.  The 558 motif TF strategy similarly makes no assumptions about regulatory regions, but
+probably is enriched for better studied TFs. In the absence of good data about the target genes's
+actual regulatory regions, and binding, either of these inclusive approaches can be useful.
 
 However, there is an emerging consensus (Cusanovich 2014 & etc) that a great deal of actually bound
 TFs, as detected by ChIP-seq, in known regulatory regions, are not functional.  Their
 knockdown or silencing has no effect on the expression of the target gene.  Thus the primary challenge
-for the first stage of trena - TF selection - is how to avoid considering too many TF candidates.
+for the first stage of trena - TF selection - is how to avoid considering too many extraneous TF candidates.
 
 We adopt these strategies for TF selection:
 
@@ -100,30 +101,17 @@ to aggregate these scores.   Individucal analysts evolve their own informal aggr
 example:  giving weight and preference to the random forest score while also heeding spearman correlation.
 Quite commonly, as will be seen in the case studies, the various methods produce compatible predictions.
 
+The first criterion of value for a computational tool such as trena is its ability to reliably
+reproduce existing knowledge.  Here we accomplish that with four case studies, first by demonstrating failure
+with bulk GTEx blood RNA-seq, then success with three applications of stage-specific erythropoiesis
+RNA-seq and ATAC-seq data.
 
-### [Case Study 1:  trena reproduces known regulation of NFE2 by GATA1 in erythropoiesis](caseStudyOne.html)
+### Case Studies
 
-The first criterion of value for a computational tool such as trena is its ability to reliably reproduce
-existing knowledge.   Here (follow the link) we accomplish that, in these steps:
-
-   1. A summary of the publications which establish this regulatory relationship
-   2. Weakly reproduce the finding  using GTEx blood RNA-seq, multiple TF selection strategies
-   3. Credibly reproduce the finding use Corces et al, 2016, RNA-seq on FACS-separated erythropoiesis stages, GSE74246
-   4. As with 3, but this time with Brand lab GSE118537
-
-#### Case Study 2:  Identify a novel regulator of GATA2 in erythropoesis, with preliminary laboratory validation
-
-Using bulk RNA-seq across a cell-sorted staged erythropoiesis study, accompanied by single cell
-ATAC-seq at each stage, we identify TBX15 as a likely regulatory of GATA2, with subsequent (confusing)
-functional validation by siRNA experiments.
-
-#### Case Study 3: Human Placenta Genome-scale transcriptional regulatory network to predict gene expression, with cross-validation
-
-Short introduction goes here
-
-#### Case Study 4: Cory's genome-scale models in Alzheimers?
-
-Short introduction goes here
+- [Case Study 1](caseStudyOne.html) An informative failure: trena with GTEx bulk blood expression
+- [Case Study 2](caseStudyTwo.html)  Successful recapitulation:  trena + Corces et al, 2016, RNA-seq on FACS-separated erythropoiesis stages, GSE74246
+- [Case Study 3](caseStudyThree.html) Successful recapituation: more recent Brand lab (similar to Corces et al), GSE118537
+- [Case Study 4](caseStudyFour.html)  Discover a novel regulator of GATA2?: trena + Brand lab + scATAC-seq
 
 <!--
 This image summarizes the NFE2 genome neighborhood and binding sites for putative regulators identified

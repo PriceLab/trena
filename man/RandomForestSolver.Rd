@@ -4,8 +4,13 @@
 \alias{RandomForestSolver}
 \title{Create a Solver class object using the Random Forest solver}
 \usage{
-RandomForestSolver(mtx.assay = matrix(), targetGene, candidateRegulators,
-  regulatorWeights = rep(1, length(candidateRegulators)), quiet = TRUE)
+RandomForestSolver(
+  mtx.assay = matrix(),
+  targetGene,
+  candidateRegulators,
+  regulatorWeights = rep(1, length(candidateRegulators)),
+  quiet = TRUE
+)
 }
 \arguments{
 \item{mtx.assay}{An assay matrix of gene expression data}
@@ -35,13 +40,17 @@ rf.solver <- RandomForestSolver(mtx.sub, targetGene, candidateRegulators)
 \seealso{
 \code{\link{solve.RandomForest}}, \code{\link{getAssayData}}
 
-Other Solver class objects: \code{\link{BayesSpikeSolver}},
-  \code{\link{EnsembleSolver}},
-  \code{\link{HumanDHSFilter-class}},
-  \code{\link{LassoPVSolver}}, \code{\link{LassoSolver}},
-  \code{\link{PearsonSolver}}, \code{\link{RidgeSolver}},
-  \code{\link{Solver-class}}, \code{\link{SpearmanSolver}},
-  \code{\link{SqrtLassoSolver}},
-  \code{\link{XGBoostSolver}}
+Other Solver class objects: 
+\code{\link{BayesSpikeSolver}},
+\code{\link{EnsembleSolver}},
+\code{\link{HumanDHSFilter-class}},
+\code{\link{LassoPVSolver}},
+\code{\link{LassoSolver}},
+\code{\link{PearsonSolver}},
+\code{\link{RidgeSolver}},
+\code{\link{Solver-class}},
+\code{\link{SpearmanSolver}},
+\code{\link{SqrtLassoSolver}},
+\code{\link{XGBoostSolver}}
 }
 \concept{Solver class objects}
