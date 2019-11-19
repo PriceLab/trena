@@ -1,0 +1,11 @@
+---
+title: "Case Study Four: a novel regulator of GATA2 in erythropoieis?"
+output: html_document
+vignette: >
+  %\VignetteIndexEntry{"Case Study Four: a novel regulator of GATA2 in erythropoieis?"}
+  %\VignetteEngine{knitr::knitr}
+  %\VignetteEncoding{UTF-8}
+---
+
+# Corces et al, 2016, RNA-seq on FACS sorted cells in erythropoiesis
+

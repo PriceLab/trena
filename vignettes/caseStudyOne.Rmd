@@ -74,13 +74,12 @@ The GeneOntology project annotates 1663 human genes to the molecular function
 </pre>
 
 We hope to see the three erythropoiesis transcription factors somewhere in the trena
-model.  In this one, they are not prominent, found at positions 125, 225 and 252 when
-the model is sorted by the absolute value of the pearson coefficient:
+model.  In this one, they are not prominent, found at positions 371 725 and 824 in 
+the model as  sorted by the absolute value of the pearson coefficient:
 
 <pre>
-> match(c("GATA1", "TAL1", "KLF1"), tbl.lps$gene)   # 125, 225, 252
+> match(c("GATA1", "TAL1", "KLF1"), tbl.lps$gene)   # 
 [1] 371 725 824
-> 
 </pre>
 
 ## Expression and only transcription factors with known motifs
@@ -122,9 +121,10 @@ factors are limited to this set.
 The three TFs score higher in this model, but can not be said, in any strong sense, to be predicted
 by it as regulators of NFE2.
 
-> match(c("GATA1", "TAL1", "KLF1"), tbl.model$gene)   # 125, 225, 252
-[1]  125 225 252
 <pre>
+> match(c("GATA1", "TAL1", "KLF1"), tbl.model$gene) 
+[1]  125 225 252
+</pre>
 
 ## Expression and highly-conserved, high-scoring transcription factors in a 20kb regulatory region
 
@@ -134,21 +134,56 @@ binding sites.   When found, and when tf/target gene expression is also correlat
 viewed as possibly sound trena predictions.
 
 Here we use a precalculated table of FIMO and phast7 scores for 20kb surrounding the NFE2
-transcription start site, extracting only those TFs with very high match and conservation:
+transcription start site, extracting only those TFs with very high match and conservation.  With
+these data and assumptions, GATA1 rises to rank 15 in the model, but appears as a repressor -
+contrary to expectation and the findings of the published papers.   
 
 <pre>
-tbl.tfs.elite <- subset(tbl.fimoMotifs, p.value <= fimo.score & phast7 >= phast.score)
-dim(tbl.tfs.elite)
-tfs <- sort(unique(tbl.tbs.elite)$tf)
-length(tfs)  # 52
-match(c("GATA1", "TAL1", "KLF1"), tfs.elite)   # 13 41 16
-solver <- EnsembleSolver(mtx.blood.lps, target.gene, tfs, geneCutoff=1.0, solverNames=solverNames)
-tbl <- run(solver)
-new.order <- order(abs(tbl$pearsonCoeff), decreasing=TRUE)
-tbl <- tbl[new.order,]
-rownames(tbl) <- NULL
-tbl.fimo.phast.stringent <- tbl
-match(c("GATA1", "TAL1", "KLF1"), tbl.fimo.phast.stringent)   # NA NA NA
+> tbl.tfs.elite <- subset(tbl.fimoMotifs, p.value <= fimo.score & phast7 >= phast.score)
+> dim(tbl.tfs.elite)
+> tfs <- sort(unique(tbl.tbs.elite)$tf)
+> length(tfs)  # 52
+> match(c("GATA1", "TAL1", "KLF1"), tfs.elite)   # 13 41 16
+> solver <- EnsembleSolver(mtx.blood.lps, target.gene, tfs, geneCutoff=1.0, solverNames=solverNames)
+> tbl <- run(solver)
+> new.order <- order(abs(tbl$pearsonCoeff), decreasing=TRUE)
+> tbl <- tbl[new.order,]
+> rownames(tbl) <- NULL
+> tbl.fimo.phast.stringent <- tbl
+> head(tbl.fimo.phast.stringent, n=20)
+> head(tbl.fimo.phast.stringent, n=20)
+    gene   betaLasso pearsonCoeff    rfScore    betaRidge spearmanCoeff      xgboost
+1   SPI1  0.54116978    0.8748366 232.581245  0.174503316     0.8931940 0.7557817023
+2  CEBPA  0.23523082    0.8130808 139.720676  0.127110447     0.8356710 0.0281807591
+3   RARA  0.00000000    0.7768149  78.055568  0.110157856     0.8108477 0.0551366432
+4    SP1  0.06980607    0.7766227  72.914116  0.114400926     0.7866711 0.0026924588
+5  KLF16  0.00000000    0.6804686  33.001648  0.065192653     0.7286630 0.0040067050
+6    MNT  0.00000000    0.6803979  12.478543  0.056498612     0.6911230 0.0007373286
+7  NR6A1  0.00000000    0.6480948   8.466320  0.038737218     0.6580332 0.0013781294
+8  THAP1  0.01304063    0.6299785  10.929519  0.071647737     0.6430135 0.0012611141
+9  STAT3  0.00000000    0.5609655   4.885006  0.078064628     0.5551787 0.0017422688
+10  ELF2  0.00000000    0.5390169   4.306037  0.037256849     0.5308688 0.0007064301
+11 TFCP2  0.00000000    0.5278668   2.716275  0.045926049     0.5175253 0.0005061365
+12  EGR1 -0.12759104   -0.5131861  32.791422 -0.092334479    -0.5532816 0.0590037734
+13  FLI1  0.00000000    0.4952012   1.395661  0.013529524     0.4905536 0.0029439625
+14  NFIC  0.00000000    0.4724385   3.651387  0.032486039     0.4540451 0.0007173075
+15 GATA1  0.00000000   -0.3971076   4.030233 -0.015668836    -0.4394136 0.0016572605
+16   MAZ  0.00000000    0.3159501   2.228739  0.021758139     0.2773423 0.0004919320
+17  KLF9  0.00000000    0.3029702   1.480844 -0.004387528     0.3096802 0.0011933040
+18  IRF4 -0.01352598   -0.2827062   7.656989 -0.070280645    -0.3225595 0.0008688548
+19 PROX1  0.00000000   -0.2742029   1.997726 -0.012063810    -0.3004936 0.0009774531
+20   SP3  0.00000000    0.2691114   1.473230 -0.010016557     0.2725386 0.0003386794
+
+</pre>
+
+This model is built with only the 52 TFs which pass the fimo (sequence match) and phast7 (sequence
+conservation) thresholds.  GATA1, TAL1 and KLF1 are in this much smaller group, so necessarily
+have a higher rank in the resulting model.  Note, however, the negative correlation with the
+target gene, NFE2.
+
+<pre>
+> match(c("GATA1", "TAL1", "KLF1"), tbl.fimo.phast.stringent$gene)
+[1] 15 27 30
 </pre>
 
 ## Expression and somewhat-conserved, FIMO default matched  transcription factors in a 20kb regulatory region
@@ -157,22 +192,20 @@ Here we see that loosening the FIMO match threshold to its traditional default v
 phast7 conservation to 20% does not increase our ability to predict the regulation of NFE2 by GATA1:
 
 <pre>
-tbl.tfs.weak <- subset(tbl.fimoMotifs, p.value <= 1e-4 & phast7 > 0.2)
-dim(tbl.tfs.weak)   # 2846
-tfs.weak <- unique(tbl.tfs.weak$tf)
-length(tfs.weak)  # 525
-match(c("GATA1", "TAL1", "KLF1"), tfs.weak)   # 281 282 330
-
-solver <- EnsembleSolver(mtx.blood.lps, target.gene, tfs.weak, geneCutoff=1.0, solverNames=solverNames)
-tbl <- run(solver)
-dim(tbl)  # 378
-new.order <- order(abs(tbl$pearsonCoeff), decreasing=TRUE)
-tbl <- tbl[new.order,]
-rownames(tbl) <- NULL
-tbl.fimo.phast.weak <- tbl
-match(c("GATA1", "TAL1", "KLF1"), tbl.fimo.phast.stringent)   # NA NA NA
-head(tbl.fimo.phast.weak, n=20)
-
+> tbl.tfs.weak <- subset(tbl.fimoMotifs, p.value <= 1e-4 & phast7 > 0.2)
+> nrow(tbl.tfs.weak)   # 2846
+> tfs.weak <- unique(tbl.tfs.weak$tf)
+> length(tfs.weak)  # 525
+> match(c("GATA1", "TAL1", "KLF1"), tfs.weak)   # 281 282 330
+> 
+> solver <- EnsembleSolver(mtx.blood.lps, target.gene, tfs.weak, geneCutoff=1.0, solverNames=solverNames)
+> tbl <- run(solver)
+> dim(tbl)  # 378
+> new.order <- order(abs(tbl$pearsonCoeff), decreasing=TRUE)
+> tbl <- tbl[new.order,]
+> rownames(tbl) <- NULL
+> tbl.fimo.phast.weak <- tbl
+> head(tbl.fimo.phast.weak, n=20)
      gene   betaLasso pearsonCoeff     rfScore    betaRidge spearmanCoeff      xgboost
 1    SPI1  0.37925044    0.8748366 173.3335617  0.048503015     0.8931940 4.866324e-01
 2    RFX2  0.13351525    0.8611165 148.3728199  0.033019631     0.8703952 2.471701e-01
@@ -194,7 +227,16 @@ head(tbl.fimo.phast.weak, n=20)
 18    JUN -0.08756301   -0.7030002  26.9067254 -0.015677627    -0.6639774 7.007604e-02
 19  NR4A1 -0.01683527   -0.7025484   8.3418147 -0.017519536    -0.7020151 1.222394e-03
 20 ZNF282  0.00000000    0.6916040   2.5692101  0.025967945     0.7208917 2.445573e-03
+</pre>
 
+With this more inclusive list of TFs, less stringent with respect to sequence match
+and conservation, our three genes of interest fall to lower positions in the model.
+For this reason, and for the anti-correlation of GATA1, we decline to call this result
+a prediction of NFE2 regulation.
+
+<pre>
+> match(c("GATA1", "TAL1", "KLF1"), tbl.fimo.phast.weak$gene)
+> [1]  95 168 190
 </pre>
 
 ## Conclusion

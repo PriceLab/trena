@@ -1,0 +1,218 @@
+---
+title: "Case Study Two reproduces known regulation of NFE2 by GATA1 in erytrhopoiesis RNA-seq"
+output: html_document
+vignette: >
+  %\VignetteIndexEntry{"Case Study Two reproduces known regulation of NFE2 by GATA1 in erytrhop RNA-seq"}
+  %\VignetteEngine{knitr::knitr}
+  %\VignetteEncoding{UTF-8}
+---
+
+# Introduction
+
+Corces et al measured RNA-seq and ATAC-seq in thirteen distinct human primary hematopoiesis cell
+types.  Here we explore whether these data, in contrast to bulk GTEx blood RNA-seq, allow us to
+predict the regulation of NFE2.  We use the same progressive approach for the selection of candidate
+transcription factors: all annotated TFs, all TFs with motifs, TFs with stringent or relaxed binding
+and sequence conservation scores.
+
+ 1. 
+
+# Corces et al, 2016, RNA-seq on FACS sorted cells in erythropoiesis
+
+## Expression plus all known transcription factors
+
+The GeneOntology project annotates 1663 human genes to the molecular function 
+[DNA-binding transcription factor activity](https://www.ebi.ac.uk/QuickGO/term/GO:0003700):
+
+<pre>
+> tfs.all <- sort(unique(select(org.Hs.eg.db, keys="GO:0003700", keytype="GOALL", columns="SYMBOL")$SYMBOL))
+> length(tfs.all)  # 1663
+> target.gene <- "NFE2"
+> tfs <- intersect(tfs.all, rownames(mtx.corces))
+> length(tfs)  # 1534
+> solver <- EnsembleSolver(mtx.corces, target.gene, tfs, geneCutoff=1.0)
+> tbl <- run(solver)
+> dim(tbl)  # 1530 8
+> new.order <- order(abs(tbl$pearsonCoeff), decreasing=TRUE)
+> tbl <- tbl[new.order,]
+> rownames(tbl) <- NULL
+> tbl.goAll <- tbl # [1:100,]
+> head(tbl.goAll, n=20)
+      gene    betaLasso  lassoPValue pearsonCoeff      rfScore    betaRidge spearmanCoeff      xgboost
+1     LMO2  0.047541125 5.249385e-20    0.8101163 8.702037e+00  0.007119946     0.6555403 1.500191e-01
+2     NFIX  0.093098353 5.384999e-20    0.8099891 6.852083e+00  0.008154300     0.7870852 5.241650e-02
+3    ZNF80 -0.066366470 6.490916e-20   -0.8096562 1.052108e+01 -0.008193182    -0.7093304 5.867285e-01
+4    GFI1B  0.226649379 2.578638e-19    0.8016940 2.483361e+00  0.009161609     0.7929971 4.310633e-08
+5     MITF  0.177632172 5.326661e-19    0.8009208 6.091928e+00  0.008086801     0.6164877 6.660835e-05
+6     MAFG  0.057656557 1.079359e-16    0.7905432 3.829226e+00  0.007892880     0.7665661 1.711896e-04
+7    GATA2  0.000000000 2.166205e-03    0.7691669 1.720552e+00  0.007813329     0.6851964 9.772821e-07
+8    IKZF3  0.000000000 1.000000e+00   -0.7620993 4.786622e+00 -0.006253381    -0.3980242 1.528179e-06
+9     LYL1  0.006733866 1.179134e-08    0.7581465 1.184926e+00  0.006740238     0.7822108 0.000000e+00
+10   HOXA5  0.000000000 1.000000e+00    0.7312527 1.621898e+00  0.005573155     0.4879902 1.384144e-07
+11  HOXA10  0.000000000 1.000000e+00    0.7262372 2.515769e-01  0.004681578     0.5537364 0.000000e+00
+12   SP140  0.000000000 1.000000e+00   -0.7127619 1.478112e+00 -0.006094842    -0.5231002 0.000000e+00
+13    ETS1 -0.020158108 4.193672e-11   -0.7070259 4.233599e+00 -0.007438296    -0.5267590 0.000000e+00
+14   NR6A1  0.000000000 1.000000e+00    0.6971826 6.104783e-02  0.004443842     0.5772753 0.000000e+00
+15  BCL11B  0.000000000 1.000000e+00   -0.6951305 6.063338e-05 -0.005375201    -0.4351164 0.000000e+00
+16    IRF4 -0.012852384 2.796501e-10   -0.6919585 6.507420e-02 -0.007734237    -0.5694599 0.000000e+00
+17   CEBPA  0.012159852 2.784620e-10    0.6864443 4.485537e-01  0.007222885     0.5459188 7.626946e-04
+18   MEIS1  0.000000000 1.000000e+00    0.6815312 1.375627e-01  0.003999963     0.5606262 0.000000e+00
+19 CBFA2T3  0.000000000 1.000000e+00    0.6809550 3.927459e-03  0.005125665     0.5737458 4.681401e-06
+20   SMAD1  0.000000000 4.842264e-02    0.6758645 1.686901e+00  0.006522420     0.5366757 0.000000e+00
+</pre>
+
+<pre>
+> match(c("GATA1", "TAL1", "KLF1"), tbl.goAll$gene)
+[1] 116 38 51
+</pre>
+
+## Expression plus only those transcription factors with known motifs
+
+The JASPAR 2018 and Hocomoco transcription factor compendia, when combined, identify
+780 annotated transcription factor motif.  In building the next model, candidate transcription
+factors are limited to this set.
+
+<pre>
+> tfs.with.motifs <- sort(unique(mcols(query(MotifDb, c("sapiens"), c("jaspar2018", "hocomoco")))$geneSymbol))
+> length(tfs.with.motifs)
+[1] 780
+> tfs <- intersect(tfs.with.motifs, rownames(mtx.corces))
+> length(tfs)
+[1] 509
+> 
+> solver <- EnsembleSolver(mtx.corces, target.gene, tfs, geneCutoff=1.0, solverNames=solverNames)
+> suppressWarnings(
+>    tbl <- run(solver)
+>    )
+> dim(tbl) # 507 8
+> new.order <- order(abs(tbl$pearsonCoeff), decreasing=TRUE)
+> tbl <- tbl[new.order,]
+> rownames(tbl) <- NULL
+> tbl.withMotifs <- tbl # [1:100,]
+> head(tbl.withMotifs, n=20
+     gene   betaLasso  lassoPValue pearsonCoeff     rfScore    betaRidge spearmanCoeff      xgboost
+1    NFIX  0.10626036 5.375931e-20    0.8099891 10.93109147  0.020402127     0.7870852 5.449019e-01
+2   GFI1B  0.25679512 3.100623e-19    0.8016940  6.88338652  0.022793570     0.7929971 2.273725e-02
+3    MITF  0.20075697 2.815766e-19    0.8009208  7.83112670  0.016352198     0.6164877 1.779597e-01
+4    MAFG  0.06992969 2.477448e-17    0.7905432  5.69753582  0.017553696     0.7665661 3.340823e-05
+5   GATA2  0.00687861 6.610933e-02    0.7691669  1.99289713  0.016963665     0.6851964 5.200143e-05
+6   HOXA5  0.00000000 1.000000e+00    0.7312527  3.05457854  0.013316331     0.4879902 0.000000e+00
+7  HOXA10  0.00000000 1.420628e-01    0.7262372  0.75941803  0.014015820     0.5537364 6.400621e-06
+8    ETS1 -0.06970416 3.556011e-13   -0.7070259  8.07010777 -0.018193677    -0.5267590 0.000000e+00
+9   NR6A1  0.00000000 2.461098e-01    0.6971826  0.41803310  0.011750808     0.5772753 0.000000e+00
+10   IRF4 -0.02169888 1.360509e-10   -0.6919585  0.46599226 -0.020261614    -0.5694599 0.000000e+00
+11  CEBPA  0.03482203 9.188178e-11    0.6864443  0.69499215  0.014358728     0.5459188 1.349195e-04
+12  MEIS1  0.00000000 1.000000e+00    0.6815312  0.33666404  0.012905598     0.5606262 0.000000e+00
+13  SMAD1  0.00000000 4.204800e-02    0.6758645  3.70105486  0.016631861     0.5366757 1.032892e-08
+14   TFEC  0.00000000 1.000000e+00    0.6740365  1.17192544  0.013276577     0.4392922 1.344201e-01
+15   RFX2  0.00000000 1.000000e+00    0.6670588  0.03802791  0.011815788     0.6588538 1.071266e-06
+16  MYBL1  0.00000000 1.000000e+00   -0.6585463  1.31516074 -0.014894704    -0.4524598 0.000000e+00
+17   MYCN  0.00000000 1.000000e+00    0.6554632  0.09194602  0.014752993     0.5671422 2.840913e-06
+18  TBX21  0.00000000 1.000000e+00   -0.6442284  0.28941161 -0.013417225    -0.4703482 4.371519e-08
+19   FOSB  0.00000000 1.000000e+00    0.6433983  0.36776177  0.011620625     0.4334291 0.000000e+00
+20    ERG  0.00000000 1.000000e+00    0.6353066  0.14183513  0.009995614     0.4743840 2.279443e-07
+</pre>
+
+<pre>
+> match(c("GATA1", "TAL1", "KLF1"), tbl.withMotifs$gene)
+[1] 58 21 28
+</pre>
+
+## Expression plus highly-conserved, high-scoring transcription factors in a 20kb regulatory region
+
+We hypothesize that transcription factors binding sites with well-matched motifs found in highly conserved regulatory
+regions within +/- 10kb of the target gene’s TSS are likely to be functional.
+When found, and when tf/target gene expression is also correlated, or anti-correlated, these are
+possibly useful trena predictions, worthy of further consideration.
+
+Here we use a precalculated table of FIMO and phast7 scores for 20kb surrounding the NFE2
+transcription start site, extracting only those TFs with very high match and conservation. With
+these data and assumptions, GATA1 rises to rank 8 in the model with a pearson correlation of 0.5.
+consisent with expectation and the findings of the published papers.
+
+<pre>
+   phast.score <- 0.90
+
+   tbl.fimo.strong <- subset(tbl.fimoMotifs, p.value <= fimo.score & phast7 >= phast.score)
+   dim(tbl.fimo.strong)
+   tfs <- sort(unique(tbl.fimo.strong$tf))
+   length(tfs)  # 52
+
+   solver <- EnsembleSolver(mtx.corces, target.gene, tfs, geneCutoff=1.0, solverNames=solverNames)
+   tbl <- run(solver)
+   dim(tbl)
+   new.order <- order(abs(tbl$pearsonCoeff), decreasing=TRUE)
+   tbl <- tbl[new.order,]
+   rownames(tbl) <- NULL
+   tbl.corces.fimo <- tbl
+head(tbl.corces.fimo)
+    gene   betaLasso  lassoPValue pearsonCoeff    rfScore    betaRidge spearmanCoeff      xgboost
+1  NR6A1  0.11363323 4.828668e-13    0.6971826  9.0740837  0.086916431     0.5772753 1.054292e-02
+2   IRF4 -0.20320953 7.953286e-13   -0.6919585  9.9411368 -0.119304407    -0.5694599 2.641889e-02
+3  CEBPA  0.24585247 2.816974e-12    0.6864443 14.2590463  0.091246714     0.5459188 5.745650e-01
+4   TAL1  0.03548830 1.393689e-08    0.6295745  6.9310420  0.098972619     0.6479781 2.837518e-02
+5   KLF1  0.21135723 1.836624e-10    0.6101488  6.6824143  0.099546351     0.7398168 5.372569e-02
+6   EGR1  0.03228123 2.758436e-06    0.5675901  4.7301588  0.072134395     0.4494879 2.970836e-03
+7   KLF4  0.03207437 1.354203e-05    0.5561067  6.2918779  0.068473007     0.3475569 4.553295e-04
+8  GATA1  0.00000000 8.364670e-01    0.5002867  1.2874843  0.071154365     0.5965923 2.693193e-01
+9   SPI1  0.00000000 3.861188e-03    0.4970352  1.4543843  0.057362960     0.4428889 3.514533e-05
+10   WT1  0.00000000 3.669754e-03    0.4620940  0.7724266  0.066273775     0.3997158 2.638663e-03
+11   MAZ  0.00000000 8.521497e-01    0.4337519  1.1328829  0.037589727     0.5226550 3.047602e-03
+12 KLF16  0.00000000 7.258461e-01    0.3626252  0.9036973  0.018445763     0.4697260 1.414089e-03
+13  NFIC  0.00000000 6.982975e-01    0.3594703  0.7852467  0.022511178     0.4386880 4.238493e-05
+14   SP4  0.00000000 6.701522e-01   -0.3519025  0.9325721 -0.040376487    -0.2032725 3.356494e-04
+15  RARA  0.00000000 6.907189e-01    0.2790644  0.4344835  0.012695432     0.3050455 1.760672e-06
+16  KLF8  0.00000000 3.740316e-02   -0.2703237  1.2021745 -0.058074080    -0.1528057 8.541978e-05
+17   SP1  0.00000000 3.059809e-01    0.2605265  0.3552120  0.038543500     0.3223789 1.450075e-04
+18   MNT  0.00000000 4.523336e-01    0.2338399  0.5426188  0.001283042     0.3682946 6.916575e-03
+19 TFCP2  0.00000000 9.849067e-01    0.2283194  0.8576896  0.025533904     0.2673853 1.616500e-03
+20 STAT3  0.00000000 9.734015e-01    0.2222853  1.2926596  0.011888279     0.4048896 2.600591e-03
+</pre>
+
+All three transcription factors are now found among the top regulators in the model:
+<pre>
+> match(c("GATA1", "TAL1", "KLF1"), tbl.corces.fimo$gene)   # 8 4 5
+[1] 8 4 5
+</pre>
+
+Cusanovich 2014 establised that function transcription factors tend to have
+
+ - good motif matching scores
+ - multiple binding sites in the target gene's proximal promoter
+
+Our heuristic has been to select for only very high conservation and sequence match, but it is
+widely recognized that TF binding is more promiscuous than that.   So now we add two columns to the
+model table showing binding site counts for strict and lenient motif/conservation scoring.  Extra
+credence is conferred on TFs which rank high in the model and which, by one or both measures, has
+multiple binding sites.
+
+*tfbs.strong* counts are of sites with phast7 conservation score (opossum - primates) > 0.90 and
+FIMO motif match < 1e-5.
+
+*tfbs.weak* counts with phast7 > 0.5 and FIMO < 1e-4.
+
+<pre>
+    gene betaLasso lassoPValue pearsonCoeff rfScore betaRidge spearmanCoeff xgboost tfbs.strong tfbs.weak
+1  NR6A1     0.114    4.83e-13        0.697   9.074     0.087         0.577   0.011           1         3
+2   IRF4    -0.203    7.95e-13       -0.692   9.941    -0.119        -0.569   0.026           1         9
+3  CEBPA     0.246    2.82e-12        0.686  14.259     0.091         0.546   0.575           1         9
+4   TAL1     0.035    1.39e-08        0.630   6.931     0.099         0.648   0.028           1         2
+5   KLF1     0.211    1.84e-10        0.610   6.682     0.100         0.740   0.054           4        28
+6   EGR1     0.032    2.76e-06        0.568   4.730     0.072         0.449   0.003           2        11
+7   KLF4     0.032    1.35e-05        0.556   6.292     0.068         0.348   0.000           2         4
+8  GATA1     0.000    8.36e-01        0.500   1.287     0.071         0.597   0.269           1         4
+9   SPI1     0.000    3.86e-03        0.497   1.454     0.057         0.443   0.000           2         9
+10   WT1     0.000    3.67e-03        0.462   0.772     0.066         0.400   0.003           2         4
+11   MAZ     0.000    8.52e-01        0.434   1.133     0.038         0.523   0.003           1         6
+12 KLF16     0.000    7.26e-01        0.363   0.904     0.018         0.470   0.001           2         7
+13  NFIC     0.000    6.98e-01        0.359   0.785     0.023         0.439   0.000           4        36
+14   SP4     0.000    6.70e-01       -0.352   0.933    -0.040        -0.203   0.000           1         3
+15  RARA     0.000    6.91e-01        0.279   0.434     0.013         0.305   0.000           3        12
+16  KLF8     0.000    3.74e-02       -0.270   1.202    -0.058        -0.153   0.000           1        10
+17   SP1     0.000    3.06e-01        0.261   0.355     0.039         0.322   0.000           1         3
+18   MNT     0.000    4.52e-01        0.234   0.543     0.001         0.368   0.007           1         3
+19 TFCP2     0.000    9.85e-01        0.228   0.858     0.026         0.267   0.002           1         6
+20 STAT3     0.000    9.73e-01        0.222   1.293     0.012         0.405   0.003           4        30
+
+</pre>
+

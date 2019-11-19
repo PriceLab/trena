@@ -1,0 +1,34 @@
+---
+title: "Case Study Three attempt to reproduce known regulation of NFE2 by GATA1 in bulk RNA-seq"
+output: html_document
+vignette: >
+  %\VignetteIndexEntry{"Case Study Three: reproduce known regulation of NFE2 by GATA1 in bulk RNA-seq"}
+  %\VignetteEngine{knitr::knitr}
+  %\VignetteEncoding{UTF-8}
+---
+
+# Introduction
+
+The recently published [Benchmark and integration of resources for the estimation of human
+transcription factor
+activities](https://genome.cshlp.org/content/early/2019/07/24/gr.240663.118.abstract) provides a useful
+curation of TF/target gene relations divided into five confidence categories.  We chose one high
+confidence (score "A") relation from this dataset for this case study: the regulation of NFE2 by
+GATA1 in erythropoiesis.  We will use trena to "discover" this relationship, a necessary but not
+sufficient proof of trena's value.
+
+Hematopoiesis (the production of blood cells) involves two subprocesses: erythropoiesis (red blood
+cell biogenesis) and megakaryopoiesis (megakaryocytes and platelets).  These processes have been
+intensively studied for decades, and much has been learned about the complex and hierarchical
+regulation of these processes of differentiation.  GATA1, TALl, KLF1 and the p45 isoform of NFE2 are
+some of the transcription factors involved.
+
+The Benchmark dataset reports two studies[ref1, ref2] reporting transcriptional regulation of NFE2
+by GATA1.  In addition, [Takayama et al, 2010](https://mcb.asm.org/content/30/11/2668.short) report
+that "In megakaryocytes, GATA1 deficiency reduces p45 expression by approximately 50%, indicating
+the presence of GATA1-dependent and -independent regulation of the p45 gene."   We lack
+precise knowledge of the intricacies of regulatory networks in erythropoieis, but the cited research
+in combination strongly suggests the regulation by GATA1 of NFE2 in erythropoieis.
+
+# Corces et al, 2016, RNA-seq on FACS sorted cells in erythropoiesis
+

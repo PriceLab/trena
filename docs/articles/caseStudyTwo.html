@@ -5,12 +5,12 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Case Study Two reproduces known regulation of NFE2 by GATA1 in bulk RNA-seq • trena</title>
+<title>Case Study Two reproduces known regulation of NFE2 by GATA1 in erytrhopoiesis RNA-seq • trena</title>
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
-<script src="../pkgdown.js"></script><meta property="og:title" content="Case Study Two reproduces known regulation of NFE2 by GATA1 in bulk RNA-seq">
+<script src="../pkgdown.js"></script><meta property="og:title" content="Case Study Two reproduces known regulation of NFE2 by GATA1 in erytrhopoiesis RNA-seq">
 <meta property="og:description" content="">
 <meta name="twitter:card" content="summary">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
@@ -66,7 +66,7 @@
       <a href="../articles/caseStudyThree.html">Case Study Three attempt to reproduce known regulation of NFE2 by GATA1 in bulk RNA-seq</a>
     </li>
     <li>
-      <a href="../articles/caseStudyTwo.html">Case Study Two reproduces known regulation of NFE2 by GATA1 in bulk RNA-seq</a>
+      <a href="../articles/caseStudyTwo.html">Case Study Two reproduces known regulation of NFE2 by GATA1 in erytrhopoiesis RNA-seq</a>
     </li>
     <li>
       <a href="../articles/overview.html">TRENA: computational prediction of gene regulation</a>
@@ -93,7 +93,7 @@
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
-      <h1>Case Study Two reproduces known regulation of NFE2 by GATA1 in bulk RNA-seq</h1>
+      <h1>Case Study Two reproduces known regulation of NFE2 by GATA1 in erytrhopoiesis RNA-seq</h1>
             
       
       
@@ -106,10 +106,139 @@
 <div id="introduction" class="section level1">
 <h1 class="hasAnchor">
 <a href="#introduction" class="anchor"></a>Introduction</h1>
+<p>Corces et al measured RNA-seq and ATAC-seq in thirteen distinct human primary hematopoiesis cell types. Here we explore whether these data, in contrast to bulk GTEx blood RNA-seq, allow us to predict the regulation of NFE2. We use the same progressive approach for the selection of candidate transcription factors: all annotated TFs, all TFs with motifs, TFs with stringent or relaxed binding and sequence conservation scores.</p>
+<ol style="list-style-type: decimal">
+<li>
+</ol>
 </div>
 <div id="corces-et-al-2016-rna-seq-on-facs-sorted-cells-in-erythropoiesis" class="section level1">
 <h1 class="hasAnchor">
 <a href="#corces-et-al-2016-rna-seq-on-facs-sorted-cells-in-erythropoiesis" class="anchor"></a>Corces et al, 2016, RNA-seq on FACS sorted cells in erythropoiesis</h1>
+<div id="expression-plus-all-known-transcription-factors" class="section level2">
+<h2 class="hasAnchor">
+<a href="#expression-plus-all-known-transcription-factors" class="anchor"></a>Expression plus all known transcription factors</h2>
+<p>The GeneOntology project annotates 1663 human genes to the molecular function <a href="https://www.ebi.ac.uk/QuickGO/term/GO:0003700">DNA-binding transcription factor activity</a>:</p>
+<pre>
+&gt; tfs.all  length(tfs.all)  # 1663
+&gt; target.gene  tfs  length(tfs)  # 1534
+&gt; solver  tbl  dim(tbl)  # 1530 8
+&gt; new.order  tbl  rownames(tbl)  tbl.goAll  head(tbl.goAll, n=20)
+      gene    betaLasso  lassoPValue pearsonCoeff      rfScore    betaRidge spearmanCoeff      xgboost
+1     LMO2  0.047541125 5.249385e-20    0.8101163 8.702037e+00  0.007119946     0.6555403 1.500191e-01
+2     NFIX  0.093098353 5.384999e-20    0.8099891 6.852083e+00  0.008154300     0.7870852 5.241650e-02
+3    ZNF80 -0.066366470 6.490916e-20   -0.8096562 1.052108e+01 -0.008193182    -0.7093304 5.867285e-01
+4    GFI1B  0.226649379 2.578638e-19    0.8016940 2.483361e+00  0.009161609     0.7929971 4.310633e-08
+5     MITF  0.177632172 5.326661e-19    0.8009208 6.091928e+00  0.008086801     0.6164877 6.660835e-05
+6     MAFG  0.057656557 1.079359e-16    0.7905432 3.829226e+00  0.007892880     0.7665661 1.711896e-04
+7    GATA2  0.000000000 2.166205e-03    0.7691669 1.720552e+00  0.007813329     0.6851964 9.772821e-07
+8    IKZF3  0.000000000 1.000000e+00   -0.7620993 4.786622e+00 -0.006253381    -0.3980242 1.528179e-06
+9     LYL1  0.006733866 1.179134e-08    0.7581465 1.184926e+00  0.006740238     0.7822108 0.000000e+00
+10   HOXA5  0.000000000 1.000000e+00    0.7312527 1.621898e+00  0.005573155     0.4879902 1.384144e-07
+11  HOXA10  0.000000000 1.000000e+00    0.7262372 2.515769e-01  0.004681578     0.5537364 0.000000e+00
+12   SP140  0.000000000 1.000000e+00   -0.7127619 1.478112e+00 -0.006094842    -0.5231002 0.000000e+00
+13    ETS1 -0.020158108 4.193672e-11   -0.7070259 4.233599e+00 -0.007438296    -0.5267590 0.000000e+00
+14   NR6A1  0.000000000 1.000000e+00    0.6971826 6.104783e-02  0.004443842     0.5772753 0.000000e+00
+15  BCL11B  0.000000000 1.000000e+00   -0.6951305 6.063338e-05 -0.005375201    -0.4351164 0.000000e+00
+16    IRF4 -0.012852384 2.796501e-10   -0.6919585 6.507420e-02 -0.007734237    -0.5694599 0.000000e+00
+17   CEBPA  0.012159852 2.784620e-10    0.6864443 4.485537e-01  0.007222885     0.5459188 7.626946e-04
+18   MEIS1  0.000000000 1.000000e+00    0.6815312 1.375627e-01  0.003999963     0.5606262 0.000000e+00
+19 CBFA2T3  0.000000000 1.000000e+00    0.6809550 3.927459e-03  0.005125665     0.5737458 4.681401e-06
+20   SMAD1  0.000000000 4.842264e-02    0.6758645 1.686901e+00  0.006522420     0.5366757 0.000000e+00
+</pre>
+<pre>
+&gt; match(c("GATA1", "TAL1", "KLF1"), tbl.goAll$gene)
+[1] 116 38 51
+</pre>
+</div>
+<div id="expression-plus-only-those-transcription-factors-with-known-motifs" class="section level2">
+<h2 class="hasAnchor">
+<a href="#expression-plus-only-those-transcription-factors-with-known-motifs" class="anchor"></a>Expression plus only those transcription factors with known motifs</h2>
+<p>The JASPAR 2018 and Hocomoco transcription factor compendia, when combined, identify 780 annotated transcription factor motif. In building the next model, candidate transcription factors are limited to this set.</p>
+<pre>
+&gt; tfs.with.motifs  length(tfs.with.motifs)
+[1] 780
+&gt; tfs  length(tfs)
+[1] 509
+&gt; 
+&gt; solver  suppressWarnings(
+&gt;    tbl     )
+&gt; dim(tbl) # 507 8
+&gt; new.order  tbl  rownames(tbl)  tbl.withMotifs  head(tbl.withMotifs, n=20
+     gene   betaLasso  lassoPValue pearsonCoeff     rfScore    betaRidge spearmanCoeff      xgboost
+1    NFIX  0.10626036 5.375931e-20    0.8099891 10.93109147  0.020402127     0.7870852 5.449019e-01
+2   GFI1B  0.25679512 3.100623e-19    0.8016940  6.88338652  0.022793570     0.7929971 2.273725e-02
+3    MITF  0.20075697 2.815766e-19    0.8009208  7.83112670  0.016352198     0.6164877 1.779597e-01
+4    MAFG  0.06992969 2.477448e-17    0.7905432  5.69753582  0.017553696     0.7665661 3.340823e-05
+5   GATA2  0.00687861 6.610933e-02    0.7691669  1.99289713  0.016963665     0.6851964 5.200143e-05
+6   HOXA5  0.00000000 1.000000e+00    0.7312527  3.05457854  0.013316331     0.4879902 0.000000e+00
+7  HOXA10  0.00000000 1.420628e-01    0.7262372  0.75941803  0.014015820     0.5537364 6.400621e-06
+8    ETS1 -0.06970416 3.556011e-13   -0.7070259  8.07010777 -0.018193677    -0.5267590 0.000000e+00
+9   NR6A1  0.00000000 2.461098e-01    0.6971826  0.41803310  0.011750808     0.5772753 0.000000e+00
+10   IRF4 -0.02169888 1.360509e-10   -0.6919585  0.46599226 -0.020261614    -0.5694599 0.000000e+00
+11  CEBPA  0.03482203 9.188178e-11    0.6864443  0.69499215  0.014358728     0.5459188 1.349195e-04
+12  MEIS1  0.00000000 1.000000e+00    0.6815312  0.33666404  0.012905598     0.5606262 0.000000e+00
+13  SMAD1  0.00000000 4.204800e-02    0.6758645  3.70105486  0.016631861     0.5366757 1.032892e-08
+14   TFEC  0.00000000 1.000000e+00    0.6740365  1.17192544  0.013276577     0.4392922 1.344201e-01
+15   RFX2  0.00000000 1.000000e+00    0.6670588  0.03802791  0.011815788     0.6588538 1.071266e-06
+16  MYBL1  0.00000000 1.000000e+00   -0.6585463  1.31516074 -0.014894704    -0.4524598 0.000000e+00
+17   MYCN  0.00000000 1.000000e+00    0.6554632  0.09194602  0.014752993     0.5671422 2.840913e-06
+18  TBX21  0.00000000 1.000000e+00   -0.6442284  0.28941161 -0.013417225    -0.4703482 4.371519e-08
+19   FOSB  0.00000000 1.000000e+00    0.6433983  0.36776177  0.011620625     0.4334291 0.000000e+00
+20    ERG  0.00000000 1.000000e+00    0.6353066  0.14183513  0.009995614     0.4743840 2.279443e-07
+</pre>
+<pre>
+&gt; match(c("GATA1", "TAL1", "KLF1"), tbl.withMotifs$gene)
+[1] 58 21 28
+</pre>
+</div>
+<div id="expression-plus-highly-conserved-high-scoring-transcription-factors-in-a-20kb-regulatory-region" class="section level2">
+<h2 class="hasAnchor">
+<a href="#expression-plus-highly-conserved-high-scoring-transcription-factors-in-a-20kb-regulatory-region" class="anchor"></a>Expression plus highly-conserved, high-scoring transcription factors in a 20kb regulatory region</h2>
+<p>We hypothesize that transcription factors binding sites with well-matched motifs found in highly conserved regulatory regions within +/- 10kb of the target gene’s TSS are likely to be functional. When found, and when tf/target gene expression is also correlated, or anti-correlated, these are possibly useful trena predictions, worthy of further consideration.</p>
+<p>Here we use a precalculated table of FIMO and phast7 scores for 20kb surrounding the NFE2 transcription start site, extracting only those TFs with very high match and conservation. With these data and assumptions, GATA1 rises to rank 8 in the model with a pearson correlation of 0.5. consisent with expectation and the findings of the published papers.</p>
+<pre>
+   phast.score = phast.score)
+   dim(tbl.fimo.strong)
+   tfs 
+All three transcription factors are now found among the top regulators in the model:
+<pre>
+&gt; match(c("GATA1", "TAL1", "KLF1"), tbl.corces.fimo$gene)   # 8 4 5
+[1] 8 4 5
+</pre>
+<p>Cusanovich 2014 establised that function transcription factors tend to have</p>
+</pre>
+<ul>
+<li>good motif matching scores</li>
+<li>multiple binding sites in the target gene’s proximal promoter</li>
+</ul>
+<p>Our heuristic has been to select for only very high conservation and sequence match, but it is widely recognized that TF binding is more promiscuous than that. So now we add two columns to the model table showing binding site counts for strict and lenient motif/conservation scoring. Extra credence is conferred on TFs which rank high in the model and which, by one or both measures, has multiple binding sites.</p>
+<p><em>tfbs.strong</em> counts are of sites with phast7 conservation score (opossum - primates) &gt; 0.90 and FIMO motif match &lt; 1e-5.</p>
+<p><em>tfbs.weak</em> counts with phast7 &gt; 0.5 and FIMO &lt; 1e-4.</p>
+<pre>
+    gene betaLasso lassoPValue pearsonCoeff rfScore betaRidge spearmanCoeff xgboost tfbs.strong tfbs.weak
+1  NR6A1     0.114    4.83e-13        0.697   9.074     0.087         0.577   0.011           1         3
+2   IRF4    -0.203    7.95e-13       -0.692   9.941    -0.119        -0.569   0.026           1         9
+3  CEBPA     0.246    2.82e-12        0.686  14.259     0.091         0.546   0.575           1         9
+4   TAL1     0.035    1.39e-08        0.630   6.931     0.099         0.648   0.028           1         2
+5   KLF1     0.211    1.84e-10        0.610   6.682     0.100         0.740   0.054           4        28
+6   EGR1     0.032    2.76e-06        0.568   4.730     0.072         0.449   0.003           2        11
+7   KLF4     0.032    1.35e-05        0.556   6.292     0.068         0.348   0.000           2         4
+8  GATA1     0.000    8.36e-01        0.500   1.287     0.071         0.597   0.269           1         4
+9   SPI1     0.000    3.86e-03        0.497   1.454     0.057         0.443   0.000           2         9
+10   WT1     0.000    3.67e-03        0.462   0.772     0.066         0.400   0.003           2         4
+11   MAZ     0.000    8.52e-01        0.434   1.133     0.038         0.523   0.003           1         6
+12 KLF16     0.000    7.26e-01        0.363   0.904     0.018         0.470   0.001           2         7
+13  NFIC     0.000    6.98e-01        0.359   0.785     0.023         0.439   0.000           4        36
+14   SP4     0.000    6.70e-01       -0.352   0.933    -0.040        -0.203   0.000           1         3
+15  RARA     0.000    6.91e-01        0.279   0.434     0.013         0.305   0.000           3        12
+16  KLF8     0.000    3.74e-02       -0.270   1.202    -0.058        -0.153   0.000           1        10
+17   SP1     0.000    3.06e-01        0.261   0.355     0.039         0.322   0.000           1         3
+18   MNT     0.000    4.52e-01        0.234   0.543     0.001         0.368   0.007           1         3
+19 TFCP2     0.000    9.85e-01        0.228   0.858     0.026         0.267   0.002           1         6
+20 STAT3     0.000    9.73e-01        0.222   1.293     0.012         0.405   0.003           4        30
+
+</pre>
+</div>
 </div>
   </div>
 
@@ -120,7 +249,13 @@
 <a href="#tocnav" class="anchor"></a>Contents</h2>
       <ul class="nav nav-pills nav-stacked">
 <li><a href="#introduction">Introduction</a></li>
-      <li><a href="#corces-et-al-2016-rna-seq-on-facs-sorted-cells-in-erythropoiesis">Corces et al, 2016, RNA-seq on FACS sorted cells in erythropoiesis</a></li>
+      <li>
+<a href="#corces-et-al-2016-rna-seq-on-facs-sorted-cells-in-erythropoiesis">Corces et al, 2016, RNA-seq on FACS sorted cells in erythropoiesis</a><ul class="nav nav-pills nav-stacked">
+<li><a href="#expression-plus-all-known-transcription-factors">Expression plus all known transcription factors</a></li>
+      <li><a href="#expression-plus-only-those-transcription-factors-with-known-motifs">Expression plus only those transcription factors with known motifs</a></li>
+      <li><a href="#expression-plus-highly-conserved-high-scoring-transcription-factors-in-a-20kb-regulatory-region">Expression plus highly-conserved, high-scoring transcription factors in a 20kb regulatory region</a></li>
+      </ul>
+</li>
       </ul>
 </div>
       </div>

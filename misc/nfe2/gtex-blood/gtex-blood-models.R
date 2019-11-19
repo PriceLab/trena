@@ -145,14 +145,14 @@ build.with.fimo.and.phast <- function()
    match(c("GATA1", "TAL1", "KLF1"), tfs.elite)   # 13 41 16
 
 
-   solver <- EnsembleSolver(mtx.blood.lps, target.gene, tfs, geneCutoff=1.0, solverNames=solverNames)
+   solver <- EnsembleSolver(mtx.blood.lps, target.gene, tfs.elite, geneCutoff=1.0, solverNames=solverNames)
    tbl <- run(solver)
    dim(tbl)
    new.order <- order(abs(tbl$pearsonCoeff), decreasing=TRUE)
    tbl <- tbl[new.order,]
    rownames(tbl) <- NULL
    tbl.fimo.phast.stringent <- tbl
-   match(c("GATA1", "TAL1", "KLF1"), tbl.fimo.phast.stringent)   # NA NA NA
+   match(c("GATA1", "TAL1", "KLF1"), tbl.fimo.phast.stringent$gene)   # 15 27 30
 
 
    tbl.tfs.weak <- subset(tbl.fimoMotifs, p.value <= 1e-4 & phast7 > 0.2)
@@ -163,12 +163,12 @@ build.with.fimo.and.phast <- function()
 
    solver <- EnsembleSolver(mtx.blood.lps, target.gene, tfs.weak, geneCutoff=1.0, solverNames=solverNames)
    tbl <- run(solver)
-   dim(tbl)  # 378
+   dim(tbl)  # 379 7
    new.order <- order(abs(tbl$pearsonCoeff), decreasing=TRUE)
    tbl <- tbl[new.order,]
    rownames(tbl) <- NULL
    tbl.fimo.phast.weak <- tbl
-   match(c("GATA1", "TAL1", "KLF1"), tbl.fimo.phast.stringent)   # NA NA NA
+   match(c("GATA1", "TAL1", "KLF1"), tbl.fimo.phast.weak$gene)   #  95 168 190
 
    tbl.tfbs.counts <- as.data.frame(sort(table(tbl.fimo.strong$tf)))
    bindingSiteCount <- merge(tbl.blood.lps.fimo, tbl.tfbs.counts, by.x="gene", by.y="Var1")$Freq
