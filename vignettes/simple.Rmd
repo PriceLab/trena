@@ -38,12 +38,6 @@ library(limma)
 2 + 1
 ```
 
-### 4. display code and output
-```{r load trenaSGM, no prompt, prompt=FALSE, message=FALSE, results="asis"}
-library(trenaSGM)
-2 + 2
-```
-
 ### 5. no code display, just the output
 ```{r just results, prompt=FALSE, message=FALSE, echo=FALSE, results="show"}
 sprintf("variant %d", 2 + 3)
