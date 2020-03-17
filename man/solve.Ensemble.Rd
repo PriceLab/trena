@@ -38,7 +38,7 @@ ensemble.solver <- EnsembleSolver(mtx.sub, target.gene, tfs)
 tbl <- run(ensemble.solver)
 
 # Solve the same problem, but supply extra arguments that change alpha for LASSO to 0.8 and also
-# Change the gene cutoff from 10% to 20%
+# Change the gene cutoff from 10\% to 20\%
 ensemble.solver <- EnsembleSolver(mtx.sub, target.gene, tfs, geneCutoff = 0.2, alpha.lasso = 0.8)
 tbl <- run(ensemble.solver)
 
