@@ -77,7 +77,6 @@ Other Solver class objects:
 \code{\link{RidgeSolver}},
 \code{\link{Solver-class}},
 \code{\link{SpearmanSolver}},
-\code{\link{SqrtLassoSolver}},
 \code{\link{XGBoostSolver}}
 }
 \concept{Solver class objects}

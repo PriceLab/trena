@@ -4,8 +4,6 @@ print(load("../extdata/bugDemoData/solver.bug.2017-11-01.09:49:40.RData"))
 solver <- EnsembleSolver(mtx, targetGene, candidates, solver.names)
 run(solver)
 
-# Error in `[.data.frame`(out.list$out.sqrtlasso, , c("beta", "gene")) :
-#   undefined columns selected
 
 # paul-shannon's sessionInfo
 # R version 3.4.1 (2017-06-30)

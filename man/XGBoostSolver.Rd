@@ -46,7 +46,6 @@ Other Solver class objects:
 \code{\link{RandomForestSolver}},
 \code{\link{RidgeSolver}},
 \code{\link{Solver-class}},
-\code{\link{SpearmanSolver}},
-\code{\link{SqrtLassoSolver}}
+\code{\link{SpearmanSolver}}
 }
 \concept{Solver class objects}

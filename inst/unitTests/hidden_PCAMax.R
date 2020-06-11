@@ -50,7 +50,6 @@ test_.normalize_betas <- function()
    printf("--- test_normalize_betas")
    vn.0 <- trena:::.normalize_betaValues(tbl.mef2c$betaLasso, normalizing.max=10)
    vn.1 <- trena:::.normalize_betaValues(tbl.mef2c$betaRidge, normalizing.max=10)
-   vn.2 <- trena:::.normalize_betaValues(tbl.mef2c$betaSqrtLasso, normalizing.max=10)
 
    checkEquals(as.numeric(lapply(list(vn.0, vn.1, vn.2), max)), c(10, 10, 10))
 
@@ -80,7 +79,7 @@ test_normalizeModel <- function()
    mtx <- normalizeModel(x, normalizing.max=10)
    checkEquals(dim(mtx), c(20,7))
    coi <- c("betaLasso", "lassoPValue", "pearsonCoeff", "rfScore",
-            "betaRidge", "spearmanCoeff", "betaSqrtLasso")
+            "betaRidge", "spearmanCoeff")
    checkEquals(colnames(mtx), coi)
    mtx.summary <- apply(mtx, 2, fivenum)
 

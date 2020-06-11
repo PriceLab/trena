@@ -83,8 +83,7 @@ test_selectedSolversOnly <- function()
 
    target.gene <- "MEF2C"
    tfs <- setdiff(rownames(mtx.asinh), "MEF2C")
-   solvers <- c("lasso", "ridge", "lassopv", "pearson", "spearman") # "sqrtlasso",
-
+   solvers <- c("lasso", "ridge", "lassopv", "pearson", "spearman")
    solver <- EnsembleSolver(mtx.asinh,target.gene,tfs,solverNames=solvers)
    tbl <- run(solver)
 
@@ -115,8 +114,7 @@ doNot_test_pcaError <- function()
 
     target.gene <- "MEF2C"
     tfs <- setdiff(rownames(mtx.asinh), "MEF2C")
-    solvers <- c("lasso", "ridge", "lassopv", "pearson", "spearman") # "sqrtlasso",
-
+    solvers <- c("lasso", "ridge", "lassopv", "pearson", "spearman")
     solver <- EnsembleSolver(mtx.asinh,target.gene,tfs,solverNames=solvers)
 
     # Change warnings to errors
@@ -263,7 +261,7 @@ doNot_test_.addEnsembleScore <- function()
    mtx.scale[, "betaLasso"] <- scale.scores.normal.distribution(mtx.scale[,"betaLasso"])
    mtx.scale[, "lassoPValue"] <- scale.scores.normal.distribution(-log10(mtx.scale[,"lassoPValue"]))
    mtx.scale[, "pearsonCoeff"] <- scale.scores.normal.distribution(mtx.scale[,"pearsonCoeff"])
-   mtx.scale[, "betaSqrtLasso"] <- scale.scores.normal.distribution(mtx.scale[,"betaSqrtLasso"])
+   # mtx.scale[, "betaSqrtLasso"] <- scale.scores.normal.distribution(mtx.scale[,"betaSqrtLasso"])
    mtx.scale[, "rfScore"] <- scale.scores.normal.distribution(mtx.scale[,"rfScore"])
    mtx.scale[, "betaRidge"] <- scale.scores.normal.distribution(mtx.scale[,"betaRidge"])
    mtx.scale[, "spearmanCoeff"] <- scale.scores.normal.distribution(mtx.scale[,"spearmanCoeff"])

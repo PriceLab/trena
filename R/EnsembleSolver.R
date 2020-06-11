@@ -233,7 +233,7 @@ setMethod("run", "EnsembleSolver",
 
               # Intersect with the accepted solvers
               accepted.solvers <- c("bayesspike", "lassopv", "lasso", "pearson",
-                                    "ridge", "randomforest", "spearman", "sqrtlasso", "xgboost")
+                                    "ridge", "randomforest", "spearman", "xgboost")
               not.accepted <- setdiff(solver.list, accepted.solvers)
               solver.list <- intersect(solver.list, accepted.solvers)
 
@@ -264,8 +264,6 @@ setMethod("run", "EnsembleSolver",
                                                                    nOrderings = obj@nOrderings.bayes),
                                    "pearson" = PearsonSolver(mtx, target.gene, tfs),
                                    "spearman" = SpearmanSolver(mtx, target.gene, tfs),
-                                   "sqrtlasso" = SqrtLassoSolver(mtx, target.gene, tfs,
-                                                                 lambda = obj@lambda.sqrt, nCores = obj@nCores.sqrt),
                                    "lassopv" = LassoPVSolver(mtx, target.gene, tfs),
                                    "ridge" = RidgeSolver(mtx, target.gene, tfs,
                                                          alpha = obj@alpha.ridge, lambda = obj@lambda.ridge),
@@ -295,8 +293,6 @@ setMethod("run", "EnsembleSolver",
                                                                    nOrderings = obj@nOrderings.bayes),
                                    "pearson" = PearsonSolver(mtx, target.gene, tfs),
                                    "spearman" = SpearmanSolver(mtx, target.gene, tfs),
-                                   "sqrtlasso" = SqrtLassoSolver(mtx, target.gene, tfs,
-                                                                 lambda = obj@lambda.sqrt, nCores = obj@nCores.sqrt),
                                    "lassopv" = LassoPVSolver(mtx, target.gene, tfs),
                                    "ridge" = RidgeSolver(mtx, target.gene, tfs,
                                                          alpha = obj@alpha.ridge, lambda = obj@lambda.ridge),
@@ -378,15 +374,6 @@ setMethod("run", "EnsembleSolver",
                   lassopv.scale <- sqrt(mean(p.log10*p.log10))
               }
 
-              #SqrtLasso
-              if("sqrtlasso" %in% tolower(solver.list)){
-                  out.list$out.sqrtlasso$gene <- rownames(out.list$out.sqrtlasso)
-                  rownames(out.list$out.sqrtlasso) <- NULL
-                  out.list$out.sqrtlasso <- out.list$out.sqrtlasso[, c("beta", "gene")]
-                  names(out.list$out.sqrtlasso) <- c("betaSqrtLasso", "gene")
-                  sqrtlasso.med <- stats::median(out.list$out.sqrtlasso$betaSqrtLasso)
-                  sqrtlasso.scale <- stats::mad(out.list$out.sqrtlasso$betaSqrtLasso)
-              }
 
               #Ridge
               if("ridge" %in% tolower(solver.list)){

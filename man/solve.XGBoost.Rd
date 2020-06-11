@@ -38,7 +38,6 @@ Other solver methods:
 \code{\link{run,PearsonSolver-method}},
 \code{\link{run,RandomForestSolver-method}},
 \code{\link{run,RidgeSolver-method}},
-\code{\link{run,SpearmanSolver-method}},
-\code{\link{run,SqrtLassoSolver-method}}
+\code{\link{run,SpearmanSolver-method}}
 }
 \concept{solver methods}
