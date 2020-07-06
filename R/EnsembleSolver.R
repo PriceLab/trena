@@ -450,11 +450,6 @@ setMethod("run", "EnsembleSolver",
 #                                                    scale = spearman.scale)
 #              }
 #
-#              if("betaSqrtLasso" %in% names(tbl.scale)){
-#                  tbl.scale$betaSqrtLasso <- scale(tbl.scale$betaSqrtLasso,
-#                                                    center = sqrtlasso.med,
-#                                                    scale = sqrtlasso.scale)
-#              }
 #
 #              if("bayesScore" %in% names(tbl.scale)){
 #                  tbl.scale$bayesScore <- scale(tbl.scale$bayesScore,

@@ -13,7 +13,7 @@
 #' @examples
 #' # Note: Both examples return :
 #' # list(chrom="chr10", start=118441047, end=118445892)
-#' 
+#'
 #' # Parse a string containing the "chr" prefix for chromosome
 #' chrom.list <- parseChromLocString("chr10:118441047-118445892")
 #'
@@ -96,10 +96,10 @@ parseDatabaseUri <- function(database.uri)
 
 getAvailableSolvers <- function() {
 
-    # Create the list of available solvers
     availableSolvers <- c("BayesSpike", "LassoPV", "Lasso", "Pearson",
-                          "RandomForest", "Ridge", "Spearman", "SqrtLasso")
-    
+                          "RandomForest", "Ridge", "Spearman")
+
     return(availableSolvers)
+
 } # getAvailableSolvers
 #----------------------------------------------------------------------------------------------------

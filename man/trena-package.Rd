@@ -11,7 +11,7 @@ several classes and their associated methods, briefly documented below
 }
 \details{
 #'
-Solver Class Objects 
+Solver Class Objects
 
  The \code{\link{Solver}} class is a base class used within `trena`. A particular
 \code{\link{Solver}} object also contains the name of the selected solver and
@@ -21,7 +21,6 @@ different feature selection methods: \code{\link{BayesSpikeSolver}},
 \code{\link{EnsembleSolver}}, \code{\link{LassoPVSolver}},
 \code{\link{LassoSolver}}, \code{\link{PearsonSolver}},
 \code{\link{RandomForestSolver}}, \code{\link{RidgeSolver}},
-\code{\link{SpearmanSolver}}, \code{\link{SqrtLassoSolver}}.
 
 CandidateFilter Class Objects
 
@@ -31,7 +30,7 @@ regulators. Filtering method depends on the filter type chosen; there are curren
 following subclasses: \code{\link{FootprintFilter}}, \code{\link{HumanDHSFilter}},
 \code{\link{GeneOntologyFilter}}, and \code{\link{VarianceFilter}}. The filters are
 applied using the \code{\link{getCandidates}} method on a given
-\code{\link{CandidateFilter}} object. 
+\code{\link{CandidateFilter}} object.
 
 FootprintFinder Class Objects
 

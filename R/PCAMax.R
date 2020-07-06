@@ -33,7 +33,7 @@ PCAMax <- function(tbl, tfIdentifierColumnName="tf.hgnc")
 {
     stopifnot(tfIdentifierColumnName %in% colnames(tbl))
     standardSolverNames <- c("betaLasso", "lassoPValue", "pearsonCoeff", "rfScore",
-                             "betaRidge", "spearmanCoeff", "betaSqrtLasso")
+                             "betaRidge", "spearmanCoeff")
 
     coi <- intersect(standardSolverNames, colnames(tbl))
     if(length(coi) < 3)
@@ -67,7 +67,7 @@ setMethod('normalizeModel', 'PCAMax',
         mtx <- as.matrix(obj@tbl)
         for(colname in colnames(mtx)){
            vec <- as.numeric(mtx[, colname])
-           if(colname %in% c("betaLasso", "betaRidge", "betaSqrtLasso"))
+           if(colname %in% c("betaLasso", "betaRidge"))
               vec.norm <- .normalize_betaValues(vec, normalizing.max)
            if(colname == "lassoPValue")
               vec.norm <- .normalize_pval(vec, normalizing.max)
@@ -289,11 +289,6 @@ setMethod('getCoverage', 'PCAMax',
 #                                                    scale = spearman.scale)
 #              }
 #
-#              if("betaSqrtLasso" %in% names(tbl.scale)){
-#                  tbl.scale$betaSqrtLasso <- scale(tbl.scale$betaSqrtLasso,
-#                                                    center = sqrtlasso.med,
-#                                                    scale = sqrtlasso.scale)
-#              }
 #
 #              if("bayesScore" %in% names(tbl.scale)){
 #                  tbl.scale$bayesScore <- scale(tbl.scale$bayesScore,
