@@ -411,7 +411,7 @@ setMethod('createGeneModelFromTfList', 'Trena',
 #'
 #' @return A dataframe containing the regions surrounding the proximal promoter
 #'
-#' @export
+#   @export  # try to avoid multiple methods table found warning/error
 #'
 #' @examples
 #' if(interactive()) {  # too slow for the bioc windows build
