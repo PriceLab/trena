@@ -5,3 +5,5 @@ build.makefile
 inst/prep
 
 ^\.travis\.yml$
+
+misc/saez-benchmark-paper/
