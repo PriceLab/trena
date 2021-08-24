@@ -32,6 +32,7 @@ tbl <- run(pearson.solver)
 
 Other solver methods: 
 \code{\link{run,BayesSpikeSolver-method}},
+\code{\link{run,BicorSolver-method}},
 \code{\link{run,EnsembleSolver-method}},
 \code{\link{run,LassoPVSolver-method}},
 \code{\link{run,LassoSolver-method}},

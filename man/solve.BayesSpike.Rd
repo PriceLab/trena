@@ -38,6 +38,7 @@ tbl <- run(bayes.solver)
 \code{\link{vbsr}}, \code{\link{BayesSpikeSolver}}
 
 Other solver methods: 
+\code{\link{run,BicorSolver-method}},
 \code{\link{run,EnsembleSolver-method}},
 \code{\link{run,LassoPVSolver-method}},
 \code{\link{run,LassoSolver-method}},

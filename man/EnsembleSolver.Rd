@@ -8,8 +8,8 @@ EnsembleSolver(
   mtx.assay = matrix(),
   targetGene,
   candidateRegulators,
-  solverNames = c("lasso", "lassopv", "pearson", "randomForest", "ridge", "spearman",
-    "xgboost"),
+  solverNames = c("lasso", "lassopv", "pearson", "bicor", "randomForest", "ridge",
+    "spearman", "xgboost"),
   geneCutoff = 0.1,
   alpha.lasso = 0.9,
   alpha.ridge = 0,
@@ -77,6 +77,7 @@ ensemble.solver <- EnsembleSolver(mtx.sub, target.gene, tfs)
 
 Other Solver class objects: 
 \code{\link{BayesSpikeSolver}},
+\code{\link{BicorSolver}},
 \code{\link{HumanDHSFilter-class}},
 \code{\link{LassoPVSolver}},
 \code{\link{LassoSolver}},

@@ -69,6 +69,7 @@ EnsembleSolver <- function(mtx.assay=matrix(), targetGene, candidateRegulators,
                            solverNames = c("lasso",
                                            "lassopv",
                                            "pearson",
+                                           "bicor",
                                            "randomForest",
                                            "ridge",
                                            "spearman",
@@ -232,7 +233,7 @@ setMethod("run", "EnsembleSolver",
               solver.list <- tolower(getSolverNames(obj))
 
               # Intersect with the accepted solvers
-              accepted.solvers <- c("bayesspike", "lassopv", "lasso", "pearson",
+              accepted.solvers <- c("bayesspike", "lassopv", "lasso", "pearson", "bicor",
                                     "ridge", "randomforest", "spearman", "xgboost")
               not.accepted <- setdiff(solver.list, accepted.solvers)
               solver.list <- intersect(solver.list, accepted.solvers)
@@ -264,6 +265,7 @@ setMethod("run", "EnsembleSolver",
                                                                    nOrderings = obj@nOrderings.bayes),
                                    "pearson" = PearsonSolver(mtx, target.gene, tfs),
                                    "spearman" = SpearmanSolver(mtx, target.gene, tfs),
+                                   "bicor" = BicorSolver(mtx, target.gene, tfs),
                                    "lassopv" = LassoPVSolver(mtx, target.gene, tfs),
                                    "ridge" = RidgeSolver(mtx, target.gene, tfs,
                                                          alpha = obj@alpha.ridge, lambda = obj@lambda.ridge),
@@ -293,6 +295,7 @@ setMethod("run", "EnsembleSolver",
                                                                    nOrderings = obj@nOrderings.bayes),
                                    "pearson" = PearsonSolver(mtx, target.gene, tfs),
                                    "spearman" = SpearmanSolver(mtx, target.gene, tfs),
+                                   "bicor" = BicorSolver(mtx, target.gene, tfs),
                                    "lassopv" = LassoPVSolver(mtx, target.gene, tfs),
                                    "ridge" = RidgeSolver(mtx, target.gene, tfs,
                                                          alpha = obj@alpha.ridge, lambda = obj@lambda.ridge),
@@ -361,6 +364,15 @@ setMethod("run", "EnsembleSolver",
                   names(out.list$out.spearman) <- c("spearmanCoeff", "gene")
                   spearman.med <- stats::median(out.list$out.spearman$spearmanCoeff)
                   spearman.scale <- stats::mad(out.list$out.spearman$spearmanCoeff)
+              }
+
+              #Bicor
+              if("bicor" %in% tolower(solver.list)){
+                  out.list$out.bicor$gene <- rownames(out.list$out.bicor)
+                  rownames(out.list$out.bicor) <- NULL
+                  names(out.list$out.bicor) <- c("bicor", "gene")
+                  #spearman.med <- stats::median(out.list$out.spearman$spearmanCoeff)
+                  #spearman.scale <- stats::mad(out.list$out.spearman$spearmanCoeff)
               }
 
               #LassoPV

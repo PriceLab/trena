@@ -42,6 +42,7 @@ rf.solver <- RandomForestSolver(mtx.sub, targetGene, candidateRegulators)
 
 Other Solver class objects: 
 \code{\link{BayesSpikeSolver}},
+\code{\link{BicorSolver}},
 \code{\link{EnsembleSolver}},
 \code{\link{HumanDHSFilter-class}},
 \code{\link{LassoPVSolver}},

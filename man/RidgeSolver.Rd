@@ -57,6 +57,7 @@ Create a Solver class object using the Ridge solver
 
 Other Solver class objects: 
 \code{\link{BayesSpikeSolver}},
+\code{\link{BicorSolver}},
 \code{\link{EnsembleSolver}},
 \code{\link{HumanDHSFilter-class}},
 \code{\link{LassoPVSolver}},

@@ -42,7 +42,8 @@ test_ampAD.mef2c.154tfs.278samples.ensemble <- function()
 
    checkTrue(c("HLF") %in% tbl$gene)
        #
-   expected.colnames <- c("gene", "betaLasso", "lassoPValue", "pearsonCoeff", "rfScore", "betaRidge", "spearmanCoeff", "xgboost")
+   expected.colnames <- c("gene", "betaLasso", "lassoPValue", "pearsonCoeff", "bicor", "rfScore",
+                          "betaRidge", "spearmanCoeff", "xgboost")
    checkTrue(all(expected.colnames %in% colnames(tbl)))
    checkTrue(nrow(tbl) >= 10)
 
@@ -83,7 +84,7 @@ test_selectedSolversOnly <- function()
 
    target.gene <- "MEF2C"
    tfs <- setdiff(rownames(mtx.asinh), "MEF2C")
-   solvers <- c("lasso", "ridge", "lassopv", "pearson", "spearman")
+   solvers <- c("lasso", "ridge", "lassopv", "pearson", "spearman", "bicor")
    solver <- EnsembleSolver(mtx.asinh,target.gene,tfs,solverNames=solvers)
    tbl <- run(solver)
 
@@ -114,7 +115,7 @@ doNot_test_pcaError <- function()
 
     target.gene <- "MEF2C"
     tfs <- setdiff(rownames(mtx.asinh), "MEF2C")
-    solvers <- c("lasso", "ridge", "lassopv", "pearson", "spearman")
+    solvers <- c("lasso", "ridge", "lassopv", "pearson", "spearman", "bicor")
     solver <- EnsembleSolver(mtx.asinh,target.gene,tfs,solverNames=solvers)
 
     # Change warnings to errors

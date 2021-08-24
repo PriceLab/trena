@@ -69,6 +69,7 @@ if(interactive()) { # takes too long in the bioc windows build
 
 Other Solver class objects: 
 \code{\link{BayesSpikeSolver}},
+\code{\link{BicorSolver}},
 \code{\link{EnsembleSolver}},
 \code{\link{LassoPVSolver}},
 \code{\link{LassoSolver}},

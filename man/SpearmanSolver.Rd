@@ -38,6 +38,7 @@ spearman.solver <- SpearmanSolver(mtx.sub, target.gene, tfs)
 
 Other Solver class objects: 
 \code{\link{BayesSpikeSolver}},
+\code{\link{BicorSolver}},
 \code{\link{EnsembleSolver}},
 \code{\link{HumanDHSFilter-class}},
 \code{\link{LassoPVSolver}},

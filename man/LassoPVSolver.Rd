@@ -38,6 +38,7 @@ lassopv.solver <- LassoPVSolver(mtx.sub, target.gene, tfs)
 
 Other Solver class objects: 
 \code{\link{BayesSpikeSolver}},
+\code{\link{BicorSolver}},
 \code{\link{EnsembleSolver}},
 \code{\link{HumanDHSFilter-class}},
 \code{\link{LassoSolver}},

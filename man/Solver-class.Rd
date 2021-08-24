@@ -39,6 +39,7 @@ solver <- Solver(mtx.sub, targetGene, candidateRegulators) # Create a simple Sol
 
 Other Solver class objects: 
 \code{\link{BayesSpikeSolver}},
+\code{\link{BicorSolver}},
 \code{\link{EnsembleSolver}},
 \code{\link{HumanDHSFilter-class}},
 \code{\link{LassoPVSolver}},
