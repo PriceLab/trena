@@ -131,7 +131,7 @@ Here is the high-res model as scored by trena, followed by the genome view.
 
 
 ```{r load brand model, echo=FALSE}
-tbl.model <- get(load("brand.tbl.model.trimmed"))
+tbl.model <- get(load(system.file(package="trena", "extdata", "brand.tbl.model.trimmed")))
 knitr::kable(tbl.model)
 ```
 

@@ -1,8 +1,8 @@
 Package: trena
 Type: Package
 Title: Fit transcriptional regulatory networks using gene expression, priors, machine learning
-Version: 1.15.4
-Date: 2021-09-01
+Version: 1.15.5
+Date: 2021-10-11
 Author: Seth Ament <seth.ament@systemsbiology.org>, Paul Shannon <pshannon@systemsbioloyg.org>, Matthew Richards <mrichard@systemsbiology.org>
 Maintainer: Paul Shannon <paul.thurmond.shannon@gmail.com>
 Imports:
@@ -76,4 +76,4 @@ Collate:
     'sharedFunctions.R'
     'utils.R'
 Encoding: UTF-8
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
