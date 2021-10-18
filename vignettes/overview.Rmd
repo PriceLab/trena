@@ -186,7 +186,8 @@ Jason D.Buenrostro et al
 
 ```{r sessionInfo}
 sessionInfo()
-````
+
+```
 
 
 ![knitr logo](http://yihui.name/knitr/images/knit-logo.png)
