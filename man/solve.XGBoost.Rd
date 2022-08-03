@@ -31,7 +31,6 @@ tbl <- run(XGBoost.solver)
 \code{\link{cor}}, \code{\link{XGBoostSolver}}
 
 Other solver methods: 
-\code{\link{run,BayesSpikeSolver-method}},
 \code{\link{run,BicorSolver-method}},
 \code{\link{run,EnsembleSolver-method}},
 \code{\link{run,LassoPVSolver-method}},

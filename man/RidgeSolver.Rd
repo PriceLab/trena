@@ -56,7 +56,6 @@ Create a Solver class object using the Ridge solver
 \code{\link{solve.Ridge}}, \code{\link{getAssayData}}
 
 Other Solver class objects: 
-\code{\link{BayesSpikeSolver}},
 \code{\link{BicorSolver}},
 \code{\link{EnsembleSolver}},
 \code{\link{HumanDHSFilter-class}},

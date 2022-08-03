@@ -31,7 +31,6 @@ tbl <- run(bicor.solver)
 \code{\link{cor}}, \code{\link{BicorSolver}}
 
 Other solver methods: 
-\code{\link{run,BayesSpikeSolver-method}},
 \code{\link{run,EnsembleSolver-method}},
 \code{\link{run,LassoPVSolver-method}},
 \code{\link{run,LassoSolver-method}},

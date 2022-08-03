@@ -46,8 +46,6 @@ setGeneric("getSolverNames", signature = "obj", function(obj) standardGeneric("g
 #' permutation testing (default = NULL).
 #' @param nCores.sqrt An integer denoting the number of computational cores to devote to the
 #' square root LASSO solver, which is the slowest of the solvers (default = 4)
-#' @param nOrderings.bayes An integer denoting the number of random starts to use for the Bayes
-#' Spike method (default = 10)
 #' @param quiet A logical denoting whether or not the solver should print output
 #'
 #' @return A Solver class object with Ensemble as the solver
@@ -91,8 +89,6 @@ EnsembleSolver <- function(mtx.assay=matrix(), targetGene, candidateRegulators,
     stopifnot(length(candidateRegulators) > 0)
 
     # Send a warning if there's a row of zeros
-    if(!is.na(max(mtx.assay)) & any(rowSums(mtx.assay) == 0))
-        warning("One or more gene has zero expression; this may cause difficulty when using Bayes Spike. You may want to try 'lasso' or 'ridge' instead.")
 
     obj <- .EnsembleSolver(Solver(mtx.assay = mtx.assay,
                                   targetGene = targetGene,
@@ -233,7 +229,7 @@ setMethod("run", "EnsembleSolver",
               solver.list <- tolower(getSolverNames(obj))
 
               # Intersect with the accepted solvers
-              accepted.solvers <- c("bayesspike", "lassopv", "lasso", "pearson", "bicor",
+              accepted.solvers <- c("lassopv", "lasso", "pearson", "bicor",
                                     "ridge", "randomforest", "spearman", "xgboost")
               not.accepted <- setdiff(solver.list, accepted.solvers)
               solver.list <- intersect(solver.list, accepted.solvers)
@@ -261,8 +257,6 @@ setMethod("run", "EnsembleSolver",
                                    "lasso" = LassoSolver(mtx, target.gene, tfs,
                                                          alpha = obj@alpha.lasso, lambda = obj@lambda.lasso),
                                    "randomforest" = RandomForestSolver(mtx, target.gene, tfs),
-                                   "bayesspike" = BayesSpikeSolver(mtx, target.gene, tfs,
-                                                                   nOrderings = obj@nOrderings.bayes),
                                    "pearson" = PearsonSolver(mtx, target.gene, tfs),
                                    "spearman" = SpearmanSolver(mtx, target.gene, tfs),
                                    "bicor" = BicorSolver(mtx, target.gene, tfs),
@@ -291,8 +285,6 @@ setMethod("run", "EnsembleSolver",
                                    "lasso" = LassoSolver(mtx, target.gene, tfs,
                                                          alpha = obj@alpha.lasso, lambda = obj@lambda.lasso),
                                    "randomforest" = RandomForestSolver(mtx, target.gene, tfs),
-                                   "bayesspike" = BayesSpikeSolver(mtx, target.gene, tfs,
-                                                                   nOrderings = obj@nOrderings.bayes),
                                    "pearson" = PearsonSolver(mtx, target.gene, tfs),
                                    "spearman" = SpearmanSolver(mtx, target.gene, tfs),
                                    "bicor" = BicorSolver(mtx, target.gene, tfs),
@@ -338,15 +330,6 @@ setMethod("run", "EnsembleSolver",
                   #xgboost.scale <- sqrt(mean(out.list$out.xgboost$rfScore*out.list$out.xgboost$rfScore))
                   }
 
-              # Output the z-score from bayesspike
-              if("bayesspike" %in% tolower(solver.list)){
-                  out.list$out.bayesspike$gene <- rownames(out.list$out.bayesspike)
-                  rownames(out.list$out.bayesspike) <- NULL
-                  out.list$out.bayesspike <- out.list$out.bayesspike[, c("z", "gene")]
-                  names(out.list$out.bayesspike) <- c("bayesScore", "gene")
-                  bayesspike.med <- stats::median(out.list$out.bayesspike$bayesScore)
-                  bayesspike.scale <- stats::mad(out.list$out.bayesspike$bayesScore)
-              }
 
               # Pearson
               if("pearson" %in% tolower(solver.list)){
@@ -426,73 +409,6 @@ setMethod("run", "EnsembleSolver",
                   }
 
               tbl.all[is.na(tbl.all)] <- 0
-
-#              # Replace missing values and scale the data
-#              # Use the *.med and *.scale values to center/scale everything
-#              tbl.scale <- tbl.all[,-1]
-#
-#              if("lassoPValue" %in% names(tbl.scale)){
-#                  tbl.scale$lassoPValue <- -log10(tbl.scale$lassoPValue)
-#                  tbl.scale$lassoPValue <- scale(tbl.scale$lassoPValue,
-#                                                   center = lassopv.med,
-#                                                   scale = lassopv.scale)
-#              }
-#
-#              if("betaLasso" %in% names(tbl.scale)){
-#                  tbl.scale$betaLasso <- scale(tbl.scale$betaLasso,
-#                                                center = lasso.med,
-#                                                scale = lasso.scale)
-#              }
-#
-#              if("betaRidge" %in% names(tbl.scale)){
-#                  tbl.scale$betaRidge <- scale(tbl.scale$betaRidge,
-#                                                center = ridge.med,
-#                                                scale = ridge.scale)
-#              }
-#
-#              if("pearsonCoeff" %in% names(tbl.scale)){
-#                  tbl.scale$pearsonCoeff <- scale(tbl.scale$pearsonCoeff,
-#                                                   center = pearson.med,
-#                                                   scale = pearson.scale)
-#              }
-#
-#              if("spearmanCoeff" %in% names(tbl.scale)){
-#                  tbl.scale$spearmanCoeff <- scale(tbl.scale$spearmanCoeff,
-#                                                    center = spearman.med,
-#                                                    scale = spearman.scale)
-#              }
-#
-#
-#              if("bayesScore" %in% names(tbl.scale)){
-#                  tbl.scale$bayesScore <- scale(tbl.scale$bayesScore,
-#                                             center = bayesspike.med,
-#                                             scale = bayesspike.scale)
-#              }
-#
-#              if("rfScore" %in% names(tbl.scale)){
-#                  tbl.scale$rfScore <- scale(tbl.scale$rfScore,
-#                                              center = randomforest.med,
-#                                              scale = randomforest.scale)
-#              }
-#
-#              rownames(tbl.scale) <- tbl.all$gene
-#
-#              tbl.augmented <- try(.addEnsembleScores(tbl.scale, tbl.all), silent = TRUE)
-#
-#              # If you get new scores, add them;
-#              # Else, just keep the old table and throw a warning
-#
-#              if(class(tbl.augmented) == "try-error"){
-#                  warning("The signal strength of ensemble of solvers is too weak to support
-# composite scores ('pcaMax' and 'concordance' in the model output table. This is a classic
-# "large n, small m" problem that could be rectified by providing more samples")
-#                  tbl.all$pcaMax <- NA
-#                  tbl.all$concordance <- NA
-#              } else {
-#                  tbl.all <- tbl.augmented
-#              }
-#
-#              # Regardless of output, return the table of scores
 
           return(tbl.all)
           })

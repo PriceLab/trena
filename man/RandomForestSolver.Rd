@@ -41,7 +41,6 @@ rf.solver <- RandomForestSolver(mtx.sub, targetGene, candidateRegulators)
 \code{\link{solve.RandomForest}}, \code{\link{getAssayData}}
 
 Other Solver class objects: 
-\code{\link{BayesSpikeSolver}},
 \code{\link{BicorSolver}},
 \code{\link{EnsembleSolver}},
 \code{\link{HumanDHSFilter-class}},

@@ -31,7 +31,6 @@ tbl <- run(lasso.solver)
 \code{\link{glmnet}},, \code{\link{LassoSolver}}
 
 Other solver methods: 
-\code{\link{run,BayesSpikeSolver-method}},
 \code{\link{run,BicorSolver-method}},
 \code{\link{run,EnsembleSolver-method}},
 \code{\link{run,LassoPVSolver-method}},

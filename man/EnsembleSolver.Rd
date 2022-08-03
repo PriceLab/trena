@@ -55,9 +55,6 @@ permutation testing (default = NULL).}
 \item{nCores.sqrt}{An integer denoting the number of computational cores to devote to the
 square root LASSO solver, which is the slowest of the solvers (default = 4)}
 
-\item{nOrderings.bayes}{An integer denoting the number of random starts to use for the Bayes
-Spike method (default = 10)}
-
 \item{quiet}{A logical denoting whether or not the solver should print output}
 }
 \value{
@@ -76,7 +73,6 @@ ensemble.solver <- EnsembleSolver(mtx.sub, target.gene, tfs)
 \code{\link{solve.Ensemble}}, \code{\link{getAssayData}}
 
 Other Solver class objects: 
-\code{\link{BayesSpikeSolver}},
 \code{\link{BicorSolver}},
 \code{\link{HumanDHSFilter-class}},
 \code{\link{LassoPVSolver}},

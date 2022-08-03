@@ -37,7 +37,6 @@ pearson.solver <- PearsonSolver(mtx.sub, target.gene, tfs)
 \code{\link{solve.Pearson}}, \code{\link{getAssayData}}
 
 Other Solver class objects: 
-\code{\link{BayesSpikeSolver}},
 \code{\link{BicorSolver}},
 \code{\link{EnsembleSolver}},
 \code{\link{HumanDHSFilter-class}},

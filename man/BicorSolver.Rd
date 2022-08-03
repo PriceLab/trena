@@ -37,7 +37,6 @@ bicor.solver <- BicorSolver(mtx.sub, target.gene, tfs)
 \code{\link{solve.Bicor}}, \code{\link{getAssayData}}
 
 Other Solver class objects: 
-\code{\link{BayesSpikeSolver}},
 \code{\link{EnsembleSolver}},
 \code{\link{HumanDHSFilter-class}},
 \code{\link{LassoPVSolver}},
