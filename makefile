@@ -1,3 +1,6 @@
+default:
+	@echo targets: quick [roxy, install], test
+
 quick: roxy install
 
 all:  roxy vig build check
