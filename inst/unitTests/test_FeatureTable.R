@@ -11,6 +11,8 @@ if(length(p.value.col) == 1)
 runTests <- function()
 {
    test_ctor()
+   test_setFundamentalRegions()
+   test_addFeature()
 
 } # runTests
 #----------------------------------------------------------------------------------------------------
@@ -18,7 +20,7 @@ test_ctor <- function()
 {
     message(sprintf("--- test_ctor"))
 
-    ft <- FeatureTable$new(target.gene="NDUFS2", referenceGenome="hg38")
+    ft <- FeatureTable$new(target.gene="NDUFS2", reference.genome="hg38")
     checkTrue(all(c("FeatureTable", "R6") %in% class(ft)))
 
     tbl <- ft$getTable()
@@ -30,12 +32,13 @@ test_setFundamentalRegions <- function()
 {
     message(sprintf("--- test_eetFundamentalRegions"))
 
-    ft <- FeatureTable$new(target.gene="NDUFS2", referenceGenome="hg38")
+    ft <- FeatureTable$new(target.gene="NDUFS2", reference.genome="hg38")
 
     ft$setFundamentalRegions(tbl.fimo)
     #ft$setFundamentalRegions(tbl.fimo)
     tbl <- ft$getTable()
-    checkEquals(dim(tbl), c(416, 9))
+    checkTrue(ncol(tbl) == 9)
+    checkTrue(nrow(tbl) > 2000000)
 
 
 } # test_setFundamentalRegions
