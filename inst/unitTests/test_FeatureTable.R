@@ -12,7 +12,8 @@ runTests <- function()
 {
    test_ctor()
    test_setFundamentalRegions()
-   test_addFeature()
+   test_addRegionFeature.haploreg()
+   test_addRegionFeature.eqtls.hg19()
 
 } # runTests
 #----------------------------------------------------------------------------------------------------
@@ -43,9 +44,9 @@ test_setFundamentalRegions <- function()
 
 } # test_setFundamentalRegions
 #----------------------------------------------------------------------------------------------------
-test_addFeature <- function()
+test_addRegionFeature.haploreg <- function()
 {
-    message(sprintf("--- test_addFeature"))
+    message(sprintf("--- test_addRegionFeature.haploreg"))
 
     ft <- FeatureTable$new(target.gene="NDUFS2", reference.genome="hg38")
     ft$setFundamentalRegions(tbl.fimo)
@@ -57,11 +58,68 @@ test_addFeature <- function()
     tbl.haplo$end   <- tbl.haplo$hg38
 
     feature.guide <- list(haploreg.rsid="rsid", haploreg.rSquared="rSquared")
-    ft$addFeature(tbl.haplo, feature.genome="hg38", feature.guide)
+    ft$addRegionFeature(tbl.haplo, feature.genome="hg38", feature.guide)
 
     tbl <- ft$getTable()
     checkTrue(all(names(feature.guide) %in% colnames(tbl)))
 
-} # test_setFundamentalRegions
+    checkTrue(nrow(subset(tbl, nchar(haploreg.rsid) > 0 & tf=="ZNF410")) >= 4)
+
+} # test_addRegionFeature.haploreg
+#----------------------------------------------------------------------------------------------------
+test_addRegionFeature.eqtl.hg19 <- function()
+{
+    message(sprintf("--- test_addRegionFeature.eqtl.hg19"))
+
+    tbl.eqtl <- get(load(system.file(package="trena", "extdata", "featureTable", "eqtls.ndufs2.hg19.RData")))
+    tbl.eqtl <- subset(tbl.eqtl, study=="ampad-rosmap")
+    dim(tbl.eqtl)  # 46 10
+    checkTrue(all(c("chrom", "rsid", "hg38", "pvalue") %in% colnames(tbl.eqtl)))
+    tbl.eqtl$start <- tbl.eqtl$hg38 - 1
+    tbl.eqtl$end <- tbl.eqtl$hg38
+
+    ft <- FeatureTable$new(target.gene="NDUFS2", reference.genome="hg38")
+    ft$setFundamentalRegions(tbl.fimo)
+
+    feature.guide <- list(rosmap.eqtl.rsid="rsid", rosmap.eqtl.pvalue="pvalue")
+    ft$addRegionFeature(tbl.eqtl, feature.genome="hg38", feature.guide)
+
+    tbl <- ft$getTable()
+    checkTrue(all(names(feature.guide) %in% colnames(tbl)))
+    table(tbl$rosmap.eqtl.rsid)
+    checkTrue(nrow(subset(tbl, rosmap.eqtl.rsid=="")) > 2116200)
+
+} # test_addRegionFeature.eqtl.hg19
+#----------------------------------------------------------------------------------------------------
+test_addGeneFeature.correlated.rnaseq <- function()
+{
+   message(sprintf("---  test_addFeature.correlated.rnaseq"))
+
+   f <- system.file(package="trena", "extdata", "featureTable", "rna-seq.ndufs2.cor-gtex-cortex.RData")
+   tbl.cor <- get(load(f))
+   checkEquals(colnames(tbl.cor), c("gene", "cor"))
+   checkEquals(dim(tbl.cor), c(24821, 2))
+
+   ft <- FeatureTable$new(target.gene="NDUFS2", reference.genome="hg38")
+   ft$setFundamentalRegions(tbl.fimo)
+
+   feature.col.name <- "cortex.rna.seq.cor"
+   ft$addGeneFeature(tbl.cor, feature.name=feature.col.name)
+
+   tbl <- ft$getTable()
+   checkTrue(feature.col.name %in% colnames(tbl))
+
+      # choose a few correlations, make sure they are inscribed
+   set.seed(31)
+   indices <- sample(seq_len(nrow(tbl)), size=20)
+   tfs.oi <- tbl$tf[indices]
+   goi <- intersect(tfs.oi, tbl.cor[, "gene"])
+   incoming.correlations <- tbl.cor[match(goi, tbl.cor$gene), "cor"]
+   indices <- match(goi, tbl$tf)
+   inscribed.correlations <- as.numeric(unlist(tbl[indices, "cortex.rna.seq.cor"]))
+   checkEqualsNumeric(incoming.correlations, inscribed.correlations)
+   lapply(tbl, class)
+
+} # test_addFeature.correlated.rnaseq
 #----------------------------------------------------------------------------------------------------
 if(!interactive()) runTests()

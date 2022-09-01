@@ -19,7 +19,8 @@ import data.table
 \item \href{#method-FeatureTable-new}{\code{FeatureTable$new()}}
 \item \href{#method-FeatureTable-getTable}{\code{FeatureTable$getTable()}}
 \item \href{#method-FeatureTable-setFundamentalRegions}{\code{FeatureTable$setFundamentalRegions()}}
-\item \href{#method-FeatureTable-addFeature}{\code{FeatureTable$addFeature()}}
+\item \href{#method-FeatureTable-addRegionFeature}{\code{FeatureTable$addRegionFeature()}}
+\item \href{#method-FeatureTable-addGeneFeature}{\code{FeatureTable$addGeneFeature()}}
 \item \href{#method-FeatureTable-clone}{\code{FeatureTable$clone()}}
 }
 }
@@ -77,25 +78,46 @@ establish the basic genomic regions, typically
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-FeatureTable-addFeature"></a>}}
-\if{latex}{\out{\hypertarget{method-FeatureTable-addFeature}{}}}
-\subsection{Method \code{addFeature()}}{
+\if{html}{\out{<a id="method-FeatureTable-addRegionFeature"></a>}}
+\if{latex}{\out{\hypertarget{method-FeatureTable-addRegionFeature}{}}}
+\subsection{Method \code{addRegionFeature()}}{
 annotate each of the intersecting fundamental regions with
   the value of this feature
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FeatureTable$addFeature(tbl.feature, feature.genome, feature.guide)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{FeatureTable$addRegionFeature(tbl.feature, feature.genome, feature.guide)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{feature.genome}}{character, a recognized genome shorthand code, e.g., "hg38"}
-
-\item{\code{tbl.bed}}{a data.frame with chrom, start and end columns, and values
+\item{\code{tbl.feature}}{a data.frame with chrom, start and end columns, and values
 of interest described in the annotation guidel}
 
-\item{\code{annotation.guide}}{a neme list identifying columns of interest in
+\item{\code{feature.genome}}{character, a recognized genome shorthand code, e.g., "hg38"}
+
+\item{\code{feature.guide}}{a neme list identifying columns of interest in
 tbl.bed, and the column names to use for them in the feature table}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-FeatureTable-addGeneFeature"></a>}}
+\if{latex}{\out{\hypertarget{method-FeatureTable-addGeneFeature}{}}}
+\subsection{Method \code{addGeneFeature()}}{
+annotate each of TFs, via their associated  motif mapped to
+the genome, with the value of the feature described in the feature guide
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{FeatureTable$addGeneFeature(tbl.feature, feature.name)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{tbl.feature}}{a data.frame with gene and value columns, values
+of interest described in the featureguide}
+
+\item{\code{feature.name}}{character use this string to name the new column}
 }
 \if{html}{\out{</div>}}
 }

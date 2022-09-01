@@ -47,16 +47,16 @@ FeatureTable = R6Class("FeatureTable",
             private$tbl <- as.data.table(tbl.regions)
             },
 
-        #------------------------------------------------------------
+        #--------------------------------------------------------------------------
         #' @description annotate each of the intersecting fundamental regions with
         #'   the value of this feature
-        #' @param tbl.bed a data.frame with chrom, start and end columns, and values
+        #' @param tbl.feature a data.frame with chrom, start and end columns, and values
         #'        of interest described in the annotation guidel
         #' @param feature.genome character, a recognized genome shorthand code, e.g., "hg38"
 
-        #' @param annotation.guide a neme list identifying columns of interest in
+        #' @param feature.guide a neme list identifying columns of interest in
         #'       tbl.bed, and the column names to use for them in the feature table
-        addFeature = function(tbl.feature, feature.genome, feature.guide){
+        addRegionFeature = function(tbl.feature, feature.genome, feature.guide){
             stopifnot(all(c("chrom", "start", "end") %in% colnames(tbl.feature)))
             stopifnot(feature.genome == self$reference.genome)
             tbl.ov <- as.data.frame(findOverlaps(GRanges(tbl.feature), GRanges(private$tbl)))
@@ -68,7 +68,24 @@ FeatureTable = R6Class("FeatureTable",
                 vec[tbl.ov$subjectHits] <- tbl.feature[[source.feature.name]][tbl.ov$queryHits]
                 private$tbl[[feature]] <- vec
                 } # for feature
-            } # addFeature
+            }, # addRegionFeature
+
+        #------------------------------------------------------------------------
+        #' @description annotate each of TFs, via their associated  motif mapped to
+        #' the genome, with the value of the feature described in the feature guide
+        #'
+        #' @param tbl.feature a data.frame with gene and value columns, values
+        #'        of interest described in the featureguide
+        #' @param feature.name character use this string to name the new column
+        addGeneFeature = function(tbl.feature, feature.name){
+            stopifnot(colnames(tbl.feature)[1] == "gene")
+            stopifnot(ncol(tbl.feature) == 2)
+            tbl.match <- as.data.frame(findMatches(tbl.feature$gene, private$tbl$tf))
+            feature.class <- class(tbl.feature[,2])
+            vec <- vector(feature.class, length=nrow(private$tbl))
+            vec[tbl.match$subjectHits] <- tbl.feature[tbl.match$queryHits, 2]
+            private$tbl[[feature.name]] <- vec
+            } # addGeneFeature
 
        ) # public
 
