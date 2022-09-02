@@ -21,6 +21,7 @@ import data.table
 \item \href{#method-FeatureTable-setFundamentalRegions}{\code{FeatureTable$setFundamentalRegions()}}
 \item \href{#method-FeatureTable-addRegionFeature}{\code{FeatureTable$addRegionFeature()}}
 \item \href{#method-FeatureTable-addGeneFeature}{\code{FeatureTable$addGeneFeature()}}
+\item \href{#method-FeatureTable-addDistanceToTSS}{\code{FeatureTable$addDistanceToTSS()}}
 \item \href{#method-FeatureTable-clone}{\code{FeatureTable$clone()}}
 }
 }
@@ -84,7 +85,12 @@ establish the basic genomic regions, typically
 annotate each of the intersecting fundamental regions with
   the value of this feature
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FeatureTable$addRegionFeature(tbl.feature, feature.genome, feature.guide)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{FeatureTable$addRegionFeature(
+  tbl.feature,
+  feature.genome,
+  feature.guide,
+  default.values
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -97,6 +103,8 @@ of interest described in the annotation guidel}
 
 \item{\code{feature.guide}}{a neme list identifying columns of interest in
 tbl.bed, and the column names to use for them in the feature table}
+
+\item{\code{default.values}}{list matches feature.guide structure}
 }
 \if{html}{\out{</div>}}
 }
@@ -108,7 +116,7 @@ tbl.bed, and the column names to use for them in the feature table}
 annotate each of TFs, via their associated  motif mapped to
 the genome, with the value of the feature described in the feature guide
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FeatureTable$addGeneFeature(tbl.feature, feature.name)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{FeatureTable$addGeneFeature(tbl.feature, feature.name, default.value)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -118,6 +126,26 @@ the genome, with the value of the feature described in the feature guide
 of interest described in the featureguide}
 
 \item{\code{feature.name}}{character use this string to name the new column}
+
+\item{\code{default.value}}{any the value to assign unmatched genes}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-FeatureTable-addDistanceToTSS"></a>}}
+\if{latex}{\out{\hypertarget{method-FeatureTable-addDistanceToTSS}{}}}
+\subsection{Method \code{addDistanceToTSS()}}{
+annotate each region with a new column, the distance to TSS
+   upstream region starts will be negative, downstream will be positive
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{FeatureTable$addDistanceToTSS(tss.loc)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{tss.loc}}{integer}
 }
 \if{html}{\out{</div>}}
 }

@@ -53,10 +53,10 @@ FeatureTable = R6Class("FeatureTable",
         #' @param tbl.feature a data.frame with chrom, start and end columns, and values
         #'        of interest described in the annotation guidel
         #' @param feature.genome character, a recognized genome shorthand code, e.g., "hg38"
-
         #' @param feature.guide a neme list identifying columns of interest in
         #'       tbl.bed, and the column names to use for them in the feature table
-        addRegionFeature = function(tbl.feature, feature.genome, feature.guide){
+        #' @param default.values list matches feature.guide structure
+        addRegionFeature = function(tbl.feature, feature.genome, feature.guide, default.values){
             stopifnot(all(c("chrom", "start", "end") %in% colnames(tbl.feature)))
             stopifnot(feature.genome == self$reference.genome)
             tbl.ov <- as.data.frame(findOverlaps(GRanges(tbl.feature), GRanges(private$tbl)))
@@ -65,6 +65,7 @@ FeatureTable = R6Class("FeatureTable",
                 source.feature.name <- feature.guide[[feature]]
                 feature.class <- class(tbl.feature[[source.feature.name]])
                 vec <- vector(feature.class, length=nrow(private$tbl))
+                vec[seq_len(length(vec))] <- rep(default.values[[feature]], length(vec))
                 vec[tbl.ov$subjectHits] <- tbl.feature[[source.feature.name]][tbl.ov$queryHits]
                 private$tbl[[feature]] <- vec
                 } # for feature
@@ -77,15 +78,26 @@ FeatureTable = R6Class("FeatureTable",
         #' @param tbl.feature a data.frame with gene and value columns, values
         #'        of interest described in the featureguide
         #' @param feature.name character use this string to name the new column
-        addGeneFeature = function(tbl.feature, feature.name){
+        #' @param default.value any the value to assign unmatched genes
+        addGeneFeature = function(tbl.feature, feature.name, default.value){
             stopifnot(colnames(tbl.feature)[1] == "gene")
             stopifnot(ncol(tbl.feature) == 2)
             tbl.match <- as.data.frame(findMatches(tbl.feature$gene, private$tbl$tf))
             feature.class <- class(tbl.feature[,2])
             vec <- vector(feature.class, length=nrow(private$tbl))
+            vec[seq_len(length(vec))] <- rep(default.value, length(vec))
             vec[tbl.match$subjectHits] <- tbl.feature[tbl.match$queryHits, 2]
             private$tbl[[feature.name]] <- vec
-            } # addGeneFeature
+            }, # addGeneFeature
+
+        #--------------------------------------------------------------------------
+        #' @description annotate each region with a new column, the distance to TSS
+        #'    upstream region starts will be negative, downstream will be positive
+        #' @param tss.loc integer
+        addDistanceToTSS = function(tss.loc){
+            delta <- private$tbl$start - tss.loc
+            private$tbl$distanceToTSS <- delta
+            }
 
        ) # public
 
