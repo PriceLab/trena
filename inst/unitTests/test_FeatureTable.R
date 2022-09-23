@@ -112,13 +112,6 @@ test_addEmptyFeature <- function()
     default.values <- list(simple=FALSE)
     ft$addRegionFeature(tbl.empty, feature.genome="hg38", feature.guide, default.values)
 
-
-
-    tbl.simple$status <- TRUE
-    feature.guide <-  list(simple="status")
-    default.values <- list(simple=FALSE)
-    ft$addRegionFeature(tbl.simple, feature.genome="hg38", feature.guide, default.values)
-
     tbl <- ft$getTable()
     checkTrue(all(names(feature.guide) %in% colnames(tbl)))
     checkTrue(all(tbl$simple == FALSE))

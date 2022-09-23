@@ -59,20 +59,20 @@ FeatureTable = R6Class("FeatureTable",
         addRegionFeature = function(tbl.feature, feature.genome, feature.guide, default.values){
             stopifnot(all(c("chrom", "start", "end") %in% colnames(tbl.feature)))
             stopifnot(feature.genome == self$reference.genome)
-            if(nrow(tbl.feature) == 0){
-                for(feature in names(feature.guide)){
-                    source.feature.name <- feature.guide[[feature]]
-                    feature.class <- class(tbl.feature[[source.feature.name]])
-                    vec <- vector(feature.class, length=nrow(private$tbl))
-                    vec[seq_len(length(vec))] <- rep(default.values[[feature]], length(vec))
-                    private$tbl[[feature]] <- vec
-                    } # for feature
-                return()
-                } # empty table provided
+                # first add default values to all rows
+            for(feature in names(feature.guide)){
+                source.feature.name <- feature.guide[[feature]]
+                feature.class <- class(tbl.feature[[source.feature.name]])
+                vec <- vector(feature.class, length=nrow(private$tbl))
+                vec[seq_len(length(vec))] <- rep(default.values[[feature]], length(vec))
+                private$tbl[[feature]] <- vec
+               } # for feature
+            if(nrow(tbl.feature) == 0) return()
             gr.ov <- findOverlaps(GRanges(tbl.feature), GRanges(private$tbl))
             if(length(gr.ov) == 0) return()
-            tbl.ov <- as.data.frame(gv.ov)
+            tbl.ov <- as.data.frame(gr.ov)
             if(nrow(tbl.ov) == 0) return()
+                # todo: eliminate redundant initialization to default value, 6th line below
             for(feature in names(feature.guide)){
                 source.feature.name <- feature.guide[[feature]]
                 feature.class <- class(tbl.feature[[source.feature.name]])
