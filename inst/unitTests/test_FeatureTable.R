@@ -2,8 +2,6 @@ library(trena)
 library(RUnit)
 library(ghdb)
 #----------------------------------------------------------------------------------------------------
-f <- system.file(package="trena", "extdata", "featureTable", "tbl.fimo-ndufs2-47kb.RData")
-tbl.fimo <- get(load(f))
 tbl.fimo <- get(load("~/github/tms-makeAndBreak/studies/rs4575098-ndufs2-region/shared/tbl.fimo.NDUFS2.RData"))
 p.value.col <- grep("^p\\.value$", colnames(tbl.fimo))
 if(length(p.value.col) == 1)
@@ -13,6 +11,8 @@ runTests <- function()
 {
    test_ctor()
    test_setFundamentalRegions()
+   test_addSimpleOverlap()
+   test_addEmptyFeature()
    test_addRegionFeature.haploreg()
    test_addRegionFeature.eqtls.hg19()
    test_addGeneFeature.correlated.rnaseq()
@@ -71,6 +71,59 @@ test_addRegionFeature.haploreg <- function()
     checkTrue(nrow(subset(tbl, nchar(haploreg.rsid) > 0 & tf=="ZNF410")) >= 4)
 
 } # test_addRegionFeature.haploreg
+#----------------------------------------------------------------------------------------------------
+# sometimes the annotation to add has no data beyone
+test_addSimpleOverlap <- function()
+{
+    message(sprintf("--- test_addSimpleOverlap"))
+
+    ft <- FeatureTable$new(target.gene="NDUFS2", reference.genome="hg38")
+    ft$setFundamentalRegions(tbl.fimo)
+
+    base <- 161172691
+    tbl.simple <- data.frame(chrom="chr1", start=base, end=base+10)
+    tbl.simple$status <- TRUE
+    feature.guide <-  list(simple="status")
+    default.values <- list(simple=FALSE)
+    ft$addRegionFeature(tbl.simple, feature.genome="hg38", feature.guide, default.values)
+
+    tbl <- ft$getTable()
+    checkTrue(all(names(feature.guide) %in% colnames(tbl)))
+
+    tbl.sub <- subset(tbl, simple==TRUE)
+    checkEquals(nrow(tbl.sub), 38)
+
+       # every region in tbl.sub must have at least partial overlap with tbl.simple
+    overlaps <- as.data.frame(findOverlaps(GRanges(tbl.sub), GRanges(tbl.simple)))[, "queryHits"]
+    checkEquals(overlaps, seq_len(38))
+
+} # test_addSimpleOverlap
+#----------------------------------------------------------------------------------------------------
+test_addEmptyFeature <- function()
+{
+    message(sprintf("--- test_addEmptyFeature"))
+
+    ft <- FeatureTable$new(target.gene="NDUFS2", reference.genome="hg38")
+    ft$setFundamentalRegions(tbl.fimo)
+
+    tbl.empty <- data.frame(chrom=character(0), start=integer(0), end=integer(0), status=logical(0))
+    dim(tbl.empty)
+    feature.guide <-  list(simple="status")
+    default.values <- list(simple=FALSE)
+    ft$addRegionFeature(tbl.empty, feature.genome="hg38", feature.guide, default.values)
+
+
+
+    tbl.simple$status <- TRUE
+    feature.guide <-  list(simple="status")
+    default.values <- list(simple=FALSE)
+    ft$addRegionFeature(tbl.simple, feature.genome="hg38", feature.guide, default.values)
+
+    tbl <- ft$getTable()
+    checkTrue(all(names(feature.guide) %in% colnames(tbl)))
+    checkTrue(all(tbl$simple == FALSE))
+
+} # test_addEmptyFeature
 #----------------------------------------------------------------------------------------------------
 test_addRegionFeature.eqtls.hg19 <- function()
 {

@@ -59,7 +59,19 @@ FeatureTable = R6Class("FeatureTable",
         addRegionFeature = function(tbl.feature, feature.genome, feature.guide, default.values){
             stopifnot(all(c("chrom", "start", "end") %in% colnames(tbl.feature)))
             stopifnot(feature.genome == self$reference.genome)
-            tbl.ov <- as.data.frame(findOverlaps(GRanges(tbl.feature), GRanges(private$tbl)))
+            if(nrow(tbl.feature) == 0){
+                for(feature in names(feature.guide)){
+                    source.feature.name <- feature.guide[[feature]]
+                    feature.class <- class(tbl.feature[[source.feature.name]])
+                    vec <- vector(feature.class, length=nrow(private$tbl))
+                    vec[seq_len(length(vec))] <- rep(default.values[[feature]], length(vec))
+                    private$tbl[[feature]] <- vec
+                    } # for feature
+                return()
+                } # empty table provided
+            gr.ov <- findOverlaps(GRanges(tbl.feature), GRanges(private$tbl))
+            if(length(gr.ov) == 0) return()
+            tbl.ov <- as.data.frame(gv.ov)
             if(nrow(tbl.ov) == 0) return()
             for(feature in names(feature.guide)){
                 source.feature.name <- feature.guide[[feature]]
