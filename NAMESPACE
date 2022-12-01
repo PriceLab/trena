@@ -3,6 +3,7 @@
 export(BicorSolver)
 export(CandidateFilter)
 export(EnsembleSolver)
+export(FeatureTable)
 export(FootprintFilter)
 export(FootprintFinder)
 export(GeneOntologyFilter)
