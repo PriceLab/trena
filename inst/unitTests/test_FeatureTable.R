@@ -2,7 +2,12 @@ library(trena)
 library(RUnit)
 library(ghdb)
 #----------------------------------------------------------------------------------------------------
-tbl.fimo <- get(load("~/github/tms-makeAndBreak/studies/rs4575098-ndufs2-region/shared/tbl.fimo.NDUFS2.RData"))
+#tbl.fimo.full <- get(load("~/github/tms-makeAndBreak/studies/rs4575098-ndufs2-region/shared/tbl.fimo.NDUFS2.RData"))
+#dim(tbl.fimo.full)
+tbl.fimo <- get(load(system.file(package="trena", "extdata/featureTableFimoTable.79611x9.RData")))
+subset(tbl.fimo, start >= 161182729 & end <= 161217566)
+
+dim(tbl.fimo)
 p.value.col <- grep("^p\\.value$", colnames(tbl.fimo))
 if(length(p.value.col) == 1)
     colnames(tbl.fimo)[p.value.col] <- "fimo.pval"
@@ -40,10 +45,9 @@ test_setFundamentalRegions <- function()
     ft <- FeatureTable$new(target.gene="NDUFS2", reference.genome="hg38")
 
     ft$setFundamentalRegions(tbl.fimo)
-    #ft$setFundamentalRegions(tbl.fimo)
     tbl <- ft$getTable()
     checkTrue(ncol(tbl) == 9)
-    checkTrue(nrow(tbl) > 2000000)
+    checkTrue(nrow(tbl) > 75000)
 
 
 } # test_setFundamentalRegions
@@ -68,7 +72,7 @@ test_addRegionFeature.haploreg <- function()
     tbl <- ft$getTable()
     checkTrue(all(names(feature.guide) %in% colnames(tbl)))
 
-    checkTrue(nrow(subset(tbl, nchar(haploreg.rsid) > 0 & tf=="ZNF410")) >= 4)
+    checkTrue(nrow(subset(tbl, nchar(haploreg.rsid) > 0 & tf=="ZNF410")) >= 3)
 
 } # test_addRegionFeature.haploreg
 #----------------------------------------------------------------------------------------------------
@@ -80,7 +84,7 @@ test_addSimpleOverlap <- function()
     ft <- FeatureTable$new(target.gene="NDUFS2", reference.genome="hg38")
     ft$setFundamentalRegions(tbl.fimo)
 
-    base <- 161172691
+    base <- 161182740
     tbl.simple <- data.frame(chrom="chr1", start=base, end=base+10)
     tbl.simple$status <- TRUE
     feature.guide <-  list(simple="status")
@@ -91,11 +95,11 @@ test_addSimpleOverlap <- function()
     checkTrue(all(names(feature.guide) %in% colnames(tbl)))
 
     tbl.sub <- subset(tbl, simple==TRUE)
-    checkEquals(nrow(tbl.sub), 38)
+    checkEquals(nrow(tbl.sub), 39)
 
        # every region in tbl.sub must have at least partial overlap with tbl.simple
     overlaps <- as.data.frame(findOverlaps(GRanges(tbl.sub), GRanges(tbl.simple)))[, "queryHits"]
-    checkEquals(overlaps, seq_len(38))
+    checkEquals(overlaps, seq_len(39))
 
 } # test_addSimpleOverlap
 #----------------------------------------------------------------------------------------------------
@@ -139,7 +143,7 @@ test_addRegionFeature.eqtls.hg19 <- function()
     tbl <- ft$getTable()
     checkTrue(all(names(feature.guide) %in% colnames(tbl)))
     table(tbl$rosmap.eqtl.rsid)
-    checkTrue(nrow(subset(tbl, rosmap.eqtl.rsid=="")) > 2116200)
+    checkTrue(nrow(subset(tbl, rosmap.eqtl.rsid=="")) > 75000)
 
 } # test_addRegionFeature.eqtls.hg19
 #----------------------------------------------------------------------------------------------------
@@ -205,7 +209,7 @@ test_addGeneHancer <- function()
 
     tbl <- ft$getTable()
     checkEquals(nrow(subset(tbl, gh.any.tissue.score > 260)), 28220)
-    checkTrue(nrow(subset(tbl, gh.any.tissue.score > 10 & gh.any.tissue.score < 20)) > 30000)
+    checkTrue(nrow(subset(tbl, gh.any.tissue.score > 10 & gh.any.tissue.score < 20)) > 8000)
 
 } # test_addGeneHancer
 #----------------------------------------------------------------------------------------------------
@@ -235,7 +239,8 @@ demo <- function()
    tbl.haplo$end   <- tbl.haplo$hg38
 
    feature.guide <- list(haploreg.rsid="rsid", haploreg.rSquared="rSquared")
-   ft$addRegionFeature(tbl.haplo, feature.genome="hg38", feature.guide)
+   default.values <- list(haploreg.rsid=NA,    haploreg.rSquared=0)
+   ft$addRegionFeature(tbl.haplo, feature.genome="hg38", feature.guide, default.values)
 
    tbl.eqtl <- get(load(system.file(package="trena", "extdata", "featureTable", "eqtls.ndufs2.hg19.RData")))
    tbl.eqtl <- subset(tbl.eqtl, study=="ampad-rosmap")
@@ -245,7 +250,8 @@ demo <- function()
    tbl.eqtl$end <- tbl.eqtl$hg38
 
    feature.guide <- list(rosmap.eqtl.rsid="rsid", rosmap.eqtl.pvalue="pvalue")
-   ft$addRegionFeature(tbl.eqtl, feature.genome="hg38", feature.guide)
+   default.values <- list(rosmap.eqtl.rsid=NA, rosmap.eqtl.pvalue=1.0)
+   ft$addRegionFeature(tbl.eqtl, feature.genome="hg38", feature.guide, default.values)
 
    f <- system.file(package="trena", "extdata", "featureTable", "rna-seq.ndufs2.cor-gtex-cortex.RData")
    tbl.cor <- get(load(f))
@@ -253,12 +259,12 @@ demo <- function()
    checkEquals(dim(tbl.cor), c(24821, 2))
 
    feature.col.name <- "cortex.rna.seq.cor"
-   ft$addGeneFeature(tbl.cor, feature.name=feature.col.name)
+   ft$addGeneFeature(tbl.cor, feature.name=feature.col.name, default.value=0)
 
    tbl <- ft$getTable()
    dim(tbl)
    colnames(tbl)
-   coi <- c("tf", "cortex.rna.seq.dor", "rosmap.eqtl.pvalue", "chrom", "start", "end")
+   coi <- c("tf", "cortex.rna.seq.cor", "rosmap.eqtl.pvalue", "chrom", "start", "end")
    tbl <- tbl[, ..coi]
    tbl$rosmap.eqtl.pvalue <- -log10(tbl$rosmap.eqtl.pvalue+000001)
    colnames(tbl)[6] <- "rosmap.eqtl.score"
