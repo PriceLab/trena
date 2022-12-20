@@ -1,8 +1,9 @@
 library(trena)
 library(ghdb)
+library(igvR)
 
-if(!exists("igv"))
-    igv <- start.igv("NDUFS2", "hg38")
+if(interactive())
+   igv <- start.igv("NDUFS2", "hg38")
 
 ghdb <- GeneHancerDB()
 targetGene <- "NDUFS2"
@@ -10,7 +11,7 @@ tbl.gh <- retrieveEnhancersFromDatabase(ghdb, targetGene, tissues="all")
 tbl.gh$score <- asinh(tbl.gh$combinedscore)
 track <- DataFrameQuantitativeTrack("GH", tbl.gh[, c("chrom", "start", "end", "score")],
                                     autoscale=TRUE, color="black")
-displayTrack(igv, track)
+if(interactive()) displayTrack(igv, track)
 
 data.dir <- "~/github/tms-makeAndBreak/studies/rs4575098-ndufs2-region/shared"
                 # haploreg-rs4575098-0.2.tsv
@@ -35,7 +36,7 @@ dim(tbl.fimo)   #  828415      9
 tbl.track <- tbl.fimo[, c("chrom", "start", "end", "p.value")]
 tbl.track$p.value <- -log10(tbl.track$p.value)
 track <- DataFrameQuantitativeTrack("fimo", tbl.track, autoscale=TRUE, color="darkred")
-displayTrack(igv, track)
+if(interactive()) displayTrack(igv, track)
 ft$setFundamentalRegions(tbl.fimo)
 
    #-------------------------------------------------------------------
@@ -57,7 +58,7 @@ tbl.eqtl.gtex.ready <- tbl.eqtl.gtex[, c("chrom", "start", "end", "pvalue", "sco
 track <- DataFrameQuantitativeTrack("gtex cortex",
                                     tbl.eqtl.gtex.ready[, c("chrom", "start", "end", "score")],
                                     autoscale=FALSE, min=0, max=18, color="magenta")
-displayTrack(igv, track)
+if(interactive()) displayTrack(igv, track)
 
 feature.guide <- list(gtex.eqtl.rsid="rsid", gtex.eqtl.pvalue="pvalue")
 default.values <- list(gtex.eqtl.rsid="", gtex.eqtl.pvalue=1)
@@ -80,7 +81,7 @@ tbl.eqtl.rosmap.ready$end <- tbl.eqtl.rosmap$hg38
 track <- DataFrameQuantitativeTrack("rosmap eqtl",
                                     tbl.eqtl.rosmap.ready[, c("chrom", "start", "end", "score")],
                                     autoscale=FALSE, min=0, max=18, color="random")
-displayTrack(igv, track)
+if(interactive()) displayTrack(igv, track)
 
 feature.guide <- list(rosmap.eqtl.rsid="rsid", rosmap.eqtl.pvalue="pvalue")
 default.values <- list(rosmap.eqtl.rsid="", rosmap.eqtl.pvalue=1)
@@ -99,7 +100,7 @@ tbl.mayoAtac <- subset(tbl.mayoAtac, chrom==tbl.eqtl.rosmap$chrom[1] &
                                      end   <= max(tbl.eqtl.rosmap$hg38) + 1000)
 dim(tbl.mayoAtac)  # 36 5
 track <- DataFrameAnnotationTrack("mayo atac", tbl.mayoAtac, color="random")
-displayTrack(igv, track)
+if(interactive()) displayTrack(igv, track)
 
 tbl.mayoAtac$status <- TRUE   # we don't have scores, alas
 feature.guide <- list(mayo.atac="status")
@@ -111,14 +112,14 @@ ft$addRegionFeature(tbl.mayoAtac, feature.genome="hg38", feature.guide, default.
    # add the small set of eQTL european haplotype scores from haploreg
    #-------------------------------------------------------------------
 
-f <- system.file(package="trena", "extdata", "featureTable", "tbl.haploreg.european.rs4575098.RData")
+# f <- system.file(package="trena", "extdata", "featureTable", "tbl.haploreg.european.rs4575098.RData")
 tbl.haplo <- read.table(file.path(data.dir, "haploreg-rs4575098-0.2.tsv"), sep="\t", header=TRUE)
 dim(tbl.haplo)
 tbl.haplo$start <- tbl.haplo$hg38 - 1
 tbl.haplo$end   <- tbl.haplo$hg38
 track <- DataFrameQuantitativeTrack("haploreg", tbl.haplo[, c("chrom", "start", "end", "rSquared")],
                                     autoscale=FALSE, min=0, max=1)
-displayTrack(igv, track)
+if(interactive()) displayTrack(igv, track)
 
 feature.guide <-  list(haploreg.rsid="rsid", haploreg.rSquared="rSquared")
 default.values <- list(haploreg.rsid="",     haploreg.rSquared=0)
@@ -157,23 +158,23 @@ tbl.ft <- ft$getTable()
    # add simulated enhancer promoter interactions
    #-------------------------------------------------------------------------
 
-library(GenomicRanges)
-library(annotatr)
-library(TxDb.Hsapiens.UCSC.hg38.knownGene)
-annotation.sought <- "hg38_genes_promoters"
-annotations <- build_annotations(genome="hg38", annotations=annotation.sought)
-gr.atac <- GRanges(tbl.mayoAtac)
-tbl.ov <- as.data.frame(findOverlaps(gr.atac, annotations))
-
-
-tbl.atac.promoters <- tbl.mayoAtac[tbl.ov[,1],]
-keepers <- tbl.ov[,2]
-tbl.atac.promoters$gene <- annotations[keepers]$symbol
-rownames(tbl.atac.promoters) <- NULL
-tbl.atac.promoters <- unique(subset(tbl.atac.promoters, gene==targetGene))
-dim(tbl.atac.promoters) #   1 7 -> of all the mayo atac, only  chr1:161201843-16120272
-                        #  is annotated as an NDUFS2 promoter
-with(tbl.atac.promoters, 1 + end - start)  # 878
+# library(GenomicRanges)
+# library(annotatr)
+# library(TxDb.Hsapiens.UCSC.hg38.knownGene)
+# annotation.sought <- "hg38_genes_promoters"
+# annotations <- build_annotations(genome="hg38", annotations=annotation.sought)
+# gr.atac <- GRanges(tbl.mayoAtac)
+# tbl.ov <- as.data.frame(findOverlaps(gr.atac, annotations))
+#
+#
+# tbl.atac.promoters <- tbl.mayoAtac[tbl.ov[,1],]
+# keepers <- tbl.ov[,2]
+# tbl.atac.promoters$gene <- annotations[keepers]$symbol
+# rownames(tbl.atac.promoters) <- NULL
+# tbl.atac.promoters <- unique(subset(tbl.atac.promoters, gene==targetGene))
+# dim(tbl.atac.promoters) #   1 7 -> of all the mayo atac, only  chr1:161201843-16120272
+#                         #  is annotated as an NDUFS2 promoter
+# with(tbl.atac.promoters, 1 + end - start)  # 878
 
 
 # generate some random enhancer/promoter links which
@@ -181,46 +182,49 @@ with(tbl.atac.promoters, 1 + end - start)  # 878
 #    terminate within this 879 bp promoter
 # how large are these regions reported to be?
 #
-tbl.pe <- read.table("~/github/igvR/inst/extdata/gm12878_loops.bedpe.gz", sep="\t")
-colnames(tbl.pe) <- c("chr1", "start1", "end1", "chr1", "start2", "end2")
-with(tbl.pe, fivenum(end1-start1))  # 5000  5000  5000 10000 10000
-with(tbl.pe, fivenum(end2-start2))  # 5000  5000  5000 10000 10000
-
-  # 	Targeted high-resolution chromosome conformation capture at genome-wide scale in mouse erythroid cells
-tbl.view <- read.table("GSE160229_Capture_Viewpoints.txt.gz", sep="\t", nrow=-1)
-dim(tbl.view) # 7197    4
-head(tbl.view)
-colnames(tbl.view) <- c("gene", "chrom", "start", "end")
-tbl.view$end <- as.numeric(tbl.view$end)
-
-fivenum(tbl.view$end-tbl.view$start)  # 69.0       461.0       745.0      1167.5 207101398.0
-order(table(tbl.view$end-tbl.view$start))
-   # from this, a leap:  imaginge that actual binding sites as 70 bp
-
-
-tbl.atac.promoters
+# tbl.pe <- read.table("~/github/igvR/inst/extdata/gm12878_loops.bedpe.gz", sep="\t")
+# colnames(tbl.pe) <- c("chr1", "start1", "end1", "chr1", "start2", "end2")
+# with(tbl.pe, fivenum(end1-start1))  # 5000  5000  5000 10000 10000
+# with(tbl.pe, fivenum(end2-start2))  # 5000  5000  5000 10000 10000
+#
+#   # 	Targeted high-resolution chromosome conformation capture at genome-wide scale in mouse erythroid cells
+# tbl.view <- read.table("GSE160229_Capture_Viewpoints.txt.gz", sep="\t", nrow=-1)
+# dim(tbl.view) # 7197    4
+# head(tbl.view)
+# colnames(tbl.view) <- c("gene", "chrom", "start", "end")
+# tbl.view$end <- as.numeric(tbl.view$end)
+#
+# fivenum(tbl.view$end-tbl.view$start)  # 69.0       461.0       745.0      1167.5 207101398.0
+# order(table(tbl.view$end-tbl.view$start))
+#    # from this, a leap:  imaginge that actual binding sites as 70 bp
+#
+#
+# tbl.atac.promoters
 #      chrom     start       end width strand status   gene
 #       chr1 161201843 161202721   879      *   TRUE NDUFS2
 # create 20 landing sites in the promoter
 
-starts <- sample(161201843:(161202721-70), size=nrow(tbl.mayoAtac))
-tbl.landing <- data.frame(chrom="chr1", start=starts, end=(starts+70))
-starts <- unlist(lapply(seq_len(nrow(tbl.mayoAtac)),
-       function(r) {
-           start <- tbl.mayoAtac[r, "start"];
-           end   <- tbl.mayoAtac[r,"end"]
-           sample(start: end-70, size=1)
-           }))
-tbl.launch <- data.frame(chrom="chr1", start=starts, endd=starts+70)
-tbl.pe <- cbind(tbl.launch, tbl.landing)
-colnames(tbl.pe) <- c("chrom1", "start1", "end1", "chrom2", "start2", "end2")
-dim(tbl.pe)
-random.subset <- sample(seq_len(nrow(tbl.pe)), size=5)
-tbl.pe <- tbl.pe[random.subset,]
-rownames(tbl.pe) <- NULL
+# starts <- sample(161201843:(161202721-70), size=nrow(tbl.mayoAtac))
+# tbl.landing <- data.frame(chrom="chr1", start=starts, end=(starts+70))
+# starts <- unlist(lapply(seq_len(nrow(tbl.mayoAtac)),
+#        function(r) {
+#            start <- tbl.mayoAtac[r, "start"];
+#            end   <- tbl.mayoAtac[r,"end"]
+#            sample(start: end-70, size=1)
+#            }))
+# tbl.launch <- data.frame(chrom="chr1", start=starts, endd=starts+70)
+# tbl.pe <- cbind(tbl.launch, tbl.landing)
+# colnames(tbl.pe) <- c("chrom1", "start1", "end1", "chrom2", "start2", "end2")
+# dim(tbl.pe)
+# random.subset <- sample(seq_len(nrow(tbl.pe)), size=5)
+# tbl.pe <- tbl.pe[random.subset,]
+# rownames(tbl.pe) <- NULL
+#
+data.dir.5 <- "."
+tbl.pe <- get(load(file.path(data.dir.5, "tbl.pairedEnd.small.NDUFS2.RData")))
 
 track <- BedpeInteractionsTrack("simulated 3c", tbl.pe, color="darkgreen", trackHeight=100)
-displayTrack(igv, track)
+if(interactive()) displayTrack(igv, track)
 
     #------------------------------------------------------------
     # any tfbs which is on either end of these paired end relations
@@ -243,35 +247,17 @@ colnames(tbl.landing) <- c("chrom", "start", "end")
 tbl.landing$status <- TRUE
 ft$addRegionFeature(tbl.landing, feature.genome="hg38", feature.guide, default.values)
 
+
 tbl.ft <- ft$getTable()
 dim(tbl.ft)   # 2117704      19
 tfs <- unique(tbl.ft$tf)
 length(tfs)  # 535
 
-tbl.f0 <- subset(tbl.ft, landing.3c | launch.3c & rosmap.eqtl.pvalue < 0.05)
-length(unique(tbl.f0$tf))  # 275
+  # tbl.fft: FilteredFeatureTable
 
-tbl.f0 <- tbl.ft
-tbl.f1 <- subset(tbl.f0, rosmap.eqtl.pvalue < 0.01)
-tfs <- unique(tbl.f1$tf)
-length(tfs)  # 460
-
-tbl.f0 <- tbl.ft
-tbl.f1 <- subset(tbl.f0, gtex.eqtl.pvalue < 0.01)
-tfs <- unique(tbl.f1$tf)
-length(tfs)  # 352
-
-tbl.f1 <- subset(tbl.f0, gtex.eqtl.pvalue < 0.01 & rosmap.eqtl.pvalue < 0.01)
-tfs <- unique(tbl.f1$tf)
+tbl.fft <- subset(tbl.ft, gtex.eqtl.pvalue < 0.01 & rosmap.eqtl.pvalue < 0.01)
+tfs <- unique(tbl.fft$tf)
 length(tfs)  # 266
-
-tbl.f2 <- subset(tbl.f1, abs(gtex.cortex.rna.cor) > 0.4 )
-tfs <- unique(tbl.f2$tf)
-length(tfs)  # 75
-
-tbl.f3 <- subset(tbl.f2, mayo.atac)
-tfs <- unique(tbl.f3$tf)
-length(tfs)  # 5
 
 
 solvers <- c("lasso", "Ridge", "Spearman", "Pearson", "RandomForest")
@@ -279,7 +265,6 @@ solvers <- c("lasso", "Ridge", "Spearman", "Pearson", "RandomForest")
 solver <- EnsembleSolver(mtx,  targetGene, tfs, solverNames=solvers)
 system.time(tbl.trena <- run(solver))
 
-tbl.fft <- tbl.f1
 tbl.trena$tfbs <- as.integer(lapply(tbl.trena$gene, function(gene) nrow(subset(tbl.fft, tf==gene))))
 gtex.eqtl.column.name <- "gtex.eqtl.rsid"
 
@@ -299,4 +284,4 @@ tbl.trena$pearsonCoeff <- round(tbl.trena$pearsonCoeff, digits=3)
 tbl.trena$rfScore <- round(tbl.trena$rfScore, digits=3)
 
 wdth(1000)
-tbl.trena
+print(tbl.trena)
