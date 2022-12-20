@@ -13,13 +13,7 @@ track <- DataFrameQuantitativeTrack("GH", tbl.gh[, c("chrom", "start", "end", "s
                                     autoscale=TRUE, color="black")
 if(interactive()) displayTrack(igv, track)
 
-data.dir <- "~/github/tms-makeAndBreak/studies/rs4575098-ndufs2-region/shared"
-                # haploreg-rs4575098-0.2.tsv
-                # 1883.rosmap.snps.from.fimo.region.for.motifbreakR.RData
-                # tbl.fimo.NDUFS2.RData
-                # gtex.brain.eqtls.chr1-160684126-161688825.RData
-
-data.dir.2 <- "~/github/tms-makeAndBreak/studies/rs4575098-ndufs2-region/ndufs2"
+data.dir <- "data"
 
    #-----------------------------------------------------------------------------------
    # create the FeatureTable, initialize with fimo results trimmed to GeneHancer range
@@ -69,7 +63,7 @@ ft$addRegionFeature(tbl.eqtl.gtex.ready, feature.genome="hg38", feature.guide, d
    # add rosmap brain eQTLs for NDUFS2
    #-------------------------------------------------------------------
 
-tbl.eqtl.rosmap <- get(load(file.path(data.dir.2, "rosmap.eqtls.RData")))
+tbl.eqtl.rosmap <- get(load(file.path(data.dir, "rosmap.eqtls.RData")))
 dim(tbl.eqtl.rosmap)   # 1894 14
 tbl.eqtl.rosmap <- subset(tbl.eqtl.rosmap, pvalue < 0.10)
 dim(tbl.eqtl.rosmap)   #  346 14
@@ -91,9 +85,8 @@ ft$addRegionFeature(tbl.eqtl.rosmap.ready, feature.genome="hg38", feature.guide,
    # add mayo atac
    #-------------------------------------------------------------------
 
-data.dir.3 <- "~/github/TrenaProjectAD/inst/extdata/genomicRegions"
 filename <- "mayoAllPeaks.merged.96064x4.RData"
-tbl.mayoAtac <- get(load(file.path(data.dir.3, filename)))
+tbl.mayoAtac <- get(load(file.path(data.dir, filename)))
 dim(tbl.mayoAtac)
 tbl.mayoAtac <- subset(tbl.mayoAtac, chrom==tbl.eqtl.rosmap$chrom[1] &
                                      start >= min(tbl.eqtl.rosmap$hg38) - 1000 &
@@ -129,8 +122,7 @@ ft$addRegionFeature(tbl.haplo, feature.genome="hg38", feature.guide, default.val
    # add NDUFS2/TF correlated expression scores from GTEx Brain_Cortex.RData
    #-------------------------------------------------------------------------
 
-data.dir.4 <- "~/github/TrenaProjectAD/inst/extdata/expression/gtex.v8"
-mtx <- get(load(file.path(data.dir.4, "Brain_Cortex.RData")))
+mtx <- get(load(file.path(data.dir, "Brain_Cortex.RData")))
 dim(mtx)   # 24821 206
 
 
@@ -220,8 +212,7 @@ tbl.ft <- ft$getTable()
 # tbl.pe <- tbl.pe[random.subset,]
 # rownames(tbl.pe) <- NULL
 #
-data.dir.5 <- "."
-tbl.pe <- get(load(file.path(data.dir.5, "tbl.pairedEnd.small.NDUFS2.RData")))
+tbl.pe <- get(load(file.path(data.dir, "tbl.pairedEnd.small.NDUFS2.RData")))
 
 track <- BedpeInteractionsTrack("simulated 3c", tbl.pe, color="darkgreen", trackHeight=100)
 if(interactive()) displayTrack(igv, track)
