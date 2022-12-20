@@ -1,0 +1,11 @@
+from bioconductor/bioconductor_docker
+
+ADD components/.bashrc /root/.bashrc
+RUN mkdir /usr/local/scripts
+RUN mkdir /usr/local/data
+COPY components/installPackages-1.R /usr/local/scripts/
+RUN R -f /usr/local/scripts/installPackages-1.R
+
+USER root
+
+

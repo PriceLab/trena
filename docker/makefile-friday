@@ -20,15 +20,9 @@ build.2.noCache:
 
 bash.1:
 	$(DOCKER) run -ti --rm $(IMG) bash
+
 bash.2:
 	$(DOCKER) run \
-           -v /Users/paul/github/trena/docker/results:/usr/local/data/results \
-           -v /Users/paul/github/trena/docker/inputs:/usr/local/data/inputs \
+           -v /users/pshannon/github/bigFimo/docker/results:/usr/local/data/results \
+           -v /users/pshannon/github/bigFimo/docker/inputs:/usr/local/data/inputs \
            -ti $(IMG2) bash
-
-test:
-	$(DOCKER) run \
-           -v /Users/paul/github/trena/docker/results:/usr/local/data/results \
-           -v /Users/paul/github/trena/docker/inputs:/usr/local/data/inputs \
-           -ti $(IMG2) R -f /usr/local/scripts/test_FeatureTable.R
-

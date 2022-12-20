@@ -1,0 +1,8 @@
+FROM trenabase
+RUN mkdir /usr/local/data/inputs
+RUN mkdir /usr/local/data/results
+COPY components/installPackages-2.R /usr/local/scripts/
+COPY components/test_FeatureTable.R /usr/local/scripts/
+RUN R -f /usr/local/scripts/installPackages-2.R
+
+USER root
