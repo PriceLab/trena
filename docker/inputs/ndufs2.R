@@ -1,6 +1,7 @@
 library(trena)
 library(ghdb)
 
+printf <- function(...) print(noquote(sprintf(...)))
 
 ghdb <- GeneHancerDB()
 targetGene <- "NDUFS2"
@@ -252,3 +253,7 @@ tbl.trena$rfScore <- round(tbl.trena$rfScore, digits=3)
 
 options(width=1000)
 print(tbl.trena)
+outfile <- sprintf("../results/%s-results.tsv", targetGene)
+
+printf("writing %d rows, %d cols to %s", nrow(tbl.trena), ncol(tbl.trena), outfile)
+write.table(tbl.trena, file=outfile, sep="\t", row.names=FALSE, col.names=TRUE, quote=FALSE)
