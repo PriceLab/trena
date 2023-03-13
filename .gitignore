@@ -1,3 +1,5 @@
+*.RData
+*.pdf
 .DS_Store
 Meta
 doc
