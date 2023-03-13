@@ -1,17 +1,11 @@
 library(trena)
 library(ghdb)
-library(igvR)
 
-if(interactive())
-   igv <- start.igv("NDUFS2", "hg38")
 
 ghdb <- GeneHancerDB()
 targetGene <- "NDUFS2"
 tbl.gh <- retrieveEnhancersFromDatabase(ghdb, targetGene, tissues="all")
 tbl.gh$score <- asinh(tbl.gh$combinedscore)
-track <- DataFrameQuantitativeTrack("GH", tbl.gh[, c("chrom", "start", "end", "score")],
-                                    autoscale=TRUE, color="black")
-if(interactive()) displayTrack(igv, track)
 
 data.dir <- "data"
 
@@ -29,8 +23,7 @@ tbl.fimo <- subset(tbl.fimo, start > (min(tbl.gh$start) - 1000) &
 dim(tbl.fimo)   #  828415      9
 tbl.track <- tbl.fimo[, c("chrom", "start", "end", "p.value")]
 tbl.track$p.value <- -log10(tbl.track$p.value)
-track <- DataFrameQuantitativeTrack("fimo", tbl.track, autoscale=TRUE, color="darkred")
-if(interactive()) displayTrack(igv, track)
+
 ft$setFundamentalRegions(tbl.fimo)
 
    #-------------------------------------------------------------------
@@ -49,10 +42,6 @@ tbl.eqtl.gtex$start <- tbl.eqtl.gtex$hg38 - 1
 tbl.eqtl.gtex$end <- tbl.eqtl.gtex$hg38
 
 tbl.eqtl.gtex.ready <- tbl.eqtl.gtex[, c("chrom", "start", "end", "pvalue", "score", "rsid")]
-track <- DataFrameQuantitativeTrack("gtex cortex",
-                                    tbl.eqtl.gtex.ready[, c("chrom", "start", "end", "score")],
-                                    autoscale=FALSE, min=0, max=18, color="magenta")
-if(interactive()) displayTrack(igv, track)
 
 feature.guide <- list(gtex.eqtl.rsid="rsid", gtex.eqtl.pvalue="pvalue")
 default.values <- list(gtex.eqtl.rsid="", gtex.eqtl.pvalue=1)
@@ -72,11 +61,6 @@ tbl.eqtl.rosmap.ready$score <- -log10(tbl.eqtl.rosmap$pvalue)
 tbl.eqtl.rosmap.ready$start <- tbl.eqtl.rosmap$hg38 - 1
 tbl.eqtl.rosmap.ready$end <- tbl.eqtl.rosmap$hg38
 
-track <- DataFrameQuantitativeTrack("rosmap eqtl",
-                                    tbl.eqtl.rosmap.ready[, c("chrom", "start", "end", "score")],
-                                    autoscale=FALSE, min=0, max=18, color="random")
-if(interactive()) displayTrack(igv, track)
-
 feature.guide <- list(rosmap.eqtl.rsid="rsid", rosmap.eqtl.pvalue="pvalue")
 default.values <- list(rosmap.eqtl.rsid="", rosmap.eqtl.pvalue=1)
 ft$addRegionFeature(tbl.eqtl.rosmap.ready, feature.genome="hg38", feature.guide, default.values)
@@ -92,8 +76,6 @@ tbl.mayoAtac <- subset(tbl.mayoAtac, chrom==tbl.eqtl.rosmap$chrom[1] &
                                      start >= min(tbl.eqtl.rosmap$hg38) - 1000 &
                                      end   <= max(tbl.eqtl.rosmap$hg38) + 1000)
 dim(tbl.mayoAtac)  # 36 5
-track <- DataFrameAnnotationTrack("mayo atac", tbl.mayoAtac, color="random")
-if(interactive()) displayTrack(igv, track)
 
 tbl.mayoAtac$status <- TRUE   # we don't have scores, alas
 feature.guide <- list(mayo.atac="status")
@@ -110,9 +92,6 @@ tbl.haplo <- read.table(file.path(data.dir, "haploreg-rs4575098-0.2.tsv"), sep="
 dim(tbl.haplo)
 tbl.haplo$start <- tbl.haplo$hg38 - 1
 tbl.haplo$end   <- tbl.haplo$hg38
-track <- DataFrameQuantitativeTrack("haploreg", tbl.haplo[, c("chrom", "start", "end", "rSquared")],
-                                    autoscale=FALSE, min=0, max=1)
-if(interactive()) displayTrack(igv, track)
 
 feature.guide <-  list(haploreg.rsid="rsid", haploreg.rSquared="rSquared")
 default.values <- list(haploreg.rsid="",     haploreg.rSquared=0)
@@ -214,9 +193,6 @@ tbl.ft <- ft$getTable()
 #
 tbl.pe <- get(load(file.path(data.dir, "tbl.pairedEnd.small.NDUFS2.RData")))
 
-track <- BedpeInteractionsTrack("simulated 3c", tbl.pe, color="darkgreen", trackHeight=100)
-if(interactive()) displayTrack(igv, track)
-
     #------------------------------------------------------------
     # any tfbs which is on either end of these paired end relations
     # deserves to be annotated to reflect that.
@@ -274,5 +250,5 @@ tbl.trena$spearmanCoeff <- round(tbl.trena$spearmanCoeff, digits=3)
 tbl.trena$pearsonCoeff <- round(tbl.trena$pearsonCoeff, digits=3)
 tbl.trena$rfScore <- round(tbl.trena$rfScore, digits=3)
 
-wdth(1000)
+options(width=1000)
 print(tbl.trena)

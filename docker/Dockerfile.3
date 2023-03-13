@@ -1,0 +1,7 @@
+FROM trena2
+RUN mkdir /usr/local/data/inputs/ndufs2
+RUN mkdir /usr/local/data/inputs/ndufs2/data
+COPY components/ndufs2/ndufs2.R /usr/local/scripts/
+COPY components/ndufs2/data/* /usr/local/data/inputs/ndufs2/data/
+
+USER root
